@@ -1,0 +1,18 @@
+import axios from "axios";
+
+const axiosInstance = axios.create({
+  baseURL: "http://142.93.222.196:8001/api/v1/admin", 
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default axiosInstance;
