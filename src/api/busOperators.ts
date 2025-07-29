@@ -9,6 +9,6 @@ export const fetchBusOperators = async (): Promise<BusOperator[]> => {
     email: user.email,
     mobile: user.phoneNumber,
     status: user.verificationStatus,
-    numberOfBuses: 0, // or fetch separately if available
+    numberOfBuses: 0,
   }));
 };

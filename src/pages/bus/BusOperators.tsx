@@ -23,6 +23,7 @@ const BusOperators = () => {
         setOperators(data);
       } catch (error) {
         console.error("Failed to fetch bus operators", error);
+        setOperators(busOperators);
       } finally {
         setLoading(false);
       }
@@ -104,13 +105,13 @@ const BusOperators = () => {
           <h1 className="text-2xl font-bold">Bus Operators</h1>
           <p className="text-gray-600">Manage all bus operators</p>
         </div>
-        {/* <Button
+        <Button
           onClick={() => navigate("/bus-management/operators/new")}
           className="flex items-center gap-2"
         >
           <Plus size={18} />
           Add Bus Operator
-        </Button> */}
+        </Button>
       </div>
 
       <DataTable

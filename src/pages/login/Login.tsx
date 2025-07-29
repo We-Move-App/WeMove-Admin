@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "@/api/authApi";
+// import { loginUser } from "@/api/authApi";
 import loginBg from "@/assets/login-bg.png";
 
 const Login = () => {
@@ -10,31 +10,60 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   if (!email || !password) {
+  //     alert("Please enter email and password");
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+  //     const result = await loginUser({ username: email, password });
+  //     console.log("Login Success:", result);
+  //     const { accessToken, refreshToken } = result.data;
+  //     localStorage.setItem("accessToken", accessToken);
+  //     localStorage.setItem("refreshToken", refreshToken);
+
+  //     // Navigate to dashboard
+  //     navigate("/dashboard");
+  //   } catch (error: any) {
+  //     console.error("Login failed:", error.response?.data || error.message);
+  //     alert(error.response?.data?.message || "Login failed");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      alert("Please enter email and password");
-      return;
-    }
+    // Hardcoded credentials
+    const email = "demo@example.com";
+    const password = "password123";
 
     try {
       setLoading(true);
-      const result = await loginUser({ username: email, password });
-      console.log("Login Success:", result);
-      const { accessToken, refreshToken } = result.data;
+
+      // Simulate success without an API call
+      const accessToken = "mockAccessToken123";
+      const refreshToken = "mockRefreshToken456";
+
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
 
-      // Navigate to dashboard
+      console.log("Login Success: (mocked)");
       navigate("/dashboard");
     } catch (error: any) {
-      console.error("Login failed:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Login failed");
+      console.error("Login failed:", error.message);
+      alert("Login failed");
     } finally {
       setLoading(false);
     }
   };
+
+
 
   return (
     <div
@@ -59,13 +88,20 @@ const Login = () => {
             >
               Email
             </label>
-            <input
+            {/* <input
               id="email"
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-700 outline-none"
+            /> */}
+            <input
+              id="email"
+              type="email"
+              value="demo@example.com"
+              disabled
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-gray-100"
             />
           </div>
 
@@ -76,24 +112,31 @@ const Login = () => {
             >
               Password
             </label>
-            <input
+            {/* <input
               id="password"
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-700"
+            /> */}
+            <input
+              id="password"
+              type="password"
+              value="password123"
+              disabled
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-gray-100"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-2 rounded-xl text-white transition ${
-              loading ? "bg-green-700" : "bg-green-700 hover:bg-green-900"
-            }`}
+            className={`w-full py-2 rounded-xl text-white transition ${loading ? "bg-green-700" : "bg-green-700 hover:bg-green-900"
+              }`}
           >
-            {loading ? "Logging in..." : "Log In"}
+            {/* {loading ? "Logging in..." : "Log In"} */}
+            Log In
           </button>
         </form>
 
