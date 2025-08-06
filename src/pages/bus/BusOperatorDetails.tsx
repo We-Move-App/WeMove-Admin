@@ -23,9 +23,15 @@ const BusOperatorDetails = () => {
 
   const isNewOperator = id === "new";
   const pageTitle = isNewOperator ? "Add Bus Operator" : "Edit Bus Operator";
-
   const [isEditMode, setIsEditMode] = useState(isNewOperator);
-  const statusOptions = ["Approved", "Processing", "Submitted"];
+  const mode: 'add' | 'view' | 'edit' = isNewOperator
+    ? 'add'
+    : isEditMode
+      ? 'edit'
+      : 'view';
+
+
+  const statusOptions = ["approved", "processing", "submitted"];
   useEffect(() => {
     const fetchOperator = async () => {
       if (isNewOperator) {
@@ -36,15 +42,15 @@ const BusOperatorDetails = () => {
           email: "",
           status: "Pending",
           numberOfBuses: 0,
-          profilePhoto: dummyProfile,
+          profilePhoto: null,
           address: "",
-          idCardFront: dummyIdFront,
-          idCardBack: dummyIdBack,
-          businessLicense: dummyLicense,
+          idCardFront: null,
+          idCardBack: null,
+          businessLicense: null,
           bankName: "",
           bankAccountNumber: "",
           accountHolderName: "",
-          bankAccountDetails: dummyBankDetails,
+          bankAccountDetails: null,
         });
         setLoading(false);
         return;
@@ -54,27 +60,33 @@ const BusOperatorDetails = () => {
         const response = await axiosInstance.get(
           `/bus-management/bus-operators/${id}`
         );
-        const userData = response.data?.data?.user;
+        const data = response.data?.data;
+        const user = data?.user;
+        const docs = data?.docs?.documentIds || [];
+        const getDocUrl = (name: string) => {
+          return docs.find(doc => doc.documentName === name)?.file.url || null;
+        };
 
-        if (userData) {
+        if (user) {
           setOperator({
-            id: userData._id,
-            name: userData.fullName || "",
-            mobile: userData.phoneNumber || "",
-            email: userData.email || "",
-            status: userData.verificationStatus || "Pending",
+            id: user._id,
+            name: user.fullName || "",
+            mobile: user.phoneNumber || "",
+            email: user.email || "",
+            status: user.verificationStatus || "Pending",
             numberOfBuses: 0,
-            profilePhoto: userData.profilePhoto || dummyProfile,
-            address: "Some Address",
-            idCardFront: userData.idCardFront || dummyIdFront,
-            idCardBack: userData.idCardBack || dummyIdBack,
-            businessLicense: userData.businessLicense || dummyLicense,
-            bankName: "HDFC Bank",
-            bankAccountNumber: "Bank Account Number",
-            accountHolderName: userData.fullName || "",
-            bankAccountDetails: userData.bankAccountDetails || dummyBankDetails,
+            profilePhoto: user.avatar?.url || dummyProfile,
+            address: user?.companyAddress || "",
+            idCardFront: getDocUrl("national_identity_card_front") || dummyIdFront,
+            idCardBack: getDocUrl("national_identity_card_back") || dummyIdBack,
+            businessLicense: getDocUrl("business_license") || dummyLicense,
+            bankName: "",
+            bankAccountNumber: "",
+            accountHolderName: "",
+            bankAccountDetails: null,
           });
-        } else {
+        }
+        else {
           setOperator(null);
         }
       } catch (error) {
@@ -104,29 +116,89 @@ const BusOperatorDetails = () => {
     }
   };
 
-  const handleFileChange = (
-    fieldName: keyof BusOperator,
-    file: File | null
-  ) => {
-    if (operator) {
-      setOperator({
-        ...operator,
-        [fieldName]: file ? URL.createObjectURL(file) : null,
+  // const handleFileChange = (
+  //   fieldName: keyof BusOperator,
+  //   file: File | null
+  // ) => {
+  //   if (operator) {
+  //     setOperator({
+  //       ...operator,
+  //       [fieldName]: file ? URL.createObjectURL(file) : null,
+  //     });
+  //   }
+  // };
+
+  const handleFileChange = (field: string, file: File) => {
+    setOperator((prev: any) => ({
+      ...prev,
+      [field]: file, // this should be a File object
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      if (isNewOperator) {
+        // ADD NEW OPERATOR (POST)
+        const formData = {
+          name: operator?.name,
+          mobile: operator?.mobile,
+          email: operator?.email,
+          status: operator?.status,
+          address: operator?.address,
+          bankName: operator?.bankName,
+          bankAccountNumber: operator?.bankAccountNumber,
+          accountHolderName: operator?.accountHolderName,
+        };
+
+        await axiosInstance.post(`/bus-management/bus-operators/register`, formData);
+
+        toast({
+          title: "Bus Operator Added",
+          description: `${operator?.name} has been added successfully.`,
+        });
+
+      } else {
+        await Promise.all([
+          axiosInstance.put(`/bus-management/bus-operators/verify/${id}`, {
+            status: operator?.status,
+          }),
+          axiosInstance.put(`/bus-management/bus-operators/updateBusOperator/${id}`, {
+            fullName: operator?.name,
+            companyAddress: operator?.address,
+            national_identity_card_front: operator?.idCardFront,
+            national_identity_card_back: operator?.idCardBack,
+            avatar: operator?.profilePhoto,
+            bankName: operator?.bankName,
+            bankAccountNumber: operator?.bankAccountNumber,
+            accountHolderName: operator?.accountHolderName,
+            bank_details: operator?.bankAccountDetails,
+            email: operator?.email,
+            phoneNumber: operator?.mobile,
+          }),
+        ]);
+        toast({ title: "Operator updated successfully" });
+
+        toast({
+          title: "Bus Operator Updated",
+          description: `${operator?.name} has been verified successfully.`,
+        });
+      }
+
+      setIsEditMode(false);
+      navigate("/bus-management/operators");
+    } catch (error: any) {
+      console.error("Form submission failed:", error);
+      toast({
+        title: "Error",
+        description:
+          error?.response?.data?.message || "Failed to submit form.",
+        variant: "destructive",
       });
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Submit logic would go here
-    toast({
-      title: isNewOperator ? "Bus Operator Added" : "Bus Operator Updated",
-      description: `${operator?.name} has been ${isNewOperator ? "added" : "updated"
-        } successfully.`,
-    });
-
-    navigate("/bus-management/operators");
-  };
 
   const handleEdit = () => {
     if (isEditMode) {
@@ -139,6 +211,8 @@ const BusOperatorDetails = () => {
       setIsEditMode(true);
     }
   };
+
+  // console.log("profilePhoto", operator?.profilePhoto);
 
 
   if (loading) {
@@ -161,6 +235,7 @@ const BusOperatorDetails = () => {
     );
   }
 
+
   return (
     <>
       <div className="mb-6">
@@ -171,26 +246,6 @@ const BusOperatorDetails = () => {
           <ArrowLeft size={18} className="mr-1" />
           Back to Bus Operators
         </button>
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">{pageTitle}</h1>
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => navigate("/bus-management/operators")}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 mr-3"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleEdit}
-              className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
-            >
-              {isEditMode ? <Save size={18} className="mr-2" /> : <SquarePen size={18} className="mr-2" />}
-              {isEditMode ? "Save" : "Edit"}
-            </button>
-          </div>
-        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6">
@@ -199,12 +254,12 @@ const BusOperatorDetails = () => {
             {/* Basic Information */}
             <div className="form-section col-span-full">
               <h2 className="form-section-title">Basic Information</h2>
-              <div className="grid grid-cols-1  gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <UploadField
                   label="Profile Photo"
-                  value={operator.profilePhoto}
+                  value={operator?.profilePhoto ?? null}
                   onChange={(file) => handleFileChange("profilePhoto", file)}
-                  showCloseButton={isEditMode}
+                  showCloseButton={mode === 'edit' || mode === 'add'}
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -212,55 +267,66 @@ const BusOperatorDetails = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Name
                     </label>
-                    <input
-                      type="text"
-                      name="name"
-                      readOnly={!isEditMode}
-                      value={operator.name}
-                      onChange={handleInputChange}
-                      className="filter-input w-full"
-                      style={{ outline: "none" }}
-                      required
-                    />
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">{operator.name}</p>
+                    ) : (
+                      <input
+                        type="text"
+                        name="name"
+                        value={operator.name}
+                        onChange={handleInputChange}
+                        className="filter-input w-full"
+                        style={{ outline: "none" }}
+                        required
+                      />
+                    )}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Mobile
                     </label>
-                    <input
-                      type="text"
-                      name="mobile"
-                      readOnly={!isEditMode}
-                      value={operator.mobile}
-                      onChange={handleInputChange}
-                      className="filter-input w-full"
-                      style={{ outline: "none" }}
-                      required
-                    />
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">{operator.mobile}</p>
+                    ) : (
+                      <input
+                        type="text"
+                        name="mobile"
+                        value={operator.mobile}
+                        onChange={handleInputChange}
+                        className="filter-input w-full"
+                        style={{ outline: "none" }}
+                        required
+                      />
+                    )}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Email ID
                     </label>
-                    <input
-                      type="email"
-                      name="email"
-                      readOnly={!isEditMode}
-                      value={operator.email}
-                      onChange={handleInputChange}
-                      className="filter-input w-full"
-                      style={{ outline: "none" }}
-                      required
-                    />
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">{operator.email}</p>
+                    ) : (
+                      <input
+                        type="email"
+                        name="email"
+                        value={operator.email}
+                        onChange={handleInputChange}
+                        className="filter-input w-full"
+                        style={{ outline: "none" }}
+                        required
+                      />
+                    )}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Status
                     </label>
-                    {isEditMode ? (
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">{operator.status}</p>
+                    ) : (
                       <select
                         name="status"
                         value={operator.status}
@@ -273,26 +339,7 @@ const BusOperatorDetails = () => {
                           </option>
                         ))}
                       </select>
-                    ) : (
-                      <p className="filter-select w-full">{operator.status}</p>
                     )}
-                  </div>
-
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Number of Buses
-                    </label>
-                    <input
-                      type="number"
-                      name="numberOfBuses"
-                      value={operator.numberOfBuses}
-                      readOnly={!isEditMode}
-                      onChange={handleInputChange}
-                      className="filter-input w-full"
-                      style={{ outline: "none" }}
-                      min="0"
-                    />
                   </div>
                 </div>
               </div>
@@ -305,15 +352,18 @@ const BusOperatorDetails = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Address
                 </label>
-                <textarea
-                  name="address"
-                  readOnly={!isEditMode}
-                  value={operator.address || ""}
-                  onChange={(e) =>
-                    setOperator({ ...operator, address: e.target.value })
-                  }
-                  className="filter-input w-full h-24"
-                />
+                {mode === "view" ? (
+                  <p className="filter-input w-full bg-gray-100 whitespace-pre-wrap">
+                    {operator.address || "N/A"}
+                  </p>
+                ) : (
+                  <textarea
+                    name="address"
+                    value={operator.address || ""}
+                    onChange={(e) => setOperator({ ...operator, address: e.target.value })}
+                    className="filter-input w-full h-24"
+                  />
+                )}
               </div>
             </div>
 
@@ -325,30 +375,24 @@ const BusOperatorDetails = () => {
                   label="ID Card Front"
                   value={operator.idCardFront}
                   onChange={(file) => handleFileChange("idCardFront", file)}
-                  showCloseButton={isEditMode}
+                  showCloseButton={mode === 'edit' || mode === 'add'}
                 />
 
                 <UploadField
                   label="ID Card Back"
                   value={operator.idCardBack}
                   onChange={(file) => handleFileChange("idCardBack", file)}
-                  showCloseButton={isEditMode}
-                />
-
-                <UploadField
-                  label="Business License"
-                  value={operator.businessLicense}
-                  onChange={(file) => handleFileChange("businessLicense", file)}
-                  showCloseButton={isEditMode}
+                  showCloseButton={mode === 'edit' || mode === 'add'}
                 />
               </div>
             </div>
-
             {/* Bank Details */}
             <div className="form-section col-span-full">
               <h2 className="form-section-title">Bank Details</h2>
+
               <div className="flex flex-col flex-col-reverse gap-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Bank Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Bank Name
@@ -363,6 +407,7 @@ const BusOperatorDetails = () => {
                     />
                   </div>
 
+                  {/* Account Number */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Account Number
@@ -374,10 +419,10 @@ const BusOperatorDetails = () => {
                       value={operator.bankAccountNumber || ""}
                       onChange={handleInputChange}
                       className="filter-input w-full"
-                      style={{ outline: "none" }}
                     />
                   </div>
 
+                  {/* Account Holder Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Account Holder Name
@@ -389,42 +434,75 @@ const BusOperatorDetails = () => {
                       value={operator.accountHolderName || ""}
                       onChange={handleInputChange}
                       className="filter-input w-full"
-                      style={{ outline: "none" }}
                     />
                   </div>
                 </div>
 
-                <UploadField
-                  label="Bank Account Details"
-                  value={operator.bankAccountDetails}
-                  onChange={(file) =>
-                    handleFileChange("bankAccountDetails", file)
-                  }
-                  showCloseButton={isEditMode}
-                />
+                {/* Upload Field */}
+                {isEditMode ? (
+                  <UploadField
+                    label="Bank Account Details"
+                    value={operator.bankAccountDetails}
+                    onChange={(file) => handleFileChange("bankAccountDetails", file)}
+                    showCloseButton
+                    disabled={false}
+                  />
+                ) : operator.bankAccountDetails ? (
+                  <div className="text-sm text-gray-800">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Bank Account Details
+                    </label>
+                    <a
+                      href={operator.bankAccountDetails}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline"
+                    >
+                      View Uploaded Document
+                    </a>
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500 italic">No bank document uploaded.</div>
+                )}
               </div>
             </div>
-          </div>
 
-          <div className="mt-8 flex justify-end">
-            <button
-              type="button"
-              onClick={() => navigate("/bus-management/operators")}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 mr-3"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleEdit}
-              className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
-            >
-              {isEditMode ? <Save size={18} className="mr-2" /> : <SquarePen size={18} className="mr-2" />}
-              {isEditMode ? "Save" : "Edit"}
-            </button>
+            {/* Buttons */}
+            <div className="flex justify-end mt-6">
+              <button
+                type="button"
+                onClick={() => navigate("/bus-management/operators")}
+                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 mr-3"
+              >
+                Cancel
+              </button>
+
+              {mode === "view" && (
+                <button
+                  type="button"
+                  onClick={() => setIsEditMode(true)}
+                  className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
+                >
+                  <SquarePen size={18} className="mr-2" />
+                  Edit
+                </button>
+              )}
+
+              {(mode === "add" || mode === "edit") && (
+                <button
+                  type="submit"
+                  className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
+                >
+                  <Save size={18} className="mr-2" />
+                  Save
+                </button>
+              )}
+            </div>
+
           </div>
         </form>
       </div>
+
     </>
   );
 };
