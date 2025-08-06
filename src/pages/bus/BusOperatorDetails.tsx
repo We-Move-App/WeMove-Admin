@@ -25,7 +25,6 @@ const BusOperatorDetails = () => {
   const pageTitle = isNewOperator ? "Add Bus Operator" : "Edit Bus Operator";
 
   const [isEditMode, setIsEditMode] = useState(isNewOperator);
-  // Status options
   const statusOptions = ["Approved", "Processing", "Submitted"];
   useEffect(() => {
     const fetchOperator = async () => {
@@ -78,53 +77,18 @@ const BusOperatorDetails = () => {
         } else {
           setOperator(null);
         }
-        // } catch (error) {
-        //   console.error("Failed to fetch bus operator:", error);
-        //   setOperator(null);
-        //   toast({
-        //     title: "Error",
-        //     description: "Failed to fetch bus operator details.",
-        //     variant: "destructive",
-        //   });
-        // } finally {
-        //   setLoading(false);
-        // }
       } catch (error) {
         console.error("Failed to fetch bus operator:", error);
-
-        // Try fallback to mock data
-        const fallbackOperator = busOperators.find((op) => op.id === id);
-
-        if (fallbackOperator) {
-          setOperator({
-            ...fallbackOperator,
-            profilePhoto: dummyProfile,
-            idCardFront: dummyIdFront,
-            idCardBack: dummyIdBack,
-            businessLicense: dummyLicense,
-            bankName: fallbackOperator.bankName || "HDFC Bank",
-            bankAccountNumber: fallbackOperator.bankAccountNumber || "1234567890",
-            accountHolderName: fallbackOperator.name,
-            bankAccountDetails: dummyBankDetails,
-            address: "Some fallback address",
-          });
-          toast({
-            title: "Offline Mode",
-            description: "Using fallback operator data.",
-          });
-        } else {
-          setOperator(null);
-          toast({
-            title: "Error",
-            description: "Failed to fetch bus operator details.",
-            variant: "destructive",
-          });
-        }
+        setOperator(null);
+        toast({
+          title: "Error",
+          description: "Failed to fetch bus operator details.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
-
     fetchOperator();
   }, [id, isNewOperator]);
 
