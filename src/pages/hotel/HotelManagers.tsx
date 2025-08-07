@@ -133,12 +133,12 @@ const HotelManagers = () => {
           <h1 className="text-2xl font-bold">Hotel Managers</h1>
           <p className="text-gray-600">Manage all hotel managers</p>
         </div>
-        {/* <Button
+        <Button
           onClick={() => navigate("/hotel-management/managers/new")}
           className="flex items-center gap-2"
         >
           <Plus size={16} /> Add Hotel Manager
-        </Button> */}
+        </Button>
       </div>
 
       {loading ? (

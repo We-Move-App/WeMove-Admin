@@ -1,78 +1,80 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Wallet as WalletIcon } from 'lucide-react';
 // import Layout from '@/components/layout/Layout';
 import DataTable from '@/components/ui/DataTable';
 import { WalletTransaction } from '@/types/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import StatusBadge from '@/components/ui/StatusBadge';
+import axios from 'axios';
 
 // Mock data for wallet transactions
-const mockWalletTransactions: WalletTransaction[] = [
-  {
-    id: "1",
-    userId: "user-001",
-    userName: "John Doe",
-    type: "Credit",
-    amount: 500,
-    date: "2023-10-15",
-    status: "Completed",
-    description: "Refund for cancelled booking #12345"
-  },
-  {
-    id: "2",
-    userId: "user-002",
-    userName: "Jane Smith",
-    type: "Debit",
-    amount: 350,
-    date: "2023-10-16",
-    status: "Completed",
-    description: "Payment for hotel booking #67890"
-  },
-  {
-    id: "3",
-    userId: "user-003",
-    userName: "Michael Johnson",
-    type: "Transfer",
-    amount: 200,
-    date: "2023-10-17",
-    status: "Completed",
-    description: "Transfer to bank account"
-  },
-  {
-    id: "4",
-    userId: "user-004",
-    userName: "Sarah Williams",
-    type: "Withdrawal",
-    amount: 150,
-    date: "2023-10-18",
-    status: "Pending",
-    description: "Withdrawal request to bank account"
-  },
-  {
-    id: "5",
-    userId: "user-005",
-    userName: "Robert Brown",
-    type: "Credit",
-    amount: 100,
-    date: "2023-10-19",
-    status: "Completed",
-    description: "Cashback reward"
-  },
-  {
-    id: "6",
-    userId: "user-002",
-    userName: "Jane Smith",
-    type: "Withdrawal",
-    amount: 200,
-    date: "2023-10-20",
-    status: "Failed",
-    description: "Withdrawal request failed - insufficient funds"
-  }
-];
+// const mockWalletTransactions: WalletTransaction[] = [
+//   {
+//     id: "1",
+//     userId: "user-001",
+//     userName: "John Doe",
+//     type: "Credit",
+//     amount: 500,
+//     date: "2023-10-15",
+//     status: "Completed",
+//     description: "Refund for cancelled booking #12345"
+//   },
+//   {
+//     id: "2",
+//     userId: "user-002",
+//     userName: "Jane Smith",
+//     type: "Debit",
+//     amount: 350,
+//     date: "2023-10-16",
+//     status: "Completed",
+//     description: "Payment for hotel booking #67890"
+//   },
+//   {
+//     id: "3",
+//     userId: "user-003",
+//     userName: "Michael Johnson",
+//     type: "Transfer",
+//     amount: 200,
+//     date: "2023-10-17",
+//     status: "Completed",
+//     description: "Transfer to bank account"
+//   },
+//   {
+//     id: "4",
+//     userId: "user-004",
+//     userName: "Sarah Williams",
+//     type: "Withdrawal",
+//     amount: 150,
+//     date: "2023-10-18",
+//     status: "Pending",
+//     description: "Withdrawal request to bank account"
+//   },
+//   {
+//     id: "5",
+//     userId: "user-005",
+//     userName: "Robert Brown",
+//     type: "Credit",
+//     amount: 100,
+//     date: "2023-10-19",
+//     status: "Completed",
+//     description: "Cashback reward"
+//   },
+//   {
+//     id: "6",
+//     userId: "user-002",
+//     userName: "Jane Smith",
+//     type: "Withdrawal",
+//     amount: 200,
+//     date: "2023-10-20",
+//     status: "Failed",
+//     description: "Withdrawal request failed - insufficient funds"
+//   }
+// ];
 
 const Wallet = () => {
-  const [transactions] = useState<WalletTransaction[]>(mockWalletTransactions);
+  const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Calculate summary stats
   const totalTransactions = transactions.length;
@@ -139,6 +141,44 @@ const Wallet = () => {
       ]
     }
   ];
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const res = await axios.get(
+          "https://reward-understanding-usually-aggressive.trycloudflare.com/api/v1/wallet/transactions/admin",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const apiTransactions = res.data?.data?.transactions || [];
+
+        // Convert API shape to your table format if needed
+        const formattedTransactions: WalletTransaction[] = apiTransactions.map((txn) => ({
+          id: txn.transactionId,
+          userId: txn.adminId,
+          userName: "Admin", // or null/empty string
+          type: txn.type === "CREDIT" ? "Credit" : "Debit", // Adjust if needed
+          amount: txn.amount,
+          date: new Date(txn.createdAt).toLocaleDateString(),
+          status: txn.status === "SUCCESS" ? "Completed" : txn.status,
+          description: txn.description,
+        }));
+        console.log("API Transaction:", apiTransactions);
+        setTransactions(formattedTransactions);
+      } catch (err) {
+        console.error("Failed to fetch transactions:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
 
   return (
     <>

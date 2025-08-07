@@ -13,6 +13,7 @@ import dummyIdBack from "@/assets/dummy-data/id-back.jpg";
 import dummyLicense from "@/assets/dummy-data/bus-license.png";
 import dummyBankDetails from "@/assets/dummy-data/hdfc.jpg";
 import Loader from "@/components/ui/loader";
+import axios from "axios";
 
 const BusOperatorDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -104,6 +105,9 @@ const BusOperatorDetails = () => {
     fetchOperator();
   }, [id, isNewOperator]);
 
+  const accessToken = localStorage.getItem("accessToken");
+  // console.log("Access Token:", accessToken);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -160,24 +164,33 @@ const BusOperatorDetails = () => {
         });
 
       } else {
-        await Promise.all([
-          axiosInstance.put(`/bus-management/bus-operators/verify/${id}`, {
-            status: operator?.status,
-          }),
-          axiosInstance.put(`/bus-management/bus-operators/updateBusOperator/${id}`, {
-            fullName: operator?.name,
-            companyAddress: operator?.address,
-            national_identity_card_front: operator?.idCardFront,
-            national_identity_card_back: operator?.idCardBack,
-            avatar: operator?.profilePhoto,
-            bankName: operator?.bankName,
-            bankAccountNumber: operator?.bankAccountNumber,
-            accountHolderName: operator?.accountHolderName,
-            bank_details: operator?.bankAccountDetails,
-            email: operator?.email,
-            phoneNumber: operator?.mobile,
-          }),
-        ]);
+        await axiosInstance.put(`/bus-management/bus-operators/verify/${id}`, {
+          status: operator?.status,
+        });
+
+        const formData = new FormData();
+        formData.append("fullName", operator?.name);
+        formData.append("companyAddress", operator?.address);
+        formData.append("email", operator?.email);
+        formData.append("phoneNumber", operator?.mobile);
+        formData.append("bankName", operator?.bankName);
+        formData.append("bankAccountNumber", operator?.bankAccountNumber);
+        formData.append("accountHolderName", operator?.accountHolderName);
+
+        if (operator?.profilePhoto) formData.append("avatar", operator.profilePhoto);
+        if (operator?.idCardFront) formData.append("national_identity_card_front", operator.idCardFront);
+        if (operator?.idCardBack) formData.append("national_identity_card_back", operator.idCardBack);
+        if (operator?.bankAccountDetails) formData.append("bank_detail", operator.bankAccountDetails);
+
+        await axiosInstance.put(
+          `/bus-management/bus-operators/updateBusOperator/${id}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
         toast({ title: "Operator updated successfully" });
 
         toast({
