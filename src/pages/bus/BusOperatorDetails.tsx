@@ -281,6 +281,26 @@ const BusOperatorDetails = () => {
                       />
                     )}
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Company Name
+                    </label>
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">{operator.name}</p>
+                    ) : (
+                      <input
+                        type="text"
+                        name="name"
+                        value={operator.name}
+                        onChange={handleInputChange}
+                        className="filter-input w-full"
+                        style={{ outline: "none" }}
+                        required
+                      />
+                    )}
+                  </div>
+
+
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -350,7 +370,7 @@ const BusOperatorDetails = () => {
               <h2 className="form-section-title">Address</h2>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Address
+                  Company Address
                 </label>
                 {mode === "view" ? (
                   <p className="filter-input w-full bg-gray-100 whitespace-pre-wrap">
