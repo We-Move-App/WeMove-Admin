@@ -2,9 +2,9 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   // Deployed URL
-  // baseURL: "http://139.59.20.155:8001/api/v1/admin",
+  baseURL: "http://139.59.20.155:8000/api/v1/admin",
   // Local URL
-  baseURL: "http://192.168.0.208:8000/api/v1/admin",
+  // baseURL: "http://192.168.0.208:8000/api/v1/admin",
   headers: {
     "Content-Type": "application/json",
   },
