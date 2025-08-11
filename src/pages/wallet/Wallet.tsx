@@ -7,6 +7,7 @@ import { WalletTransaction } from '@/types/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import StatusBadge from '@/components/ui/StatusBadge';
 import axios from 'axios';
+import axiosInstance from '@/api/axiosInstance';
 
 // Mock data for wallet transactions
 // const mockWalletTransactions: WalletTransaction[] = [
@@ -147,7 +148,7 @@ const Wallet = () => {
       try {
         const token = localStorage.getItem("accessToken");
         const res = await axios.get(
-          "https://reward-understanding-usually-aggressive.trycloudflare.com/api/v1/wallet/transactions/admin",
+          "https://break-trains-sig-fame.trycloudflare.com/api/v1/wallet/transactions/admin",
           {
             headers: {
               Authorization: `Bearer ${token}`,

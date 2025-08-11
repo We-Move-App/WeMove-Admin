@@ -6,7 +6,8 @@ const axiosInstance = axios.create({
   // Local URL
   // baseURL: "http://192.168.0.208:8000/api/v1/admin",
   // baseURL:
-  //   "https://reward-understanding-usually-aggressive.trycloudflare.com/api/v1/admin",
+  //   "https://individually-intro-week-thats.trycloudflare.com/api/v1/admin",
+  // baseURL: "https://break-trains-sig-fame.trycloudflare.com/api/v1/admin",
   headers: {
     "Content-Type": "application/json",
   },
@@ -19,5 +20,7 @@ axiosInstance.interceptors.request.use((config) => {
   }
   return config;
 });
+
+console.log("Stored token:", localStorage.getItem("accessToken"));
 
 export default axiosInstance;

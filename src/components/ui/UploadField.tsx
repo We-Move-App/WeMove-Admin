@@ -6,7 +6,7 @@ interface UploadFieldProps {
   label: string;
   accept?: string;
   onChange: (file: File | null) => void;
-  value?: string | null;
+  value: string | File | null;
   multiple?: boolean;
   showCloseButton?: boolean;
   disabled?: boolean;
@@ -22,7 +22,10 @@ const UploadField = ({
   disabled = false,
 }: UploadFieldProps) => {
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(value || null);
+  // const [preview, setPreview] = useState<string | null>(value || null);
+  const [preview, setPreview] = useState<string | null>(
+    typeof value === "string" ? value : null
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,7 +157,10 @@ const UploadField = ({
           {isPDF ? (
             <div className="flex items-center p-4 bg-gray-50 rounded-md border border-gray-200">
               <FileText className="text-red-500 mr-2" size={24} />
-              <span className="text-sm truncate max-w-xs">{value?.split("/").pop()}</span>
+              {/* <span className="text-sm truncate max-w-xs">{value?.split("/").pop()}</span> */}
+              <span className="text-sm truncate max-w-xs">
+                {typeof value === "string" ? value.split("/").pop() : file?.name ?? "File"}
+              </span>
             </div>
           ) : (
             <img
@@ -172,7 +178,10 @@ const UploadField = ({
           {isPDF ? (
             <div className="flex items-center p-4 bg-gray-50 rounded-md border border-gray-200">
               <FileText className="text-red-500 mr-2" size={24} />
-              <span className="text-sm truncate max-w-xs">{file?.name || value?.split("/").pop()}</span>
+              {/* <span className="text-sm truncate max-w-xs">{file?.name || value?.split("/").pop()}</span> */}
+              <span className="text-sm truncate max-w-xs">
+                {typeof value === "string" ? value.split("/").pop() : file?.name ?? "File"}
+              </span>
               {!disabled && (
                 <button
                   type="button"

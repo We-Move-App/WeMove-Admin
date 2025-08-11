@@ -1,10 +1,9 @@
-
 // Admin related types
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'Admin' | 'Subadmin' | 'Manager';
+  role: "Admin" | "Subadmin" | "Manager";
   permissions: string[];
   createdAt: string;
 }
@@ -25,25 +24,34 @@ export interface ChartData {
 export interface BusOperator {
   id: string;
   name: string;
+  companyName: string;
   email: string;
   mobile?: string;
   phone?: string;
   address?: string;
   city?: string;
   state?: string;
-  status: 'active' | 'inactive' | 'pending' | 'Approved' | 'Rejected' | 'Submitted' | 'Blocked' | 'Pending';
+  status:
+    | "active"
+    | "inactive"
+    | "pending"
+    | "Approved"
+    | "Rejected"
+    | "Submitted"
+    | "Blocked"
+    | "Pending";
   numberOfBuses?: number;
   busCount?: number;
   joinDate?: string;
   // Additional properties used in BusOperatorDetails.tsx
-  profilePhoto?: string;
-  idCardFront?: string;
-  idCardBack?: string;
+  profilePhoto?: File | string;
+  idCardFront?: File | string;
+  idCardBack?: File | string;
   businessLicense?: string;
   bankName?: string;
   bankAccountNumber?: string;
   accountHolderName?: string;
-  bankAccountDetails?: string;
+  bankAccountDetails?: File | string;
 }
 
 export interface Bus {
@@ -53,7 +61,7 @@ export interface Bus {
   type: string;
   capacity: number;
   amenities?: string[];
-  status: 'active' | 'inactive' | 'maintenance';
+  status: "active" | "inactive" | "maintenance";
   manufactureYear?: number;
   lastMaintenance?: string;
   insuranceValidTill?: string;
@@ -70,7 +78,8 @@ export interface BusBooking {
   to: string;
   journeyDate: string;
   amount: number;
-  status: 'Completed' | 'Upcoming' | 'Cancelled' | 'Confirmed' | 'Pending';
+  status: "Completed" | "Upcoming" | "Cancelled" | "Confirmed" | "Pending";
+  paymentStatus: string;
 }
 
 // Hotel related types
@@ -83,7 +92,15 @@ export interface HotelManager {
   address?: string;
   city?: string;
   state?: string;
-  status: 'active' | 'inactive' | 'pending' | 'Approved' | 'Rejected' | 'Submitted' | 'Blocked' | 'Pending';
+  status:
+    | "active"
+    | "inactive"
+    | "pending"
+    | "Approved"
+    | "Rejected"
+    | "Submitted"
+    | "Blocked"
+    | "Pending";
   roomCount?: number;
   joinDate?: string;
   // Additional properties used in HotelManagerDetails.tsx
@@ -126,7 +143,7 @@ export interface HotelBooking {
   checkInDate: string;
   checkOutDate: string;
   amount: number;
-  status: 'Completed' | 'Upcoming' | 'Cancelled' | 'Confirmed' | 'Pending';
+  status: "Completed" | "Upcoming" | "Cancelled" | "Confirmed" | "Pending";
 }
 
 // Taxi related types
@@ -140,7 +157,15 @@ export interface TaxiDriver {
   vehicleNumber?: string;
   vehicleType?: string;
   city?: string;
-  status: 'active' | 'inactive' | 'pending' | 'Approved' | 'Rejected' | 'Submitted' | 'Blocked' | 'Pending';
+  status:
+    | "active"
+    | "inactive"
+    | "pending"
+    | "Approved"
+    | "Rejected"
+    | "Submitted"
+    | "Blocked"
+    | "Pending";
   joinDate?: string;
   // Additional properties used in TaxiDriverDetails.tsx
   age?: number;
@@ -182,7 +207,15 @@ export interface BikeRider {
   vehicleRegistrationCertificate?: string;
   vehiclePhotos?: string[];
   city?: string;
-  status: 'active' | 'inactive' | 'pending' | 'Approved' | 'Rejected' | 'Submitted' | 'Blocked' | 'Pending';
+  status:
+    | "active"
+    | "inactive"
+    | "pending"
+    | "Approved"
+    | "Rejected"
+    | "Submitted"
+    | "Blocked"
+    | "Pending";
   joinDate?: string;
   age?: number;
   address?: string;
@@ -217,7 +250,7 @@ export interface Commission {
   serviceType: string;
   percentage: number | null;
   fixedRate: number | null;
-  commissionType: 'percentage' | 'fixed';
+  commissionType: "percentage" | "fixed";
   effectiveFrom: string;
   effectiveTo?: string;
   isActive: boolean;
@@ -229,7 +262,7 @@ export interface Coupon {
   name: string;
   code: string;
   serviceType: string;
-  discountType: 'percentage' | 'fixed';
+  discountType: "percentage" | "fixed";
   discountPercentage: number | null;
   discountAmount: number | null;
   startDate: string;
@@ -242,10 +275,10 @@ export interface Transaction {
   id: string;
   userId: string;
   amount: number;
-  type: 'credit' | 'debit';
+  type: "credit" | "debit";
   description: string;
   date: string;
-  status: 'completed' | 'pending' | 'failed';
+  status: "completed" | "pending" | "failed";
 }
 
 export interface WalletTransaction {
@@ -264,7 +297,7 @@ export interface Notification {
   id: string;
   title: string;
   message: string;
-  type?: 'info' | 'success' | 'warning' | 'error';
+  type?: "info" | "success" | "warning" | "error";
   recipientType?: string;
   read?: boolean;
   sentAt?: string;
@@ -278,7 +311,7 @@ export interface BookingSummary {
   service?: string;
   count?: number;
   percentage?: number;
-  trend?: 'up' | 'down' | 'flat';
+  trend?: "up" | "down" | "flat";
   color?: string;
   totalBookings: number;
   completedBookings: number;

@@ -36,11 +36,13 @@ type DataTableProps<T> = {
   data: T[];
   keyExtractor: (item: T) => string | number;
   onRowClick?: (item: T) => void;
+  searchable?: boolean;
+  exportable?: boolean;
   filterable?: boolean;
   filterOptions?: FilterOption[];
   paginate?: boolean;
   pageSize?: number;
-  loading?: boolean; 
+  loading?: boolean;
 };
 
 function DataTable<T>({
@@ -246,8 +248,8 @@ function DataTable<T>({
                       {column.render
                         ? column.render(item)
                         : item[column.key as keyof T] !== undefined
-                        ? String(item[column.key as keyof T])
-                        : ""}
+                          ? String(item[column.key as keyof T])
+                          : ""}
                     </TableCell>
                   ))}
                 </TableRow>

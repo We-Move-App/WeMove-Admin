@@ -6,6 +6,7 @@ import { ArrowLeft, Save, SquarePen } from "lucide-react";
 import { busOperators } from "@/data/mockData";
 import { BusOperator } from "@/types/admin";
 import { useToast } from "@/hooks/use-toast";
+// import { axiosFileUpload } from "@/api/axiosInstance";
 import axiosInstance from "@/api/axiosInstance";
 import dummyProfile from "@/assets/dummy-data/user-image.jpg";
 import dummyIdFront from "@/assets/dummy-data/id-front.jpg";
@@ -39,6 +40,7 @@ const BusOperatorDetails = () => {
         setOperator({
           id: "new",
           name: "",
+          companyName: "",
           mobile: "",
           email: "",
           status: "Pending",
@@ -69,24 +71,27 @@ const BusOperatorDetails = () => {
         };
 
         if (user) {
+          const bank = data?.bank;
           setOperator({
             id: user._id,
             name: user.fullName || "",
+            companyName: user.companyName || "",
             mobile: user.phoneNumber || "",
             email: user.email || "",
             status: user.verificationStatus || "Pending",
             numberOfBuses: 0,
             profilePhoto: user.avatar?.url || dummyProfile,
             address: user?.companyAddress || "",
-            idCardFront: getDocUrl("national_identity_card_front") || dummyIdFront,
-            idCardBack: getDocUrl("national_identity_card_back") || dummyIdBack,
-            businessLicense: getDocUrl("business_license") || dummyLicense,
-            bankName: "",
-            bankAccountNumber: "",
-            accountHolderName: "",
-            bankAccountDetails: null,
+            idCardFront: getDocUrl("National ID Front") || dummyIdFront,
+            idCardBack: getDocUrl("National ID Back") || dummyIdBack,
+            businessLicense: getDocUrl("Business License") || dummyLicense,
+            bankName: bank?.bankName || "",
+            bankAccountNumber: bank?.accountNumber || "",
+            accountHolderName: bank?.accountHolderName || "",
+            bankAccountDetails: bank?.bankDocs?.url || null,
           });
         }
+
         else {
           setOperator(null);
         }
@@ -120,86 +125,138 @@ const BusOperatorDetails = () => {
     }
   };
 
-  // const handleFileChange = (
-  //   fieldName: keyof BusOperator,
-  //   file: File | null
-  // ) => {
-  //   if (operator) {
-  //     setOperator({
-  //       ...operator,
-  //       [fieldName]: file ? URL.createObjectURL(file) : null,
-  //     });
-  //   }
-  // };
+
 
   const handleFileChange = (field: string, file: File) => {
     setOperator((prev: any) => ({
       ...prev,
-      [field]: file, // this should be a File object
+      [field]: file,
     }));
   };
+
+  const uploadToServer = async (file: File) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await axios.post(
+      "https://break-trains-sig-fame.trycloudflare.com/api/v1/file/upload",
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+
+    return response.data?.data;
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      // Upload files only if they are new (File instance)
+      const avatarFile =
+        operator?.profilePhoto instanceof File
+          ? await uploadToServer(operator.profilePhoto)
+          : operator?.profilePhoto || null;
+
+      const idFrontFile =
+        operator?.idCardFront instanceof File
+          ? await uploadToServer(operator.idCardFront)
+          : operator?.idCardFront || null;
+
+      const idBackFile =
+        operator?.idCardBack instanceof File
+          ? await uploadToServer(operator.idCardBack)
+          : operator?.idCardBack || null;
+
+      const bankDocFile =
+        operator?.bankAccountDetails instanceof File
+          ? await uploadToServer(operator.bankAccountDetails)
+          : operator?.bankAccountDetails || null;
+
       if (isNewOperator) {
-        // ADD NEW OPERATOR (POST)
-        const formData = {
-          name: operator?.name,
-          mobile: operator?.mobile,
-          email: operator?.email,
-          status: operator?.status,
-          address: operator?.address,
-          bankName: operator?.bankName,
-          bankAccountNumber: operator?.bankAccountNumber,
-          accountHolderName: operator?.accountHolderName,
+        // ✅ POST payload (nested)
+        const postPayload = {
+          basicInfo: {
+            fullName: operator?.name,
+            companyName: operator?.companyName,
+            companyAddress: operator?.address,
+            email: operator?.email,
+            phoneNumber: operator?.mobile,
+            avatar: avatarFile || {},
+          },
+          bankDetails: {
+            accountHolderName: operator?.accountHolderName,
+            accountNumber: operator?.bankAccountNumber,
+            bankName: operator?.bankName,
+            bankDocs: bankDocFile || {},
+          },
+          national_identity_card_front: {
+            documentName: "National ID Front",
+            file: idFrontFile || {},
+            documentType: "national_identity_card_front",
+          },
+          national_identity_card_back: {
+            documentName: "National ID Back",
+            file: idBackFile || {},
+            documentType: "national_identity_card_back",
+          },
         };
 
-        await axiosInstance.post(`/bus-management/bus-operators/register`, formData);
+        await axiosInstance.post(
+          "/bus-management/bus-operators/register",
+          postPayload
+        );
 
         toast({
           title: "Bus Operator Added",
           description: `${operator?.name} has been added successfully.`,
         });
-
       } else {
-        await axiosInstance.put(`/bus-management/bus-operators/verify/${id}`, {
-          status: operator?.status,
-        });
-
-        const formData = new FormData();
-        formData.append("fullName", operator?.name);
-        formData.append("companyAddress", operator?.address);
-        formData.append("email", operator?.email);
-        formData.append("phoneNumber", operator?.mobile);
-        formData.append("bankName", operator?.bankName);
-        formData.append("bankAccountNumber", operator?.bankAccountNumber);
-        formData.append("accountHolderName", operator?.accountHolderName);
-
-        if (operator?.profilePhoto) formData.append("avatar", operator.profilePhoto);
-        if (operator?.idCardFront) formData.append("national_identity_card_front", operator.idCardFront);
-        if (operator?.idCardBack) formData.append("national_identity_card_back", operator.idCardBack);
-        if (operator?.bankAccountDetails) formData.append("bank_detail", operator.bankAccountDetails);
+        // ✅ PUT payload (flat)
+        const putPayload = {
+          fullName: operator?.name,
+          companyName: operator?.companyName,
+          companyAddress: operator?.address,
+          email: operator?.email,
+          phoneNumber: operator?.mobile?.replace(/^\+91/, ""),
+          avatar: avatarFile || {},
+          accountHolderName: operator?.accountHolderName,
+          accountNumber: operator?.bankAccountNumber,
+          bankName: operator?.bankName,
+          bankDocs: bankDocFile || {},
+          national_identity_card_front: {
+            documentName: "National ID Front",
+            file: idFrontFile || {},
+            documentType: "national_identity_card_front",
+          },
+          national_identity_card_back: {
+            documentName: "National ID Back",
+            file: idBackFile || {},
+            documentType: "national_identity_card_back",
+          },
+        };
 
         await axiosInstance.put(
-          `/bus-management/bus-operators/updateBusOperator/${id}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
+          `/bus-management/bus-operators/updateBusOperator/${id}`, // replace operatorId with actual ID
+          putPayload
         );
-        toast({ title: "Operator updated successfully" });
+
+        // ✅ PUT request to update status
+        if (operator?.status) {
+          await axiosInstance.put(
+            `/bus-management/bus-operators/verify/${id}`,
+            {
+              status: operator.status,
+            }
+          );
+        }
 
         toast({
           title: "Bus Operator Updated",
-          description: `${operator?.name} has been verified successfully.`,
+          description: `${operator?.name} has been updated successfully.`,
         });
       }
 
-      setIsEditMode(false);
       navigate("/bus-management/operators");
     } catch (error: any) {
       console.error("Form submission failed:", error);
@@ -278,7 +335,7 @@ const BusOperatorDetails = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Name
+                      Full Name
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">{operator.name}</p>
@@ -294,24 +351,24 @@ const BusOperatorDetails = () => {
                       />
                     )}
                   </div>
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Company Name
                     </label>
                     {mode === "view" ? (
-                      <p className="filter-input w-full bg-gray-100">{operator.name}</p>
+                      <p className="filter-input w-full bg-gray-100">{operator.companyName}</p>
                     ) : (
                       <input
                         type="text"
-                        name="name"
-                        value={operator.name}
+                        name="companyName"
+                        value={operator.companyName}
                         onChange={handleInputChange}
                         className="filter-input w-full"
                         style={{ outline: "none" }}
                         required
                       />
                     )}
-                  </div>
+                  </div> */}
 
 
 
@@ -378,8 +435,142 @@ const BusOperatorDetails = () => {
               </div>
             </div>
 
-            {/* Address */}
+            {/* Company Information */}
             <div className="form-section col-span-full">
+              <h2 className="form-section-title">Company Information</h2>
+              <div className="grid grid-cols-1 gap-4">
+                {/* <UploadField
+                  label="Profile Photo"
+                  value={operator?.profilePhoto ?? null}
+                  onChange={(file) => handleFileChange("profilePhoto", file)}
+                  showCloseButton={mode === 'edit' || mode === 'add'}
+                /> */}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Name
+                    </label>
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">{operator.name}</p>
+                    ) : (
+                      <input
+                        type="text"
+                        name="name"
+                        value={operator.name}
+                        onChange={handleInputChange}
+                        className="filter-input w-full"
+                        style={{ outline: "none" }}
+                        required
+                      />
+                    )}
+                  </div> */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Company Name
+                    </label>
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">{operator.companyName}</p>
+                    ) : (
+                      <input
+                        type="text"
+                        name="companyName"
+                        value={operator.companyName}
+                        onChange={handleInputChange}
+                        className="filter-input w-full"
+                        style={{ outline: "none" }}
+                        required
+                      />
+                    )}
+                  </div>
+                  {/* <div className="form-section col-span-full"> */}
+                  <div className="">
+                    {/* <h2 className="form-section-title">Address</h2> */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Company Address
+                      </label>
+                      {mode === "view" ? (
+                        <p className="filter-input w-full bg-gray-100 whitespace-pre-wrap">
+                          {operator.address || "N/A"}
+                        </p>
+                      ) : (
+                        <textarea
+                          name="address"
+                          value={operator.address || ""}
+                          onChange={(e) => setOperator({ ...operator, address: e.target.value })}
+                          className="filter-input w-full h-24"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+
+                  {/* <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Mobile
+                    </label>
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">{operator.mobile}</p>
+                    ) : (
+                      <input
+                        type="text"
+                        name="mobile"
+                        value={operator.mobile}
+                        onChange={handleInputChange}
+                        className="filter-input w-full"
+                        style={{ outline: "none" }}
+                        required
+                      />
+                    )}
+                  </div> */}
+
+                  {/* <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email ID
+                    </label>
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">{operator.email}</p>
+                    ) : (
+                      <input
+                        type="email"
+                        name="email"
+                        value={operator.email}
+                        onChange={handleInputChange}
+                        className="filter-input w-full"
+                        style={{ outline: "none" }}
+                        required
+                      />
+                    )}
+                  </div> */}
+
+                  {/* <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">{operator.status}</p>
+                    ) : (
+                      <select
+                        name="status"
+                        value={operator.status}
+                        onChange={handleInputChange}
+                        className="filter-select w-full"
+                      >
+                        {statusOptions.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div> */}
+                </div>
+              </div>
+            </div>
+
+            {/* Address */}
+            {/* <div className="form-section col-span-full">
               <h2 className="form-section-title">Address</h2>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -398,7 +589,7 @@ const BusOperatorDetails = () => {
                   />
                 )}
               </div>
-            </div>
+            </div> */}
 
             {/* Identity Verification */}
             <div className="form-section col-span-full">
@@ -485,14 +676,31 @@ const BusOperatorDetails = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Bank Account Details
                     </label>
-                    <a
+                    {/* <a
                       href={operator.bankAccountDetails}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 underline"
                     >
                       View Uploaded Document
-                    </a>
+                    </a> */}
+                    {/* {typeof operator.bankAccountDetails === "string" && (
+                      <a
+                        href={operator.bankAccountDetails}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        View Uploaded Document
+                      </a>
+                    )} */}
+                    <UploadField
+                      label="ID Card Back"
+                      value={operator.bankAccountDetails}
+                      onChange={(file) => handleFileChange("bankAccountDetails", file)}
+                      showCloseButton={mode === 'edit' || mode === 'add'}
+                    />
+
                   </div>
                 ) : (
                   <div className="text-sm text-gray-500 italic">No bank document uploaded.</div>
