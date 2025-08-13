@@ -82,10 +82,25 @@ export interface BusBooking {
   paymentStatus: string;
 }
 
+interface HotelPolicyDocument {
+  name?: string;
+  fileUrl: string;
+}
+
+interface HotelPolicies {
+  _id: string;
+  checkInTime: string;
+  checkOutTime: string;
+  amenities: string[];
+  uploadDocuments: HotelPolicyDocument[];
+}
+
 // Hotel related types
 export interface HotelManager {
   id: string;
   name: string;
+  companyName: string;
+  companyAddress: string;
   email: string;
   mobile?: string;
   phone?: string;
@@ -128,10 +143,18 @@ export interface HotelManager {
   checkOutTime?: string;
   amenities?: string[];
   policyDocuments?: string;
+  bankName?: string;
   bankAccountNumber?: string;
   bankAccountDetails?: string;
+  accountHolderName?: string;
   idCardFront?: string;
   idCardBack?: string;
+  hotelPolicies?: HotelPolicies;
+  hotelManagerBank?: {
+    bankDocs?: {
+      url: string;
+    };
+  };
 }
 
 export interface HotelBooking {

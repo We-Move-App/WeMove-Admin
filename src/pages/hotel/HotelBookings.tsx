@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye } from "lucide-react";
 // import Layout from '@/components/layout/Layout';
 import DataTable from "@/components/ui/DataTable";
+import axiosInstance from "@/api/axiosInstance";
 import { HotelBooking } from "@/types/admin";
 import StatusBadge from "@/components/ui/StatusBadge";
 import {
@@ -59,12 +60,43 @@ const mockHotelBookings: HotelBooking[] = [
   },
 ];
 
+
+
 const HotelBookings = () => {
-  const [bookings] = useState<HotelBooking[]>(mockHotelBookings);
+  // const [bookings] = useState<HotelBooking[]>(mockHotelBookings);
+  const [bookings, setBookings] = useState<HotelBooking[]>([]);
   const [selectedBooking, setSelectedBooking] = useState<HotelBooking | null>(
     null
   );
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const res = await axiosInstance.get("/hotel-management/hotel-booking-details");
+        const apiBookings = res.data?.data?.bookings || [];
+
+        // Map API fields into our table format
+        const mapped = apiBookings.map((b: any) => ({
+          id: b.bookingId?.slice(0, 6),
+          hotelId: b.hotelId?.slice(0, 6),
+          customerName: b.customerName,
+          customerPhone: b.phone,
+          customerEmail: b.email,
+          checkInDate: new Date(b.checkInDate).toLocaleDateString(),
+          checkOutDate: new Date(b.checkOutDate).toLocaleDateString(),
+          amount: b.amount,
+          status: b.status,
+        }));
+
+        setBookings(mapped);
+      } catch (err) {
+        console.error("Failed to fetch bookings", err);
+      }
+    };
+
+    fetchBookings();
+  }, []);
 
   const viewBookingDetails = (booking: HotelBooking) => {
     setSelectedBooking(booking);
