@@ -139,7 +139,7 @@ const BusOperatorDetails = () => {
     formData.append("image", file);
 
     const response = await axios.post(
-      "https://break-trains-sig-fame.trycloudflare.com/api/v1/file/upload",
+      "http://139.59.20.155:8000/api/v1/file/upload",
       formData,
       { headers: { "Content-Type": "multipart/form-data" } }
     );

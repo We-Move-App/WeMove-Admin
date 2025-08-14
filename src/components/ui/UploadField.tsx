@@ -38,26 +38,24 @@ const UploadField = ({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = event.target.files ? Array.from(event.target.files) : [];
+    if (selectedFiles.length === 0) return;
 
-    if (selectedFiles.length > 0) {
-      setFiles(selectedFiles);
-      onChange(multiple ? selectedFiles : selectedFiles[0]);
+    setFiles(selectedFiles);
+    onChange(multiple ? selectedFiles : selectedFiles[0]);
 
-      const readers: Promise<string>[] = selectedFiles.map(file =>
-        new Promise(resolve => {
-          if (file.type.startsWith("image/")) {
-            const reader = new FileReader();
-            reader.onload = e => resolve(e.target?.result as string);
-            reader.readAsDataURL(file);
-          } else {
-            resolve(file.name); // store file name for PDFs
-          }
-        })
-      );
+    const previewUrls = selectedFiles.map(file => {
+      if (file.type.startsWith("image/")) {
+        return URL.createObjectURL(file); // image preview
+      } else if (file.type === "application/pdf") {
+        return URL.createObjectURL(file); // PDF preview as link
+      } else {
+        return ""; // fallback
+      }
+    });
 
-      Promise.all(readers).then(setPreviews);
-    }
+    setPreviews(previewUrls);
   };
+
 
   const clearFile = (index?: number) => {
     if (multiple && typeof index === "number") {
@@ -81,17 +79,28 @@ const UploadField = ({
       return;
     }
 
+    // Single string URL
     if (typeof value === "string") {
       setPreviews([value]);
       setFiles([]);
       return;
     }
 
+    // Single object with URL (from API)
+    if (value && typeof value === "object" && !Array.isArray(value) && !(value instanceof File)) {
+      const url = (value as any).url || (value as any).fileUrl || "";
+      setPreviews(url ? [url] : []);
+      setFiles([]);
+      return;
+    }
+
+    // Array of objects or Files
     if (Array.isArray(value)) {
       const urls = value.map(v => {
         if (typeof v === "string") return v;
         if (v instanceof File) return URL.createObjectURL(v);
         if (v?.fileUrl) return v.fileUrl;
+        if (v?.url) return v.url;
         return "";
       }).filter(Boolean);
 
@@ -100,6 +109,7 @@ const UploadField = ({
       return;
     }
 
+    // Single File
     if (value instanceof File) {
       setPreviews([URL.createObjectURL(value)]);
       setFiles([value]);
@@ -107,47 +117,55 @@ const UploadField = ({
   }, [value]);
 
   const renderPreview = (src: string, idx: number) => {
-    let fileName: string | undefined;
+    const file = files[idx];
 
-    if (files[idx]) {
-      fileName = files[idx].name;
-    } else if (Array.isArray(value)) {
-      const item = value[idx] as any;
-      fileName = item?.name || src.split("/").pop();
-    } else {
-      fileName = src.split("/").pop();
+    // Determine fileName from File object or uploaded object
+    let fileName = file?.name || src.split("/").pop();
+
+    if (!fileName && Array.isArray(value)) {
+      const val = value[idx];
+      if (val && typeof val === "object") {
+        fileName = (val as any).fileName || (val as any).name || "Document.pdf";
+      }
+    } else if (!fileName && value && typeof value === "object" && !Array.isArray(value)) {
+      fileName = (value as any).fileName || (value as any).name || "Document.pdf";
     }
 
     const isPDF =
-      fileName?.toLowerCase().endsWith(".pdf") ||
-      (files[idx]?.type === "application/pdf");
+      file?.type === "application/pdf" ||
+      fileName?.toLowerCase().endsWith(".pdf");
 
-    return isPDF ? (
-      <div key={idx} className="flex items-center p-4 bg-gray-50 rounded-md border border-gray-200">
-        <FileText className="text-red-500 mr-2" size={24} />
-        <a
-          href={src}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-blue-600 hover:underline truncate max-w-xs"
-        >
-          {fileName || "Document.pdf"}
-        </a>
-        {showCloseButton && !disabled && (
-          <button
-            type="button"
-            onClick={() => clearFile(idx)}
-            className="ml-auto text-gray-500 hover:text-gray-700"
+    if (isPDF) {
+      return (
+        <div key={idx} className="flex items-center p-4 bg-gray-50 rounded-md border border-gray-200">
+          <FileText className="text-red-500 mr-2" size={24} />
+          <a
+            href={src}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-blue-600 hover:underline truncate max-w-xs"
           >
-            <X size={18} />
-          </button>
-        )}
-      </div>
-    ) : (
+            {fileName}
+          </a>
+          {showCloseButton && !disabled && (
+            <button
+              type="button"
+              onClick={() => clearFile(idx)}
+              className="ml-auto text-gray-500 hover:text-gray-700"
+            >
+              <X size={18} />
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // Image preview
+    return (
       <div key={idx} className="relative mt-2 flex items-start gap-2">
         <img
           src={src}
-          alt={`Preview ${idx}`}
+          alt={fileName}
           className="h-40 object-cover rounded-md border border-gray-200"
         />
         {showCloseButton && !disabled && (

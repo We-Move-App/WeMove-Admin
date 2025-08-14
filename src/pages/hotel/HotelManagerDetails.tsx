@@ -22,7 +22,7 @@ import fileUploadInstance from "@/api/fileUploadInstance";
 import Loader from "@/components/ui/loader";
 import NotFoundImage from "@/assets/not-found-illustration.svg";
 import AmenitiesMultiSelect from "@/components/ui/amenitiesMultiSelect";
-import PolicyDocuments from "@/components/hotel/PolicyDocuments";
+import { FileText } from "lucide-react";
 
 
 const HotelManagerDetails = () => {
@@ -43,10 +43,6 @@ const HotelManagerDetails = () => {
   const [manager, setManager] = useState<Partial<HotelManager> | null>(null);
 
   const [loading, setLoading] = useState(true);
-
-
-
-
 
   const toTitleCaseStatus = (status: string): HotelManager["status"] => {
     const map: Record<string, HotelManager["status"]> = {
@@ -82,22 +78,19 @@ const HotelManagerDetails = () => {
       try {
         const response = await axiosInstance.get(`/hotel-management/hotel-managers/hotel/${id}`);
         console.log("API Response:", response.data);
-        const managerData = response.data?.data?.hotelManager;
-        // console.log("Manager Data:", managerData);
-        const hotelData = response.data?.data?.hotel;
-        // console.log("Hotel Data:", hotelData);
-        const hotelAddress = response.data?.data?.hotelAddress?.address || {};
-        // console.log("Hotel Address:", hotelAddress);
-        const roomType = response.data?.data?.roomTypes || {};
-        // console.log("Room Types:", roomType);
-        const bankData = response.data?.data?.hotelManagerBank;
-        // console.log("Bank Data:", bankData);
-        const apiStatus = managerData?.verificationStatus || "pending";
-        const standardRoom = roomType.find(r => r.roomType === "standard");
-        const luxuryRoom = roomType.find(r => r.roomType === "luxury");
-        const hotelPolicy = response.data?.data?.hotelPolicies || {};
-        // console.log("Hotel Policy:", hotelPolicy);
 
+        const hotelData = response.data?.data?.hotel || null;
+        const managerData = response.data?.data?.manager || null;
+        const hotelAddress = response.data?.data?.hotel?.address || {};
+        // const roomType = response.data?.data?.roomTypes || {};
+        // const roomTypeRaw = response.data?.data?.roomTypes;
+        // const roomType = Array.isArray(roomTypeRaw) ? roomTypeRaw : roomTypeRaw ? [roomTypeRaw] : [];
+        const bankData = response.data?.data?.bankAccount || null;
+
+        const apiStatus = managerData?.verificationStatus || "pending";
+        const standardRoom = response.data?.data?.standardRoom || null;
+        const luxuryRoom = response.data?.data?.luxuryRoom || null;
+        const hotelPolicy = response.data?.data?.policy || null;
 
 
         if (managerData) {
@@ -130,6 +123,7 @@ const HotelManagerDetails = () => {
                 photos: standardRoom.images?.map(img => img.url) || []
               }
               : { numberOfRooms: 0, price: 0, amenities: [], photos: [] },
+
             luxuryRooms: luxuryRoom
               ? {
                 numberOfRooms: parseInt(luxuryRoom.numberOfRoom, 10) || 0,
@@ -143,15 +137,13 @@ const HotelManagerDetails = () => {
             checkInTime: hotelPolicy?.checkInTime,
             checkOutTime: hotelPolicy?.checkOutTime,
             amenities: hotelPolicy?.amenities?.map(a => a.name) || [],
-            policyDocuments:
-              hotelPolicy?.uploadDocuments?.[0]?.fileUrl || null,
-
+            policyDocuments: hotelPolicy?.uploadDocuments || [],
 
             // Bank Details
             bankName: bankData?.bankName || "",
             accountHolderName: bankData?.accountHolderName || "",
             bankAccountNumber: bankData?.accountNumber || "",
-            bankAccountDetails: bankData?.bankDocs?.url || "",
+            bankAccountDetails: bankData?.bankDocs || [],
           });
         } else {
           setManager(null);
@@ -184,45 +176,43 @@ const HotelManagerDetails = () => {
 
 
 
-
-  // const uploadImage = async (file: File): Promise<string> => {
-  //   const formData = new FormData();
-  //   formData.append("image", file);
-
-  //   const res = await fileUploadInstance.post("/file/upload", formData, {
-  //     headers: { "Content-Type": "multipart/form-data" },
-  //   });
-
-  //   console.log("Uploaded file URL:", res.data?.data?.url);
-  //   return res.data?.data?.url;
-  // };
-
-  const uploadImage = async (file: File): Promise<string> => {
+  const uploadImage = async (file: File): Promise<{ public_id: string; url: string; fileName: string; fileType: string }> => {
     const formData = new FormData();
-    formData.append("image", file); // backend expects field name "image"?
+    formData.append("image", file);
 
     const res = await fileUploadInstance.post("/file/upload", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    console.log("Uploaded file URL:", res.data?.data?.url);
-    return res.data?.data?.url;
+    const uploadedData = res.data?.data;
+
+    console.log("Uploaded file response:", uploadedData);
+
+    // return the full object
+    return {
+      public_id: uploadedData.public_id,
+      url: uploadedData.url,
+      fileName: uploadedData.fileName,
+      fileType: uploadedData.fileType,
+    };
   };
 
-
-
+  // then use it like this:
   const handleFileUpload = async (file: File) => {
-    const uploadedUrl = await uploadImage(file);
-    return uploadedUrl;
+    return await uploadImage(file);
   };
 
   const handleMultipleFileUpload = async (files: File[]) => {
-    const uploadedUrls = await Promise.all(files.map(file => uploadImage(file)));
-    return uploadedUrls;
+    return await Promise.all(files.map(file => uploadImage(file)));
   };
 
-
-
+  // When handling upload
+  const handlePolicyFileChange = async (file: File) => {
+    const uploadedData = await handleFileUpload(file); // full object from upload API
+    // Instead of wrapping in { name, Url }, just store the object directly
+    const updatedDocs = [...(manager.policyDocuments || []), uploadedData];
+    handleChange("policyDocuments", updatedDocs);
+  };
 
 
   const handleSubmit = async () => {
@@ -238,9 +228,7 @@ const HotelManagerDetails = () => {
         },
         bankInfo: {
           accountNumber: manager.bankAccountNumber,
-          bankDocs: manager.bankAccountDetails && manager.bankAccountDetails.length > 0
-            ? { url: manager.bankAccountDetails[0] }
-            : null,
+          bankDocs: manager.bankAccountDetails || null,
           bankName: manager.bankName,
           accountHolderName: manager.accountHolderName,
         },
@@ -278,11 +266,7 @@ const HotelManagerDetails = () => {
           checkInTime: manager.checkInTime,
           checkOutTime: manager.checkOutTime,
           amenities: (manager.amenities || []).map(a => ({ name: a, status: true })),
-          uploadDocuments: manager.policyDocuments
-            ? Array.isArray(manager.policyDocuments)
-              ? manager.policyDocuments.map((url: string, i: number) => ({ name: `Policy Doc ${i + 1}`, fileUrl: url }))
-              : [{ name: "Policy Doc", fileUrl: manager.policyDocuments }]
-            : [],
+          uploadDocuments: manager.policyDocuments || [],
         },
       };
 
@@ -357,7 +341,10 @@ const HotelManagerDetails = () => {
       </div>
     );
   }
-
+  console.log("Policy Document:", manager.policyDocuments);
+  console.log("manager state:", manager);
+  console.log("Mode:", mode);
+  console.log("Bank Account Details:", manager.bankAccountDetails);
   return (
     <>
       <Button
@@ -429,15 +416,16 @@ const HotelManagerDetails = () => {
                   <UploadField
                     disabled={isReadOnly}
                     label="Profile Photo"
-                    value={isNewManager || !manager.profilePhoto ? null : manager.profilePhoto}
+                    value={manager?.profilePhoto}
                     onChange={async (file) => {
                       if (file instanceof File) {
-                        const uploadedUrl = await uploadImage(file);
-                        handleChange("profilePhoto", uploadedUrl);
+                        const uploadedData = await uploadImage(file);
+                        handleChange("profilePhoto", uploadedData.url);
                       }
                     }}
                     multiple={false}
                   />
+
 
                 </div>
                 <div>
@@ -638,24 +626,7 @@ const HotelManagerDetails = () => {
                     }
                   />
                 </div>
-                {/* <div className="col-span-2">
-                  <label className="block text-sm font-medium mb-1">
-                    Amenities (comma separated)
-                  </label>
-                  <Input
-                    disabled={isReadOnly}
-                    value={manager.standardRooms?.amenities?.join(", ") || ""}
-                    onChange={(e) =>
-                      handleChange("standardRooms", {
-                        ...manager.standardRooms,
-                        amenities: e.target.value
-                          .split(",")
-                          .map((item) => item.trim())
-                          .filter(Boolean),
-                      })
-                    }
-                  />
-                </div> */}
+
                 <div className="col-span-2">
                   <label className="block text-sm font-medium mb-1">Amenities</label>
                   <AmenitiesMultiSelect
@@ -783,66 +754,64 @@ const HotelManagerDetails = () => {
                     }
                   />
                 </div>
-                {/* <div className="col-span-2">
-                  <label className="block text-sm font-medium mb-1">
-                    Hotel Amenities (comma separated)
-                  </label>
-                  <Input
-                    disabled={isReadOnly}
-                    value={manager.amenities?.join(", ") || ""}
-                    onChange={(e) =>
-                      handleChange(
-                        "amenities",
-                        e.target.value
-                          .split(",")
-                          .map((item) => item.trim())
-                          .filter(Boolean)
-                      )
-                    }
-                  />
-                </div> */}
-                {/* <div className="col-span-2">
+                <div className="col-span-2">
                   <label className="block text-sm font-medium mb-1">Hotel Amenities</label>
                   <AmenitiesMultiSelect
-                    value={manager.standardRooms?.amenities || []}
+                    value={manager.amenities || []}
                     onChange={(selected) =>
-                      handleChange("standardRooms", {
-                        ...manager.standardRooms,
+                      handleChange("amenities", {
+                        ...manager.amenities,
                         amenities: selected,
                       })
                     }
                     isReadOnly={isReadOnly}
                   />
-                </div> */}
-                <div className="col-span-2">
-                  <UploadField
-                    disabled={isReadOnly}
-                    label="Policy Documents"
-                    value={
-                      isNewManager || !manager.policyDocuments
-                        ? null
-                        : manager.policyDocuments
-                    }
-                    onChange={async (file) => {
-                      if (file instanceof File) {
-                        const uploadedUrl = await handleFileUpload(file);
-                        handleChange("policyDocuments", [
-                          { name: file.name, fileUrl: uploadedUrl }
-                        ]);
-                      }
-                    }}
-                    multiple
-                  />
-                  {/* <PolicyDocuments
-                    documents={
-                      manager.policyDocuments
-                        ? Array.isArray(manager.policyDocuments)
-                          ? manager.policyDocuments.map(url => ({ fileUrl: url }))
-                          : [{ fileUrl: manager.policyDocuments }]
-                        : []
-                    }
-                  /> */}
                 </div>
+                <div className="col-span-2 space-y-2">
+                  {mode === "view" && manager.policyDocuments && manager.policyDocuments.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Policy Document</label>
+                      <div className="flex flex-col gap-2">
+                        {manager.policyDocuments.map((doc) => (
+                          <a
+                            key={doc._id}
+                            href={doc.fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-blue-600 hover:underline"
+                          >
+                            <FileText className="w-5 h-5" />
+                            <span>{doc.fileName}</span>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {mode !== "view" && (
+                    <UploadField
+                      disabled={isReadOnly}
+                      label="Policy Documents"
+                      value={isNewManager || !manager.policyDocuments ? null : manager.policyDocuments}
+                      onChange={async (file) => {
+                        if (!file) return;
+
+                        const filesArray = Array.isArray(file) ? file : [file];
+
+                        const uploadedFiles = await Promise.all(
+                          filesArray.map(async (f) => {
+                            const uploadedData = await uploadImage(f);
+                            return uploadedData;
+                          })
+                        );
+
+                        handleChange("policyDocuments", uploadedFiles);
+                      }}
+                      multiple
+                    />
+                  )}
+                </div>
+
               </div>
             </CardContent>
           </Card>
@@ -889,72 +858,64 @@ const HotelManagerDetails = () => {
                     }
                   />
                 </div>
+
                 <div>
-                  {/* <UploadField
-                    disabled={isReadOnly}
-                    label="Bank Account Details"
-                    value={
-                      isNewManager || !manager.bankAccountDetails
-                        ? null
-                        : manager.bankAccountDetails
-                    }
-                    onChange={async (files) => {
-                      if (!files) return;
+                  {/* View Mode */}
+                  {mode === "view" && manager.bankAccountDetails && (
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Bank Account Document</label>
+                      <a
+                        href={
+                          typeof manager.bankAccountDetails === "string"
+                            ? manager.bankAccountDetails
+                            : manager.bankAccountDetails.url || manager.bankAccountDetails.fileUrl
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-blue-600 hover:underline"
+                      >
+                        <FileText className="w-5 h-5" />
+                        <span>
+                          {typeof manager.bankAccountDetails === "string"
+                            ? "Bank Document"
+                            : manager.bankAccountDetails.fileName || "Bank Document"}
+                        </span>
+                      </a>
+                    </div>
+                  )}
 
-                      const filesArray = Array.isArray(files) ? files : [files];
+                  {/* Edit Mode */}
+                  {mode !== "view" && (
+                    <UploadField
+                      disabled={isReadOnly}
+                      label="Bank Account Details"
+                      value={manager.bankAccountDetails || null}
+                      multiple={false}
+                      onChange={async (file) => {
+                        if (!file) return;
 
-                      const uploadedFiles = await Promise.all(
-                        filesArray.map(async (file) => {
-                          const uploadedUrl = await handleFileUpload(file);
-                          return { name: file.name, fileUrl: uploadedUrl };
-                        })
-                      );
+                        const filesArray = Array.isArray(file) ? file : [file];
 
-                      handleChange("bankAccountDetails", uploadedFiles);
-                    }}
-
-                    multiple
-                  /> */}
-                  <UploadField
-                    disabled={isReadOnly}
-                    label="Bank Account Details"
-                    value={manager.bankAccountDetails || null}
-                    onChange={async (file) => {
-                      if (!file) return;
-                      const filesArray = Array.isArray(file) ? file : [file];
-
-                      const uploadedFiles = await Promise.all(
-                        filesArray.map(async (f) => {
-                          const uploadedUrl = await handleFileUpload(f);
-                          return uploadedUrl; // store only the URL
-                        })
-                      );
-
-                      handleChange("bankAccountDetails", uploadedFiles); // now it's string[]
-                    }}
-                    multiple
-                  />
-
-
-                  {/* <PolicyDocuments
-                    documents={
-                      manager.hotelManagerBank?.bankDocs
-                        ? [
-                          {
-                            name: "Bank Document",
-                            fileUrl: manager.hotelManagerBank.bankDocs.url,
-                          },
-                        ]
-                        : []
-                    }
-                  /> */}
+                        const uploadedFiles = await Promise.all(
+                          filesArray.map(async (f) => {
+                            const uploadedData = await handleFileUpload(f);
+                            return uploadedData;
+                          })
+                        );
+                        handleChange("bankAccountDetails", uploadedFiles[0]);
+                      }}
+                    />
+                  )}
                 </div>
+
+
+
 
               </div>
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
+      </Tabs >
     </>
   );
 };

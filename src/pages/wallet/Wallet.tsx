@@ -148,7 +148,7 @@ const Wallet = () => {
       try {
         const token = localStorage.getItem("accessToken");
         const res = await axios.get(
-          "https://break-trains-sig-fame.trycloudflare.com/api/v1/wallet/transactions/admin",
+          "http://139.59.20.155:8000/api/v1/wallet/transactions/admin",
           {
             headers: {
               Authorization: `Bearer ${token}`,

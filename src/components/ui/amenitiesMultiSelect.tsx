@@ -54,7 +54,10 @@ export function AmenitiesMultiSelect({ value = [], onChange, isReadOnly }) {
                 <Button
                     variant="outline"
                     role="combobox"
-                    className="w-full justify-between"
+                    className={clsx(
+                        "w-full justify-between",
+                        isReadOnly && "opacity-100 cursor-default bg-gray-100"
+                    )}
                     disabled={isReadOnly}
                 >
                     {value.length > 0 ? value.join(", ") : "Select amenities"}
@@ -89,3 +92,4 @@ export function AmenitiesMultiSelect({ value = [], onChange, isReadOnly }) {
 }
 
 export default AmenitiesMultiSelect;
+
