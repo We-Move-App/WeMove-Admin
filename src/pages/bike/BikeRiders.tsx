@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, Plus } from "lucide-react";
 // import Layout from '@/components/layout/Layout';
@@ -6,6 +6,7 @@ import DataTable from "@/components/ui/DataTable";
 import { BikeRider } from "@/types/admin";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/button";
+import axiosInstance from "@/api/axiosInstance";
 
 // Mock data for bike riders
 const mockBikeRiders: BikeRider[] = [
@@ -57,19 +58,56 @@ const mockBikeRiders: BikeRider[] = [
 
 const BikeRiders = () => {
   const navigate = useNavigate();
-  const [riders] = useState<BikeRider[]>(mockBikeRiders);
+  // const [riders] = useState<BikeRider[]>(mockBikeRiders);
+  const [riders, setRiders] = useState<BikeRider[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const limit = 10;
+  const totalPages = Math.ceil(total / limit);
+
+  useEffect(() => {
+    const fetchRiders = async () => {
+      try {
+        const res = await axiosInstance.get(
+          `/driver-management/drivers/?vehicleType=bike&page=${page}&limit=10`
+        );
+
+        const apiData = res.data.data || [];
+        setTotal(res.data.total || 0);
+
+        const mapped: BikeRider[] = apiData.map((rider: any) => ({
+          driverId: rider.driverId,
+          name: rider.name,
+          email: rider.email || "-",
+          mobile: rider.mobile || "-",
+          status: rider.status,
+          vehicleType: rider.vehicleType,
+          registrationNumber: rider.registrationNumber,
+        }));
+
+        setRiders(mapped);
+      } catch (err) {
+        console.error("Error fetching bike riders:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRiders();
+  }, [page]);
 
   const handleRowClick = (rider: BikeRider) => {
-    navigate(`/bike-management/riders/${rider.id}`);
+    navigate(`/bike-management/riders/${rider.driverId}`);
   };
 
   const columns = [
     { key: "name" as keyof BikeRider, header: "Name" },
     { key: "mobile" as keyof BikeRider, header: "Mobile" },
     { key: "email" as keyof BikeRider, header: "Email" },
-    { key: "vehicleType" as keyof BikeRider, header: "Vehicle Type" },
+    // { key: "vehicleType" as keyof BikeRider, header: "Vehicle Type" },
     {
-      key: "vehicleRegistrationNumber" as keyof BikeRider,
+      key: "registrationNumber" as keyof BikeRider,
       header: "Registration Number",
     },
     {
@@ -85,7 +123,7 @@ const BikeRiders = () => {
           className="action-button flex items-center"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/bike-management/riders/${rider.id}`);
+            navigate(`/bike-management/riders/${rider.driverId}`);
           }}
         >
           <Eye size={16} className="mr-1" /> View Details
@@ -99,20 +137,38 @@ const BikeRiders = () => {
       key: "status" as keyof BikeRider,
       label: "Status",
       options: [
-        { label: "Approved", value: "Approved" },
-        { label: "Rejected", value: "Rejected" },
-      ],
-    },
-    {
-      key: "vehicleType" as keyof BikeRider,
-      label: "Vehicle Type",
-      options: [
-        { label: "Scooter", value: "Scooter" },
-        { label: "MotorBike", value: "MotorBike" },
+        { label: "Approved", value: "approved" },
+        { label: "Pending", value: "pending" },
+        { label: "Rejected", value: "rejected" },
       ],
     },
   ];
 
+  // return (
+  //   <>
+  //     <div className="flex justify-between items-center mb-6">
+  //       <div>
+  //         <h1 className="text-2xl font-bold">Bike Riders</h1>
+  //         <p className="text-gray-600">Manage all bike riders</p>
+  //       </div>
+  //       <Button
+  //         onClick={() => navigate('/bike-management/riders/new')}
+  //         className="flex items-center gap-2"
+  //       >
+  //         <Plus size={16} /> Add Bike Rider
+  //       </Button>
+  //     </div>
+
+  //     <DataTable
+  //       columns={columns}
+  //       data={riders}
+  //       onRowClick={handleRowClick}
+  //       keyExtractor={(item) => item.id}
+  //       filterable={true}
+  //       filterOptions={filterOptions}
+  //     />
+  //   </>
+  // );
   return (
     <>
       <div className="flex justify-between items-center mb-6">
@@ -120,24 +176,30 @@ const BikeRiders = () => {
           <h1 className="text-2xl font-bold">Bike Riders</h1>
           <p className="text-gray-600">Manage all bike riders</p>
         </div>
-        {/* <Button
-          onClick={() => navigate('/bike-management/riders/new')}
+        <Button
+          onClick={() => navigate("/bike-management/riders/new")}
           className="flex items-center gap-2"
         >
           <Plus size={16} /> Add Bike Rider
-        </Button> */}
+        </Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={riders}
-        onRowClick={handleRowClick}
-        keyExtractor={(item) => item.id}
-        filterable={true}
-        filterOptions={filterOptions}
-      />
+      {loading ? (
+        <p>Loading riders...</p>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={riders}
+          onRowClick={handleRowClick}
+          keyExtractor={(item) => item.driverId}
+          filterable={true}
+          filterOptions={filterOptions}
+          paginate={false}
+        />
+      )}
     </>
   );
+
 };
 
 export default BikeRiders;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, Plus } from "lucide-react";
 // import Layout from '@/components/layout/Layout';
@@ -6,70 +6,25 @@ import DataTable from "@/components/ui/DataTable";
 import { TaxiDriver } from "@/types/admin";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/button";
-
-// Mock data for taxi drivers
-const mockTaxiDrivers: TaxiDriver[] = [
-  {
-    id: "1",
-    name: "John Smith",
-    mobile: "9876543210",
-    email: "john.smith@example.com",
-    status: "Approved",
-    age: 35,
-    experience: 8,
-    vehicleType: "Car",
-    vehicleRegistrationNumber: "TN-01-AB-1234",
-  },
-  {
-    id: "2",
-    name: "Michael Brown",
-    mobile: "8765432109",
-    email: "michael.brown@example.com",
-    status: "Approved",
-    age: 42,
-    experience: 15,
-    vehicleType: "Car",
-    vehicleRegistrationNumber: "TN-02-CD-5678",
-  },
-  {
-    id: "3",
-    name: "David Wilson",
-    mobile: "7654321098",
-    email: "david.wilson@example.com",
-    status: "Rejected",
-    age: 28,
-    experience: 3,
-    vehicleType: "Car",
-    vehicleRegistrationNumber: "TN-03-EF-9012",
-  },
-  {
-    id: "4",
-    name: "Robert Taylor",
-    mobile: "6543210987",
-    email: "robert.taylor@example.com",
-    status: "Approved",
-    age: 38,
-    experience: 10,
-    vehicleType: "Car",
-    vehicleRegistrationNumber: "TN-04-GH-3456",
-  },
-];
+import axiosInstance from "@/api/axiosInstance";
 
 const TaxiDrivers = () => {
   const navigate = useNavigate();
-  const [drivers] = useState<TaxiDriver[]>(mockTaxiDrivers);
+  const [drivers, setDrivers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const handleRowClick = (driver: TaxiDriver) => {
-    navigate(`/taxi-management/drivers/${driver.id}`);
+    navigate(`/taxi-management/drivers/${driver.driverId}`);
   };
 
   const columns = [
     { key: "name" as keyof TaxiDriver, header: "Name" },
     { key: "mobile" as keyof TaxiDriver, header: "Mobile" },
     { key: "email" as keyof TaxiDriver, header: "Email" },
-    { key: "vehicleType" as keyof TaxiDriver, header: "Vehicle Type" },
+    // { key: "vehicleType" as keyof TaxiDriver, header: "Vehicle Type" },
     {
-      key: "vehicleRegistrationNumber" as keyof TaxiDriver,
+      key: "registrationNumber" as keyof TaxiDriver,
       header: "Registration Number",
     },
     {
@@ -85,7 +40,7 @@ const TaxiDrivers = () => {
           className="action-button flex items-center"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/taxi-management/drivers/${driver.id}`);
+            navigate(`/taxi-management/drivers/${driver.driverId}`);
           }}
         >
           <Eye size={16} className="mr-1" /> View Details
@@ -103,15 +58,39 @@ const TaxiDrivers = () => {
         { label: "Rejected", value: "Rejected" },
       ],
     },
-    {
-      key: "vehicleType" as keyof TaxiDriver,
-      label: "Vehicle Type",
-      options: [
-        { label: "Car", value: "Car" },
-        { label: "Bike", value: "Bike" },
-      ],
-    },
+    // {
+    //   key: "vehicleType" as keyof TaxiDriver,
+    //   label: "Vehicle Type",
+    //   options: [
+    //     { label: "Car", value: "Car" },
+    //     { label: "Bike", value: "Bike" },
+    //   ],
+    // },
   ];
+
+  useEffect(() => {
+    const fetchDrivers = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get(
+          "/driver-management/drivers",
+          {
+            params: { vehicleType: "taxi" },
+          }
+        );
+        setDrivers(response.data?.data || []);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch drivers");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDrivers();
+  }, []); // runs once when component mounts
+
+  if (loading) return <p>Loading drivers...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <>
@@ -120,19 +99,19 @@ const TaxiDrivers = () => {
           <h1 className="text-2xl font-bold">Taxi Drivers</h1>
           <p className="text-gray-600">Manage all taxi drivers</p>
         </div>
-        {/* <Button
+        <Button
           onClick={() => navigate('/taxi-management/drivers/new')}
           className="flex items-center gap-2"
         >
           <Plus size={16} /> Add Taxi Driver
-        </Button> */}
+        </Button>
       </div>
 
       <DataTable
         columns={columns}
         data={drivers}
         onRowClick={handleRowClick}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.driverId}
         filterable={true}
         filterOptions={filterOptions}
       />

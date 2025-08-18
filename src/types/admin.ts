@@ -169,7 +169,8 @@ export interface HotelBooking {
 
 // Taxi related types
 export interface TaxiDriver {
-  id: string;
+  id?: string;
+  driverId?: string;
   name: string;
   email: string;
   mobile?: string;
@@ -215,6 +216,7 @@ export interface TaxiBooking {
 // Bike related types
 export interface BikeRider {
   id: string;
+  driverId?: string;
   name: string;
   email: string;
   mobile?: string;

@@ -78,7 +78,7 @@ const TaxiBookings = () => {
     { key: "from" as keyof TaxiBooking, header: "From" },
     { key: "to" as keyof TaxiBooking, header: "To" },
     { key: "rideDate" as keyof TaxiBooking, header: "Ride Date" },
-    { key: "vehicleType" as keyof TaxiBooking, header: "Vehicle Type" },
+    // { key: "vehicleType" as keyof TaxiBooking, header: "Vehicle Type" },
     {
       key: "amount" as keyof TaxiBooking,
       header: "Amount",
@@ -118,15 +118,15 @@ const TaxiBookings = () => {
         { label: "Pending", value: "Pending" },
       ],
     },
-    {
-      key: "vehicleType" as keyof TaxiBooking,
-      label: "Vehicle Type",
-      options: [
-        { label: "Sedan", value: "Sedan" },
-        { label: "SUV", value: "SUV" },
-        { label: "Hatchback", value: "Hatchback" },
-      ],
-    },
+    // {
+    //   key: "vehicleType" as keyof TaxiBooking,
+    //   label: "Vehicle Type",
+    //   options: [
+    //     { label: "Sedan", value: "Sedan" },
+    //     { label: "SUV", value: "SUV" },
+    //     { label: "Hatchback", value: "Hatchback" },
+    //   ],
+    // },
   ];
 
   return (
@@ -165,10 +165,10 @@ const TaxiBookings = () => {
                   <h4 className="text-sm text-gray-500">Status</h4>
                   <StatusBadge status={selectedBooking.status} />
                 </div>
-                <div>
+                {/* <div>
                   <h4 className="text-sm text-gray-500">Vehicle Type</h4>
                   <p className="font-medium">{selectedBooking.vehicleType}</p>
-                </div>
+                </div> */}
                 <div>
                   <h4 className="text-sm text-gray-500">Amount</h4>
                   <p className="font-medium">

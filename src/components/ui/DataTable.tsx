@@ -311,6 +311,7 @@ function DataTable<T>({
           </PaginationContent>
         </Pagination>
       )}
+
     </div>
   );
 }
