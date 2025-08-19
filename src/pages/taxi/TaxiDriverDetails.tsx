@@ -11,6 +11,7 @@ import { toast } from '@/hooks/use-toast';
 import { TaxiDriver } from '@/types/admin';
 import UploadField from '@/components/ui/UploadField';
 import axiosInstance from '@/api/axiosInstance';
+import fileUploadInstance from '@/api/fileUploadInstance';
 
 const TaxiDriverDetails = () => {
   const { id } = useParams();
@@ -75,18 +76,158 @@ const TaxiDriverDetails = () => {
     setDriver(prev => ({ ...prev, [field]: value }));
   };
 
+  // helper to upload single or multiple files
+  const uploadFiles = async (files: File | File[]) => {
+    const formData = new FormData();
+
+    if (Array.isArray(files)) {
+      files.forEach((file) => formData.append("image", file));
+    } else {
+      formData.append("image", files);
+    }
+
+    const res = await fileUploadInstance.post("/file/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return res.data.data;
+  };
+
+  // const isFile = (file: any): file is File => file && typeof file === "object" && "name" in file;
+
+  // const buildDriverPayload = async (driver: TaxiDriver) => {
+  //   // Upload files first
+  //   const profilePhoto = isFile(driver.profilePhoto)
+  //     ? await uploadFiles(driver.profilePhoto)
+  //     : driver.profilePhoto;
+
+  //   const idProofs = Array.isArray(driver.idProofs)
+  //     ? await Promise.all(driver.idProofs.map(async (f) => isFile(f) ? await uploadFiles(f) : f))
+  //     : [];
+
+  //   const driverLicense = Array.isArray(driver.driverLicense)
+  //     ? await Promise.all(driver.driverLicense.map(async (f) => isFile(f) ? await uploadFiles(f) : f))
+  //     : [];
+
+  //   const vehiclePhotos = Array.isArray(driver.vehiclePhotos)
+  //     ? await Promise.all(driver.vehiclePhotos.map(async (f) => isFile(f) ? await uploadFiles(f) : f))
+  //     : [];
+
+  //   const vehicleInsurance = isFile(driver.vehicleInsurance)
+  //     ? await uploadFiles(driver.vehicleInsurance)
+  //     : driver.vehicleInsurance;
+
+  //   const vehicleRegistrationCertificate = isFile(driver.vehicleRegistrationCertificate)
+  //     ? await uploadFiles(driver.vehicleRegistrationCertificate)
+  //     : driver.vehicleRegistrationCertificate;
+
+  //   const bankAccountDetails = isFile(driver.bankAccountDetails)
+  //     ? await uploadFiles(driver.bankAccountDetails)
+  //     : driver.bankAccountDetails;
+
+  //   // Final payload
+  //   return {
+  //     name: driver.name || "",
+  //     age: driver.age || null,
+  //     mobile: driver.mobile || "",
+  //     address: driver.address || "",
+  //     profilePhoto,
+
+  //     experience: driver.experience || 0,
+  //     idProofs,
+  //     driverLicense,
+
+  //     vehicleModel: driver.vehicleModel || "",
+  //     vehicleRegistrationNumber: driver.vehicleRegistrationNumber || "",
+  //     vehicleInsurance,
+  //     vehicleRegistrationCertificate,
+  //     vehiclePhotos,
+
+  //     accountNumber: driver.accountNumber || "",
+  //     accountHolderName: driver.accountHolderName || "",
+  //     bankAccountDetails,
+
+  //     status: "pending",
+  //   };
+  // };
+
+
+  const buildDriverPayload = async (driver: TaxiDriver) => {
+    const isFile = (file: any): file is File => file && typeof file === "object" && "name" in file;
+
+    // Upload files first
+    const profilePhoto = isFile(driver.profilePhoto) ? await uploadFiles(driver.profilePhoto) : driver.profilePhoto;
+
+    const documents = Array.isArray(driver.idProofs)
+      ? await Promise.all(driver.idProofs.map(async (f) => isFile(f) ? await uploadFiles(f) : f))
+      : [];
+
+    const driverLicenseDocs = Array.isArray(driver.driverLicense)
+      ? await Promise.all(driver.driverLicense.map(async (f) => isFile(f) ? await uploadFiles(f) : f))
+      : [];
+
+    const vehiclePhotos = Array.isArray(driver.vehiclePhotos)
+      ? await Promise.all(driver.vehiclePhotos.map(async (f) => isFile(f) ? await uploadFiles(f) : f))
+      : [];
+
+    const vehicleInsurance = isFile(driver.vehicleInsurance) ? await uploadFiles(driver.vehicleInsurance) : driver.vehicleInsurance;
+
+    const vehicleRegistrationCertificate = isFile(driver.vehicleRegistrationCertificate)
+      ? await uploadFiles(driver.vehicleRegistrationCertificate)
+      : driver.vehicleRegistrationCertificate;
+
+    const bankAccountDetails = isFile(driver.bankAccountDetails)
+      ? await uploadFiles(driver.bankAccountDetails)
+      : driver.bankAccountDetails;
+
+    // Build payload according to backend expectation
+    const payload = {
+      basicDriverDetails: {
+        fullName: driver.name || "",
+        phoneNo: driver.mobile || "",
+        email: driver.email || "",
+        age: driver.age || null,
+        experience: driver.experience || 0,
+        address: driver.address || "",
+      },
+      bankDetails: {
+        accountNumber: driver.accountNumber || "",
+        holderName: driver.accountHolderName || "",
+        document: bankAccountDetails || null,
+      },
+      vehicleDetails: {
+        model: driver.vehicleModel || "",
+        registrationNo: driver.vehicleRegistrationNumber || "",
+        vehicleType: "taxi",
+        insurance: vehicleInsurance || null,
+        registrationCertificate: vehicleRegistrationCertificate || null,
+        vehiclePhotos: vehiclePhotos.length ? vehiclePhotos[0] : null,
+        avatarPhotos: profilePhoto || null,
+      },
+      documents: [...documents, ...driverLicenseDocs],
+    };
+
+    console.log("Driver Payload:", payload);
+    return payload;
+  };
+
+
+
   const handleSubmit = async () => {
     try {
-      if (mode === 'post') {
-        await axiosInstance.post('/taxi-management/drivers', driver);
-        toast({ title: 'Taxi Driver Created', description: driver.name });
-      } else if (mode === 'edit') {
-        await axiosInstance.put(`/taxi-management/drivers/${id}`, driver);
-        toast({ title: 'Taxi Driver Updated', description: driver.name });
+      const payload = await buildDriverPayload(driver);
+      if (mode === "post") {
+        await axiosInstance.post("/driver-management/taxi-drivers/register", payload);
+      } else if (mode === "edit") {
+        await axiosInstance.put(`/driver-management/taxi-drivers/${id}?vehicleType=taxi`, payload);
       }
-      navigate('/taxi-management/drivers');
+      toast({
+        title: mode === "post" ? "Driver Created" : "Driver Updated",
+        description: driver.name,
+      });
+      navigate("/taxi-management/drivers");
     } catch (error) {
-      toast({ title: 'Error', description: 'Something went wrong!' });
+      console.error("Error saving driver:", error);
     }
   };
 
@@ -144,10 +285,11 @@ const TaxiDriverDetails = () => {
       </div >
 
       <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-3 mb-4">
+        <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-4 mb-4">
           <TabsTrigger value="personal">Personal Info</TabsTrigger>
           <TabsTrigger value="experience">Experience & Documents</TabsTrigger>
           <TabsTrigger value="vehicle">Vehicle Details</TabsTrigger>
+          <TabsTrigger value="bank">Bank Details</TabsTrigger>
         </TabsList>
 
         {/* Personal Info */}
@@ -155,6 +297,30 @@ const TaxiDriverDetails = () => {
           <Card>
             <CardContent className="pt-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Profile Photo */}
+                <div className="col-span-2">
+                  <UploadField
+                    label="Profile Photo"
+                    value={driver.profilePhoto || null}
+                    disabled={isReadOnly}
+                    multiple={false}
+                    onChange={async (file) => {
+                      if (!file) return;
+
+                      // Ensure we have an array to handle multiple files (even if multiple=false)
+                      const filesArray = Array.isArray(file) ? file : [file];
+
+                      // Upload all selected files
+                      const uploadedFiles = await Promise.all(
+                        filesArray.map(async (f) => await uploadFiles(f))
+                      );
+
+                      // Since this is single file, pick the first uploaded file
+                      handleChange("profilePhoto", uploadedFiles[0]);
+                    }}
+                  />
+
+                </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Name</label>
                   <Input
@@ -181,15 +347,6 @@ const TaxiDriverDetails = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Email</label>
-                  <Input
-                    type="email"
-                    disabled={isReadOnly}
-                    value={driver.email}
-                    onChange={(e) => handleChange('email', e.target.value)}
-                  />
-                </div>
-                <div className="col-span-2">
                   <label className="block text-sm font-medium mb-1">Address</label>
                   <Textarea
                     disabled={isReadOnly}
@@ -216,14 +373,54 @@ const TaxiDriverDetails = () => {
                     onChange={(e) => handleChange('experience', parseInt(e.target.value) || 0)}
                   />
                 </div>
-                <div className="col-span-2">
-                  <UploadField
-                    label="ID Proofs"
-                    value={driver.idProofs || []}
-                    disabled={isReadOnly}
-                    onChange={(value) => handleChange('idProofs', value)}
-                    multiple={true}
-                  />
+                <div className='col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <UploadField
+                      disabled={isReadOnly}
+                      label="ID Proofs"
+                      multiple={true}
+                      value={driver.idProofs || []}
+                      onChange={async (files) => {
+                        if (!files) return;
+
+                        // Normalize to an array
+                        const filesArray = Array.isArray(files) ? files : [files];
+
+                        // Upload all files and get uploaded data
+                        const uploadedFiles = await Promise.all(
+                          filesArray.map(async (file) => {
+                            const uploadedData = await uploadFiles(file);
+                            return uploadedData;
+                          })
+                        );
+
+                        // Update driver state with uploaded file data
+                        setDriver({
+                          ...driver,
+                          idProofs: uploadedFiles,
+                        });
+                      }}
+                    />
+
+
+                    <div>
+                      <UploadField
+                        label="Driver License"
+                        value={driver.driverLicense || []}
+                        disabled={isReadOnly}
+                        multiple={true}
+                        onChange={async (files) => {
+                          if (!files) return;
+                          const filesArray = Array.isArray(files) ? files : [files];
+                          const uploadedFiles = await Promise.all(
+                            filesArray.map(async (f) => await uploadFiles(f))
+                          );
+                          handleChange('driverLicense', uploadedFiles);
+                        }}
+                      />
+
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -235,6 +432,14 @@ const TaxiDriverDetails = () => {
           <Card>
             <CardContent className="pt-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Vehicle Model</label>
+                  <Input
+                    value={driver.vehicleModel || ''}
+                    disabled={isReadOnly}
+                    onChange={(e) => handleChange('vehicleModel', e.target.value)}
+                  />
+                </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Registration Number</label>
                   <Input
@@ -248,7 +453,13 @@ const TaxiDriverDetails = () => {
                     label="Vehicle Insurance"
                     value={driver.vehicleInsurance}
                     disabled={isReadOnly}
-                    onChange={(value) => handleChange('vehicleInsurance', value)}
+                    multiple={false}
+                    onChange={async (file) => {
+                      if (!file) return;
+                      const filesArray = Array.isArray(file) ? file : [file];
+                      const uploadedFiles = await Promise.all(filesArray.map(f => uploadFiles(f)));
+                      handleChange('vehicleInsurance', uploadedFiles[0]);
+                    }}
                   />
                 </div>
                 <div>
@@ -256,7 +467,13 @@ const TaxiDriverDetails = () => {
                     label="Registration Certificate"
                     value={driver.vehicleRegistrationCertificate}
                     disabled={isReadOnly}
-                    onChange={(value) => handleChange('vehicleRegistrationCertificate', value)}
+                    multiple={false}
+                    onChange={async (file) => {
+                      if (!file) return;
+                      const filesArray = Array.isArray(file) ? file : [file];
+                      const uploadedFiles = await Promise.all(filesArray.map(f => uploadFiles(f)));
+                      handleChange('vehicleRegistrationCertificate', uploadedFiles[0]);
+                    }}
                   />
                 </div>
                 <div className="col-span-2">
@@ -264,8 +481,53 @@ const TaxiDriverDetails = () => {
                     label="Vehicle Photos"
                     value={driver.vehiclePhotos || []}
                     disabled={isReadOnly}
-                    onChange={(value) => handleChange('vehiclePhotos', value)}
                     multiple={true}
+                    onChange={async (files) => {
+                      if (!files) return;
+                      const filesArray = Array.isArray(files) ? files : [files];
+                      const uploadedFiles = await Promise.all(filesArray.map(f => uploadFiles(f)));
+                      handleChange('vehiclePhotos', uploadedFiles);
+                    }}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Bank Details */}
+        <TabsContent value="bank" className="space-y-4">
+          <Card>
+            <CardContent className="pt-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Account Number</label>
+                  <Input
+                    value={driver.accountNumber || ''}
+                    disabled={isReadOnly}
+                    onChange={(e) => handleChange('accountNumber', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Account Holder Name</label>
+                  <Input
+                    value={driver.accountHolderName || ''}
+                    disabled={isReadOnly}
+                    onChange={(e) => handleChange('accountHolderName', e.target.value)}
+                  />
+                </div>
+                <div className='col-span-2'>
+                  <UploadField
+                    label="Bank Account Details"
+                    value={driver.bankAccountDetails}
+                    disabled={isReadOnly}
+                    multiple={false}
+                    onChange={async (file) => {
+                      if (!file) return;
+                      const filesArray = Array.isArray(file) ? file : [file];
+                      const uploadedFiles = await Promise.all(filesArray.map(f => uploadFiles(f)));
+                      handleChange('bankAccountDetails', uploadedFiles[0]);
+                    }}
                   />
                 </div>
               </div>

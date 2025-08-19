@@ -13,6 +13,9 @@ const TaxiDrivers = () => {
   const [drivers, setDrivers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(14);
+  const [totalDrivers, setTotalDrivers] = useState(0);
 
   const handleRowClick = (driver: TaxiDriver) => {
     navigate(`/taxi-management/drivers/${driver.driverId}`);
@@ -22,7 +25,6 @@ const TaxiDrivers = () => {
     { key: "name" as keyof TaxiDriver, header: "Name" },
     { key: "mobile" as keyof TaxiDriver, header: "Mobile" },
     { key: "email" as keyof TaxiDriver, header: "Email" },
-    // { key: "vehicleType" as keyof TaxiDriver, header: "Vehicle Type" },
     {
       key: "registrationNumber" as keyof TaxiDriver,
       header: "Registration Number",
@@ -58,14 +60,6 @@ const TaxiDrivers = () => {
         { label: "Rejected", value: "Rejected" },
       ],
     },
-    // {
-    //   key: "vehicleType" as keyof TaxiDriver,
-    //   label: "Vehicle Type",
-    //   options: [
-    //     { label: "Car", value: "Car" },
-    //     { label: "Bike", value: "Bike" },
-    //   ],
-    // },
   ];
 
   useEffect(() => {
@@ -75,7 +69,11 @@ const TaxiDrivers = () => {
         const response = await axiosInstance.get(
           "/driver-management/drivers",
           {
-            params: { vehicleType: "taxi" },
+            params: {
+              vehicleType: "taxi",
+              page: currentPage,
+              limit: pageSize,
+            },
           }
         );
         setDrivers(response.data?.data || []);
@@ -87,7 +85,7 @@ const TaxiDrivers = () => {
     };
 
     fetchDrivers();
-  }, []); // runs once when component mounts
+  }, [currentPage, pageSize]);
 
   if (loading) return <p>Loading drivers...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -114,6 +112,8 @@ const TaxiDrivers = () => {
         keyExtractor={(item) => item.driverId}
         filterable={true}
         filterOptions={filterOptions}
+        paginate={true}
+        pageSize={20}
       />
     </>
   );

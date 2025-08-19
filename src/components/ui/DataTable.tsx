@@ -204,7 +204,7 @@ function DataTable<T>({
       </div>
 
       {/* Table */}
-      <div className="border rounded-md overflow-hidden overflow-x-sroll">
+      <div className="border rounded-md overflow-hidden overflow-x-scroll">
         <Table>
           <TableHeader>
             <TableRow>
@@ -269,7 +269,7 @@ function DataTable<T>({
       </div>
 
       {/* Pagination */}
-      {paginate && totalPages > 1 && (
+      {paginate && totalPages >= 1 && (
         <Pagination className="mt-4">
           <PaginationContent>
             <PaginationItem>

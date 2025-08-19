@@ -90,7 +90,7 @@ interface PolicyDocument {
   _id: string;
 }
 
-interface FileObject {
+export interface FileObject {
   _id?: string;
   public_id?: string;
   url?: string;
@@ -189,15 +189,25 @@ export interface TaxiDriver {
     | "Blocked"
     | "Pending";
   joinDate?: string;
-  // Additional properties used in TaxiDriverDetails.tsx
+
+  // Extra details
   age?: number;
   address?: string;
   experience?: number;
-  idProofs?: string[];
+
+  // Files
+  vehicleModel?: string;
   vehicleRegistrationNumber?: string;
-  vehicleInsurance?: string;
-  vehicleRegistrationCertificate?: string;
+  accountNumber?: string;
+  accountHolderName?: string;
+
+  profilePhoto?: string; // or File, depending on your data
+  idProofs?: string[]; // array of file URLs or objects
+  driverLicense?: string; // or a structured object
   vehiclePhotos?: string[];
+  vehicleInsurance?: string; // file URL or object
+  vehicleRegistrationCertificate?: string;
+  bankAccountDetails?: string; // file URL or object
 }
 
 // Taxi Booking related types
