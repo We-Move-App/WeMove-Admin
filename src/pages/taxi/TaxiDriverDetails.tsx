@@ -40,29 +40,30 @@ const TaxiDriverDetails = () => {
 
           // map API response into your TaxiDriver shape
           const mappedDriver: TaxiDriver = {
-            id: apiData.TaxiDriverDetails?.driverId,
-            driverId: apiData.TaxiDriverDetails?.driverId,
-            name: apiData.TaxiDriverDetails?.name,
-            email: apiData.TaxiDriverDetails?.email,
-            mobile: apiData.TaxiDriverDetails?.mobile,
-            status: apiData.TaxiDriverDetails?.status,
-            age: apiData.TaxiDriverDetails?.age,
-            address: apiData.TaxiDriverDetails?.address,
-            experience: apiData.TaxiDriverDetails?.experience,
-            vehicleNumber: apiData.taxiDetails?.registrationNo,
-            vehicleType: apiData.taxiDetails?.vehicleType,
-            vehicleRegistrationNumber: apiData.taxiDetails?.registrationNo,
-            vehicleInsurance: apiData.documents?.insurance?.fileUrl,
-            vehicleRegistrationCertificate:
-              apiData.documents?.registrationCertificate?.fileUrl,
-            vehiclePhotos: apiData.documents?.vehicleTaxiPhotos
-              ? [apiData.documents.vehicleTaxiPhotos.fileUrl]
+            id: apiData.TaxiDriverDetails?.driverId || '',
+            driverId: apiData.TaxiDriverDetails?.driverId || '',
+            name: apiData.TaxiDriverDetails?.name || '',
+            email: apiData.TaxiDriverDetails?.email || '',
+            mobile: apiData.TaxiDriverDetails?.mobile || '',
+            status: apiData.TaxiDriverDetails?.status || '',
+            age: apiData.TaxiDriverDetails?.age || null,
+            profilePhoto: apiData.documents?.avatarPhotos?.fileUrl || '',
+            address: apiData.TaxiDriverDetails?.address || '',
+            experience: apiData.TaxiDriverDetails?.experience || 0,
+            vehicleNumber: apiData.taxiDetails?.registrationNo || '',
+            vehicleType: apiData.taxiDetails?.vehicleType || '',
+            vehicleRegistrationNumber: apiData.taxiDetails?.registrationNo || '',
+            vehicleModel: apiData.taxiDetails?.model || '',
+            vehicleInsurance: apiData.documents?.insurance?.fileUrl || '',
+            vehicleRegistrationCertificate: apiData.documents?.registrationCertificate?.fileUrl || apiData.documents?.registrationCertificate?.fileName || '',
+            vehiclePhotos: Array.isArray(apiData.documents?.vehicleTaxiPhotos)
+              ? apiData.documents.vehicleTaxiPhotos.map((doc: any) => doc.fileUrl)
               : [],
-            idProofs: apiData.documents?.idCard
-              ? [apiData.documents.idCard.fileUrl]
-              : [],
+            idProofs: apiData.documents?.idCard?.fileUrl || apiData.documents?.idCard?.fileName || "No ID Proof uploaded",
+            // driverLicense: apiData.documents?.driverLicense?.fileUrl || apiData.documents?.driverLicense?.fileName || "No Driver License uploaded",
+            driverLicense: apiData.documents?.license?.fileUrl || "No Driver License uploaded",
+            bankAccountDetails: apiData.documents?.bankAccount?.fileUrl || "No Bank Account Details uploaded",
           };
-
           setDriver(mappedDriver);
         })
         .catch((err) => {
@@ -70,7 +71,6 @@ const TaxiDriverDetails = () => {
         });
     }
   }, [id]);
-
 
   const handleChange = (field: keyof TaxiDriver, value: any) => {
     setDriver(prev => ({ ...prev, [field]: value }));
@@ -93,94 +93,56 @@ const TaxiDriverDetails = () => {
     return res.data.data;
   };
 
-  // const isFile = (file: any): file is File => file && typeof file === "object" && "name" in file;
-
-  // const buildDriverPayload = async (driver: TaxiDriver) => {
-  //   // Upload files first
-  //   const profilePhoto = isFile(driver.profilePhoto)
-  //     ? await uploadFiles(driver.profilePhoto)
-  //     : driver.profilePhoto;
-
-  //   const idProofs = Array.isArray(driver.idProofs)
-  //     ? await Promise.all(driver.idProofs.map(async (f) => isFile(f) ? await uploadFiles(f) : f))
-  //     : [];
-
-  //   const driverLicense = Array.isArray(driver.driverLicense)
-  //     ? await Promise.all(driver.driverLicense.map(async (f) => isFile(f) ? await uploadFiles(f) : f))
-  //     : [];
-
-  //   const vehiclePhotos = Array.isArray(driver.vehiclePhotos)
-  //     ? await Promise.all(driver.vehiclePhotos.map(async (f) => isFile(f) ? await uploadFiles(f) : f))
-  //     : [];
-
-  //   const vehicleInsurance = isFile(driver.vehicleInsurance)
-  //     ? await uploadFiles(driver.vehicleInsurance)
-  //     : driver.vehicleInsurance;
-
-  //   const vehicleRegistrationCertificate = isFile(driver.vehicleRegistrationCertificate)
-  //     ? await uploadFiles(driver.vehicleRegistrationCertificate)
-  //     : driver.vehicleRegistrationCertificate;
-
-  //   const bankAccountDetails = isFile(driver.bankAccountDetails)
-  //     ? await uploadFiles(driver.bankAccountDetails)
-  //     : driver.bankAccountDetails;
-
-  //   // Final payload
-  //   return {
-  //     name: driver.name || "",
-  //     age: driver.age || null,
-  //     mobile: driver.mobile || "",
-  //     address: driver.address || "",
-  //     profilePhoto,
-
-  //     experience: driver.experience || 0,
-  //     idProofs,
-  //     driverLicense,
-
-  //     vehicleModel: driver.vehicleModel || "",
-  //     vehicleRegistrationNumber: driver.vehicleRegistrationNumber || "",
-  //     vehicleInsurance,
-  //     vehicleRegistrationCertificate,
-  //     vehiclePhotos,
-
-  //     accountNumber: driver.accountNumber || "",
-  //     accountHolderName: driver.accountHolderName || "",
-  //     bankAccountDetails,
-
-  //     status: "pending",
-  //   };
-  // };
-
-
   const buildDriverPayload = async (driver: TaxiDriver) => {
-    const isFile = (file: any): file is File => file && typeof file === "object" && "name" in file;
+    const isFile = (file: any): file is File =>
+      file && typeof file === "object" && "name" in file;
 
-    // Upload files first
-    const profilePhoto = isFile(driver.profilePhoto) ? await uploadFiles(driver.profilePhoto) : driver.profilePhoto;
+    const uploadOrReturn = async (
+      file: any,
+      documentType: string
+    ): Promise<any | null> => {
+      if (!file) return null;
+      const uploaded = isFile(file) ? await uploadFiles(file) : file;
+      return uploaded ? { ...uploaded, documentType } : null;
+    };
 
-    const documents = Array.isArray(driver.idProofs)
-      ? await Promise.all(driver.idProofs.map(async (f) => isFile(f) ? await uploadFiles(f) : f))
+    // Uploads
+    const profilePhoto = await uploadOrReturn(driver.profilePhoto, "avatar");
+
+    const idProofDocs = Array.isArray(driver.idProofs)
+      ? await Promise.all(
+        driver.idProofs.map((f) => uploadOrReturn(f, "id_card"))
+      )
       : [];
 
     const driverLicenseDocs = Array.isArray(driver.driverLicense)
-      ? await Promise.all(driver.driverLicense.map(async (f) => isFile(f) ? await uploadFiles(f) : f))
+      ? await Promise.all(
+        driver.driverLicense.map((f) => uploadOrReturn(f, "license"))
+      )
       : [];
 
     const vehiclePhotos = Array.isArray(driver.vehiclePhotos)
-      ? await Promise.all(driver.vehiclePhotos.map(async (f) => isFile(f) ? await uploadFiles(f) : f))
+      ? await Promise.all(
+        driver.vehiclePhotos.map((f) => uploadOrReturn(f, "vehicle_photo"))
+      )
       : [];
 
-    const vehicleInsurance = isFile(driver.vehicleInsurance) ? await uploadFiles(driver.vehicleInsurance) : driver.vehicleInsurance;
+    const vehicleInsurance = await uploadOrReturn(
+      driver.vehicleInsurance,
+      "insurance"
+    );
 
-    const vehicleRegistrationCertificate = isFile(driver.vehicleRegistrationCertificate)
-      ? await uploadFiles(driver.vehicleRegistrationCertificate)
-      : driver.vehicleRegistrationCertificate;
+    const vehicleRegistrationCertificate = await uploadOrReturn(
+      driver.vehicleRegistrationCertificate,
+      "registration"
+    );
 
-    const bankAccountDetails = isFile(driver.bankAccountDetails)
-      ? await uploadFiles(driver.bankAccountDetails)
-      : driver.bankAccountDetails;
+    const bankAccountDetails = await uploadOrReturn(
+      driver.bankAccountDetails,
+      "passbook"
+    );
 
-    // Build payload according to backend expectation
+    // Build payload
     const payload = {
       basicDriverDetails: {
         fullName: driver.name || "",
@@ -193,25 +155,27 @@ const TaxiDriverDetails = () => {
       bankDetails: {
         accountNumber: driver.accountNumber || "",
         holderName: driver.accountHolderName || "",
-        document: bankAccountDetails || null,
+        document: bankAccountDetails,
       },
       vehicleDetails: {
         model: driver.vehicleModel || "",
         registrationNo: driver.vehicleRegistrationNumber || "",
         vehicleType: "taxi",
-        insurance: vehicleInsurance || null,
-        registrationCertificate: vehicleRegistrationCertificate || null,
-        vehiclePhotos: vehiclePhotos.length ? vehiclePhotos[0] : null,
-        avatarPhotos: profilePhoto || null,
+        insurance: vehicleInsurance,
+        registrationCertificate: vehicleRegistrationCertificate,
+        // vehiclePhotos: vehiclePhotos.length ? vehiclePhotos[0] : null,
+        vehiclePhotos: vehiclePhotos.length ? vehiclePhotos : [],
+        avatarPhotos: profilePhoto,
       },
-      documents: [...documents, ...driverLicenseDocs],
+      documents: [
+        ...idProofDocs.filter(Boolean),
+        ...driverLicenseDocs.filter(Boolean),
+      ],
     };
 
     console.log("Driver Payload:", payload);
     return payload;
   };
-
-
 
   const handleSubmit = async () => {
     try {
@@ -219,7 +183,29 @@ const TaxiDriverDetails = () => {
       if (mode === "post") {
         await axiosInstance.post("/driver-management/taxi-drivers/register", payload);
       } else if (mode === "edit") {
-        await axiosInstance.put(`/driver-management/taxi-drivers/${id}?vehicleType=taxi`, payload);
+        // First API: update driver details
+        try {
+          await axiosInstance.put(
+            `/driver-management/taxi-drivers/${id}?vehicleType=taxi`,
+            payload
+          );
+          console.log("Driver details updated");
+        } catch (err) {
+          console.error("Error updating driver details:", err);
+        }
+
+        // Second API: update driver status
+        if (driver.status) {
+          try {
+            await axiosInstance.put(
+              `/driver-management/drivers/verify/${driver.driverId}`,
+              { status: driver.status }
+            );
+            console.log("Driver status updated");
+          } catch (err) {
+            console.error("Error updating driver status:", err);
+          }
+        }
       }
       toast({
         title: mode === "post" ? "Driver Created" : "Driver Updated",
@@ -347,6 +333,14 @@ const TaxiDriverDetails = () => {
                   />
                 </div>
                 <div>
+                  <label className="block text-sm font-medium mb-1">Email</label>
+                  <Input
+                    value={driver.email}
+                    disabled={isReadOnly}
+                    onChange={(e) => handleChange('email', e.target.value)}
+                  />
+                </div>
+                <div>
                   <label className="block text-sm font-medium mb-1">Address</label>
                   <Textarea
                     disabled={isReadOnly}
@@ -418,6 +412,7 @@ const TaxiDriverDetails = () => {
                           handleChange('driverLicense', uploadedFiles);
                         }}
                       />
+
 
                     </div>
                   </div>

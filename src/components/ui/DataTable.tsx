@@ -41,6 +41,9 @@ type DataTableProps<T> = {
   filterable?: boolean;
   filterOptions?: FilterOption[];
   paginate?: boolean;
+  currentPage?: number;
+  totalItems?: number;
+  onPageChange?: (page: number) => void;
   pageSize?: number;
   loading?: boolean;
 };
@@ -54,9 +57,12 @@ function DataTable<T>({
   filterOptions = [],
   paginate = true,
   pageSize = 10,
+  currentPage = 1,      // <-- add default
+  totalItems = data.length, // <-- fallback if not provided
+  onPageChange,
 }: DataTableProps<T>) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<{
     key: keyof T | null;
     direction: "asc" | "desc";
@@ -129,13 +135,14 @@ function DataTable<T>({
   }, [sortedData, searchTerm, filters, columns]);
 
   // Pagination
-  const paginatedData = useMemo(() => {
-    if (!paginate) return filteredData;
-    const startIndex = (currentPage - 1) * pageSize;
-    return filteredData.slice(startIndex, startIndex + pageSize);
-  }, [filteredData, currentPage, pageSize, paginate]);
+  // const paginatedData = useMemo(() => {
+  //   if (!paginate) return filteredData;
+  //   const startIndex = (currentPage - 1) * pageSize;
+  //   return filteredData.slice(startIndex, startIndex + pageSize);
+  // }, [filteredData, currentPage, pageSize, paginate]);
 
-  const totalPages = Math.ceil(filteredData.length / pageSize);
+  // const totalPages = Math.ceil(filteredData.length / pageSize);
+  const totalPages = totalItems && pageSize ? Math.ceil(totalItems / pageSize) : 1;
 
   // Filter change
   const handleFilterChange = (key: string, value: string) => {
@@ -143,7 +150,7 @@ function DataTable<T>({
       ...prev,
       [key]: value === "" ? null : value,
     }));
-    setCurrentPage(1);
+    onPageChange?.(1);
   };
 
   // Pagination links
@@ -176,7 +183,7 @@ function DataTable<T>({
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
-                setCurrentPage(1);
+                onPageChange?.(1);
               }}
             />
           </div>
@@ -204,7 +211,7 @@ function DataTable<T>({
       </div>
 
       {/* Table */}
-      <div className="border rounded-md overflow-hidden overflow-x-scroll">
+      <div className="border rounded-md overflow-hidden overflow-x-sroll">
         <Table>
           <TableHeader>
             <TableRow>
@@ -232,8 +239,8 @@ function DataTable<T>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.length > 0 ? (
-              paginatedData.map((item) => (
+            {data.length > 0 ? (
+              data.map((item) => (
                 <TableRow
                   key={keyExtractor(item)}
                   onClick={() => onRowClick?.(item)}
@@ -273,10 +280,18 @@ function DataTable<T>({
         <Pagination className="mt-4">
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious
+              {/* <PaginationPrevious
                 onClick={() =>
                   currentPage > 1 && setCurrentPage(currentPage - 1)
                 }
+                className={
+                  currentPage <= 1
+                    ? "pointer-events-none opacity-50"
+                    : "cursor-pointer"
+                }
+              /> */}
+              <PaginationPrevious
+                onClick={() => currentPage > 1 && onPageChange?.(currentPage - 1)}
                 className={
                   currentPage <= 1
                     ? "pointer-events-none opacity-50"
@@ -287,9 +302,10 @@ function DataTable<T>({
 
             {getPageLinks().map((page) => (
               <PaginationItem key={page}>
+
                 <PaginationLink
                   isActive={page === currentPage}
-                  onClick={() => setCurrentPage(page)}
+                  onClick={() => onPageChange?.(page)}
                 >
                   {page}
                 </PaginationLink>
@@ -297,10 +313,18 @@ function DataTable<T>({
             ))}
 
             <PaginationItem>
-              <PaginationNext
+              {/* <PaginationNext
                 onClick={() =>
                   currentPage < totalPages && setCurrentPage(currentPage + 1)
                 }
+                className={
+                  currentPage >= totalPages
+                    ? "pointer-events-none opacity-50"
+                    : "cursor-pointer"
+                }
+              /> */}
+              <PaginationNext
+                onClick={() => currentPage < totalPages && onPageChange?.(currentPage + 1)}
                 className={
                   currentPage >= totalPages
                     ? "pointer-events-none opacity-50"

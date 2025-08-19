@@ -201,18 +201,19 @@ export interface TaxiDriver {
   accountNumber?: string;
   accountHolderName?: string;
 
-  profilePhoto?: string; // or File, depending on your data
-  idProofs?: string[]; // array of file URLs or objects
-  driverLicense?: string; // or a structured object
+  profilePhoto?: string;
+  idProofs?: string[];
+  driverLicense?: string;
   vehiclePhotos?: string[];
-  vehicleInsurance?: string; // file URL or object
+  vehicleInsurance?: string;
   vehicleRegistrationCertificate?: string;
-  bankAccountDetails?: string; // file URL or object
+  bankAccountDetails?: string;
 }
 
 // Taxi Booking related types
 export interface TaxiBooking {
   id: string;
+  bookingId?: string;
   customerName: string;
   driverName: string;
   from: string;

@@ -45,11 +45,11 @@ const UploadField = ({
 
     const previewUrls = selectedFiles.map(file => {
       if (file.type.startsWith("image/")) {
-        return URL.createObjectURL(file); // image preview
+        return URL.createObjectURL(file);
       } else if (file.type === "application/pdf") {
-        return URL.createObjectURL(file); // PDF preview as link
+        return URL.createObjectURL(file);
       } else {
-        return ""; // fallback
+        return "";
       }
     });
 
@@ -116,74 +116,21 @@ const UploadField = ({
     }
   }, [value]);
 
-  // const renderPreview = (src: string, idx: number) => {
-  //   const file = files[idx];
-
-  //   // Determine fileName from File object or uploaded object
-  //   let fileName = file?.name || src.split("/").pop();
-
-  //   if (!fileName && Array.isArray(value)) {
-  //     const val = value[idx];
-  //     if (val && typeof val === "object") {
-  //       fileName = (val as any).fileName || (val as any).name || "Document.pdf";
-  //     }
-  //   } else if (!fileName && value && typeof value === "object" && !Array.isArray(value)) {
-  //     fileName = (value as any).fileName || (value as any).name || "Document.pdf";
-  //   }
-
-  //   const isPDF =
-  //     file?.type === "application/pdf" ||
-  //     fileName?.toLowerCase().endsWith(".pdf");
-
-  //   if (isPDF) {
-  //     return (
-  //       <div key={idx} className="flex items-center p-4 bg-gray-50 rounded-md border border-gray-200">
-  //         <FileText className="text-red-500 mr-2" size={24} />
-  //         <a
-  //           href={src}
-  //           target="_blank"
-  //           rel="noopener noreferrer"
-  //           className="text-sm text-blue-600 hover:underline truncate max-w-xs"
-  //         >
-  //           {fileName}
-  //         </a>
-  //         {showCloseButton && !disabled && (
-  //           <button
-  //             type="button"
-  //             onClick={() => clearFile(idx)}
-  //             className="ml-auto text-gray-500 hover:text-gray-700"
-  //           >
-  //             <X size={18} />
-  //           </button>
-  //         )}
-  //       </div>
-  //     );
-  //   }
-
-  //   // Image preview
-  //   return (
-  //     <div key={idx} className="relative mt-2 flex items-start gap-2">
-  //       <img
-  //         src={src}
-  //         alt={fileName}
-  //         className="h-40 object-cover rounded-md border border-gray-200"
-  //       />
-  //       {showCloseButton && !disabled && (
-  //         <button
-  //           type="button"
-  //           onClick={() => clearFile(idx)}
-  //           className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md text-gray-500 hover:text-gray-700"
-  //           aria-label="Remove file"
-  //         >
-  //           <X size={18} />
-  //         </button>
-  //       )}
-  //     </div>
-  //   );
-  // };
-
   const renderPreview = (src: string, idx: number) => {
     const file = files[idx];
+
+    // If value is just plain text like "No Driver License uploaded"
+    if (src.startsWith("No ")) {
+      return (
+        <div
+          key={idx}
+          className="flex items-center p-2 bg-gray-50 rounded-md border border-gray-200 text-gray-600 text-sm"
+        >
+          <FileText className="text-gray-400 mr-2" size={18} />
+          <span>{src}</span>
+        </div>
+      );
+    }
 
     // Default name
     let fileName = file?.name || src.split("/").pop() || "Document";
@@ -198,7 +145,7 @@ const UploadField = ({
       fileName = (value as any).fileName || (value as any).name || fileName;
     }
 
-    // PDF detection: from file.type, fileName extension, or explicit mimeType
+    // PDF detection
     const mimeType =
       file?.type ||
       (Array.isArray(value) && value[idx] && (value[idx] as any).mimeType) ||
@@ -210,10 +157,7 @@ const UploadField = ({
 
     if (isPDF) {
       return (
-        <div
-          key={idx}
-          className="flex items-center p-4 bg-gray-50 rounded-md border border-gray-200"
-        >
+        <div key={idx} className="flex items-center p-4 bg-gray-50 rounded-md border border-gray-200">
           <FileText className="text-red-500 mr-2" size={24} />
           <a
             href={src}
@@ -257,8 +201,6 @@ const UploadField = ({
       </div>
     );
   };
-
-
 
   return (
     <div className="mb-4">

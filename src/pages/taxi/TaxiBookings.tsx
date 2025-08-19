@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye } from "lucide-react";
-// import Layout from '@/components/layout/Layout';
 import DataTable from "@/components/ui/DataTable";
 import { TaxiBooking } from "@/types/admin";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -10,80 +9,76 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-
-// Mock data for taxi bookings
-const mockTaxiBookings: TaxiBooking[] = [
-  {
-    id: "1",
-    customerName: "John Doe",
-    driverName: "Michael Brown",
-    from: "Airport",
-    to: "Downtown",
-    rideDate: "2023-10-15",
-    vehicleType: "Sedan",
-    amount: 45,
-    status: "Completed",
-  },
-  {
-    id: "2",
-    customerName: "Jane Smith",
-    driverName: "Robert Taylor",
-    from: "Hotel Grand",
-    to: "Shopping Mall",
-    rideDate: "2023-10-16",
-    vehicleType: "SUV",
-    amount: 60,
-    status: "Completed",
-  },
-  {
-    id: "3",
-    customerName: "David Wilson",
-    driverName: "John Smith",
-    from: "Beach Resort",
-    to: "Airport",
-    rideDate: "2023-10-17",
-    vehicleType: "Sedan",
-    amount: 55,
-    status: "Cancelled",
-  },
-  {
-    id: "4",
-    customerName: "Sarah Johnson",
-    driverName: "Michael Brown",
-    from: "City Center",
-    to: "Suburb Area",
-    rideDate: "2023-10-18",
-    vehicleType: "Hatchback",
-    amount: 35,
-    status: "Pending",
-  },
-];
+import axiosInstance from "@/api/axiosInstance";
 
 const TaxiBookings = () => {
-  const [bookings] = useState<TaxiBooking[]>(mockTaxiBookings);
-  const [selectedBooking, setSelectedBooking] = useState<TaxiBooking | null>(
-    null
-  );
+  const [bookings, setBookings] = useState<TaxiBooking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedBooking, setSelectedBooking] = useState<TaxiBooking | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalBookings, setTotalBookings] = useState(0);
 
   const viewBookingDetails = (booking: TaxiBooking) => {
     setSelectedBooking(booking);
     setIsDetailsOpen(true);
   };
 
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get(
+          "/driver-management/booking/allBookings",
+          {
+            params: {
+              vehicleType: "taxi",
+              page: currentPage,
+              limit: pageSize,
+            },
+          }
+        );
+
+        if (response.data?.statusCode === 200) {
+          setBookings(response.data.data || []);
+          setTotalBookings(response.data?.totalBookings || 0);
+        } else {
+          setBookings([]);
+        }
+      } catch (error) {
+        console.error("Error fetching taxi bookings:", error);
+        setBookings([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, [currentPage, pageSize]);
+
   const columns = [
-    { key: "id" as keyof TaxiBooking, header: "Booking ID" },
+    { key: "bookingId" as keyof TaxiBooking, header: "Booking ID" },
     { key: "customerName" as keyof TaxiBooking, header: "Customer Name" },
-    { key: "driverName" as keyof TaxiBooking, header: "Driver Name" },
+    { key: "riderName" as keyof TaxiBooking, header: "Driver Name" },
     { key: "from" as keyof TaxiBooking, header: "From" },
     { key: "to" as keyof TaxiBooking, header: "To" },
-    { key: "rideDate" as keyof TaxiBooking, header: "Ride Date" },
-    // { key: "vehicleType" as keyof TaxiBooking, header: "Vehicle Type" },
+    {
+      key: "rideDate" as keyof TaxiBooking,
+      header: "Ride Date",
+      render: (booking: TaxiBooking) => (
+        <span>
+          {booking.rideDate
+            ? new Date(booking.rideDate).toLocaleDateString("en-GB")
+            : "-"}
+        </span>
+      ),
+    },
     {
       key: "amount" as keyof TaxiBooking,
       header: "Amount",
       render: (booking: TaxiBooking) => (
-        <span>${booking.amount.toFixed(2)}</span>
+        <span>${booking.amount ? booking.amount.toFixed(2) : "0.00"}</span>
       ),
     },
     {
@@ -118,15 +113,6 @@ const TaxiBookings = () => {
         { label: "Pending", value: "Pending" },
       ],
     },
-    // {
-    //   key: "vehicleType" as keyof TaxiBooking,
-    //   label: "Vehicle Type",
-    //   options: [
-    //     { label: "Sedan", value: "Sedan" },
-    //     { label: "SUV", value: "SUV" },
-    //     { label: "Hatchback", value: "Hatchback" },
-    //   ],
-    // },
   ];
 
   return (
@@ -138,15 +124,22 @@ const TaxiBookings = () => {
         </div>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={bookings}
-        keyExtractor={(item) => item.id}
-        filterable={true}
-        // searchable={true}
-        // exportable={true}
-        filterOptions={filterOptions}
-      />
+      {loading ? (
+        <p>Loading bookings...</p>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={bookings}
+          keyExtractor={(item) => item.bookingId}
+          filterable
+          filterOptions={filterOptions}
+          paginate
+          pageSize={pageSize}
+          currentPage={currentPage}
+          totalItems={totalBookings}
+          onPageChange={setCurrentPage}
+        />
+      )}
 
       {/* Booking Details Sheet */}
       <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
@@ -159,20 +152,16 @@ const TaxiBookings = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="text-sm text-gray-500">Booking ID</h4>
-                  <p className="font-medium">{selectedBooking.id}</p>
+                  <p className="font-medium">{selectedBooking.bookingId}</p>
                 </div>
                 <div>
                   <h4 className="text-sm text-gray-500">Status</h4>
                   <StatusBadge status={selectedBooking.status} />
                 </div>
-                {/* <div>
-                  <h4 className="text-sm text-gray-500">Vehicle Type</h4>
-                  <p className="font-medium">{selectedBooking.vehicleType}</p>
-                </div> */}
                 <div>
                   <h4 className="text-sm text-gray-500">Amount</h4>
                   <p className="font-medium">
-                    ${selectedBooking.amount.toFixed(2)}
+                    ${selectedBooking.amount ? selectedBooking.amount.toFixed(2) : "0.00"}
                   </p>
                 </div>
               </div>
@@ -190,7 +179,11 @@ const TaxiBookings = () => {
                   </div>
                   <div>
                     <h4 className="text-sm text-gray-500">Ride Date</h4>
-                    <p className="font-medium">{selectedBooking.rideDate}</p>
+                    <p className="font-medium">
+                      {selectedBooking.rideDate
+                        ? new Date(selectedBooking.rideDate).toLocaleDateString("en-GB")
+                        : "-"}
+                    </p>
                   </div>
                 </div>
               </div>

@@ -14,7 +14,7 @@ const TaxiDrivers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(14);
+  const [pageSize] = useState(10);
   const [totalDrivers, setTotalDrivers] = useState(0);
 
   const handleRowClick = (driver: TaxiDriver) => {
@@ -77,6 +77,7 @@ const TaxiDrivers = () => {
           }
         );
         setDrivers(response.data?.data || []);
+        setTotalDrivers(response.data?.total || 0);
       } catch (err: any) {
         setError(err.message || "Failed to fetch drivers");
       } finally {
@@ -108,13 +109,16 @@ const TaxiDrivers = () => {
       <DataTable
         columns={columns}
         data={drivers}
-        onRowClick={handleRowClick}
         keyExtractor={(item) => item.driverId}
         filterable={true}
         filterOptions={filterOptions}
         paginate={true}
-        pageSize={20}
+        pageSize={10}
+        currentPage={currentPage}
+        totalItems={totalDrivers}
+        onPageChange={(page) => setCurrentPage(page)}
       />
+
     </>
   );
 };
