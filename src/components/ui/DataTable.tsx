@@ -19,11 +19,18 @@ import {
 import { ChevronDown, ChevronUp, Search } from "lucide-react";
 
 // Define types
-type Column<T> = {
-  key: keyof T | "actions";
+// type Column<T> = {
+//   key: keyof T | "actions";
+//   header: string;
+//   render?: (item: T) => React.ReactNode;
+// };
+
+export type Column<T> = {
+  key: keyof T | "actions" | string; // allow any custom string too
   header: string;
   render?: (item: T) => React.ReactNode;
 };
+
 
 type FilterOption = {
   key: string;
@@ -99,14 +106,23 @@ function DataTable<T>({
   }, [data, sortConfig]);
 
   // Sorting handler
-  const requestSort = (key: keyof T | "actions") => {
-    if (key === "actions") return;
+  // const requestSort = (key: keyof T | "actions") => {
+  //   if (key === "actions") return;
+  //   let direction: "asc" | "desc" = "asc";
+  //   if (sortConfig.key === key && sortConfig.direction === "asc") {
+  //     direction = "desc";
+  //   }
+  //   setSortConfig({ key, direction });
+  // };
+
+  const requestSort = (key: keyof T) => {
     let direction: "asc" | "desc" = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
     setSortConfig({ key, direction });
   };
+
 
   // Filtering
   const filteredData = useMemo(() => {
@@ -216,11 +232,21 @@ function DataTable<T>({
           <TableHeader>
             <TableRow>
               {columns.map((column) => (
+                // <TableHead
+                //   key={String(column.key)}
+                //   className={column.key !== "actions" ? "cursor-pointer" : ""}
+                //   onClick={() => {
+                //     if (column.key !== "actions") {
+                //       requestSort(column.key);
+                //     }
+                //   }}
+                // >
                 <TableHead
                   key={String(column.key)}
                   className={column.key !== "actions" ? "cursor-pointer" : ""}
                   onClick={() => {
-                    if (column.key !== "actions") {
+                    if (column.key !== "actions" && typeof column.key !== "string") {
+                      // now TS knows it's definitely keyof T
                       requestSort(column.key);
                     }
                   }}

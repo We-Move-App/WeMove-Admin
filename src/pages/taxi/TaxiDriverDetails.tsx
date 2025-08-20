@@ -30,7 +30,6 @@ const TaxiDriverDetails = () => {
     vehicleType: 'Car',
   });
 
-  // fetch existing driver when in view/edit
   useEffect(() => {
     if (id && id !== "new") {
       axiosInstance
@@ -47,22 +46,22 @@ const TaxiDriverDetails = () => {
             mobile: apiData.TaxiDriverDetails?.mobile || '',
             status: apiData.TaxiDriverDetails?.status || '',
             age: apiData.TaxiDriverDetails?.age || null,
-            profilePhoto: apiData.documents?.avatarPhotos?.fileUrl || '',
+            profilePhoto: apiData.documents?.avatarPhotos || null,
             address: apiData.TaxiDriverDetails?.address || '',
             experience: apiData.TaxiDriverDetails?.experience || 0,
             vehicleNumber: apiData.taxiDetails?.registrationNo || '',
             vehicleType: apiData.taxiDetails?.vehicleType || '',
             vehicleRegistrationNumber: apiData.taxiDetails?.registrationNo || '',
             vehicleModel: apiData.taxiDetails?.model || '',
-            vehicleInsurance: apiData.documents?.insurance?.fileUrl || '',
-            vehicleRegistrationCertificate: apiData.documents?.registrationCertificate?.fileUrl || apiData.documents?.registrationCertificate?.fileName || '',
-            vehiclePhotos: Array.isArray(apiData.documents?.vehicleTaxiPhotos)
-              ? apiData.documents.vehicleTaxiPhotos.map((doc: any) => doc.fileUrl)
-              : [],
+            vehicleInsurance: apiData.documents?.insurance || null,
+            vehicleRegistrationCertificate: apiData.documents?.registrationCertificate || null,
+            vehiclePhotos: apiData.documents?.vehicleTaxiPhotos ? [apiData.documents.vehicleTaxiPhotos] : [],
             idProofs: apiData.documents?.idCard?.fileUrl || apiData.documents?.idCard?.fileName || "No ID Proof uploaded",
             // driverLicense: apiData.documents?.driverLicense?.fileUrl || apiData.documents?.driverLicense?.fileName || "No Driver License uploaded",
             driverLicense: apiData.documents?.license?.fileUrl || "No Driver License uploaded",
-            bankAccountDetails: apiData.documents?.bankAccount?.fileUrl || "No Bank Account Details uploaded",
+            accountNumber: apiData.bankDetails?.accountNumber || '',
+            accountHolderName: apiData.bankDetails?.holderName || '',
+            bankAccountDetails: apiData?.bankDetails?.document?.fileUrl || "No Bank Account Details uploaded",
           };
           setDriver(mappedDriver);
         })
@@ -76,7 +75,6 @@ const TaxiDriverDetails = () => {
     setDriver(prev => ({ ...prev, [field]: value }));
   };
 
-  // helper to upload single or multiple files
   const uploadFiles = async (files: File | File[]) => {
     const formData = new FormData();
 
@@ -102,9 +100,26 @@ const TaxiDriverDetails = () => {
       documentType: string
     ): Promise<any | null> => {
       if (!file) return null;
-      const uploaded = isFile(file) ? await uploadFiles(file) : file;
-      return uploaded ? { ...uploaded, documentType } : null;
+
+      if (isFile(file)) {
+        // New upload -> get uploaded object from API
+        const uploaded = await uploadFiles(file);
+        return uploaded ? { ...uploaded, documentType } : null;
+      }
+
+      if (typeof file === "string") {
+        // Already uploaded (just a URL from API)
+        return { fileUrl: file, documentType };
+      }
+
+      if (typeof file === "object" && "fileUrl" in file) {
+        // Already in correct object form
+        return { ...file, documentType };
+      }
+
+      return null;
     };
+
 
     // Uploads
     const profilePhoto = await uploadOrReturn(driver.profilePhoto, "avatar");
@@ -163,8 +178,7 @@ const TaxiDriverDetails = () => {
         vehicleType: "taxi",
         insurance: vehicleInsurance,
         registrationCertificate: vehicleRegistrationCertificate,
-        // vehiclePhotos: vehiclePhotos.length ? vehiclePhotos[0] : null,
-        vehiclePhotos: vehiclePhotos.length ? vehiclePhotos : [],
+        vehiclePhotos: vehiclePhotos.length ? vehiclePhotos[0] : null,
         avatarPhotos: profilePhoto,
       },
       documents: [
@@ -177,34 +191,127 @@ const TaxiDriverDetails = () => {
     return payload;
   };
 
+  // For PUT (Update existing driver)
+  const buildPutDriverPayload = async (driver: TaxiDriver) => {
+    const isFile = (file: any): file is File =>
+      file && typeof file === "object" && "name" in file;
+
+    const uploadOrReturn = async (file: any, documentType: string) => {
+      if (!file) return null;
+
+      // Case 1: New file (File object)
+      if (isFile(file)) {
+        const uploaded = await uploadFiles(file);
+        return uploaded
+          ? {
+            fileUrl: uploaded.fileUrl,
+            fileName: uploaded.fileName || file.name,
+            documentType,
+          }
+          : null;
+      }
+
+      // Case 2: Already uploaded string URL
+      if (typeof file === "string") {
+        return {
+          fileUrl: file,
+          fileName: file.split("/").pop() || "unknown",
+          documentType,
+        };
+      }
+
+      // Case 3: Object from backend (fileUrl or url)
+      if (typeof file === "object") {
+        return {
+          fileUrl: file.fileUrl || file.url, // ✅ supports both keys
+          fileName:
+            file.fileName || file.fileUrl?.split("/").pop() || file.url?.split("/").pop() || "unknown",
+          documentType,
+        };
+      }
+
+      return null;
+    };
+
+    const profilePhoto = await uploadOrReturn(driver.profilePhoto, "avatar");
+    console.log("driver.profilePhoto:", driver.profilePhoto);
+    const vehiclePhotos = Array.isArray(driver.vehiclePhotos)
+      ? await Promise.all(
+        driver.vehiclePhotos.map((f) => uploadOrReturn(f, "vehicle_photo"))
+      )
+      : [];
+
+    const vehicleInsurance = await uploadOrReturn(driver.vehicleInsurance, "insurance");
+    const vehicleRegistrationCertificate = await uploadOrReturn(
+      driver.vehicleRegistrationCertificate,
+      "registration"
+    );
+    const bankAccountDetails = await uploadOrReturn(driver.bankAccountDetails, "passbook");
+
+    const idProofDocs = Array.isArray(driver.idProofs)
+      ? await Promise.all(driver.idProofs.map((f) => uploadOrReturn(f, "id_card")))
+      : [];
+
+    const driverLicenseDocs = Array.isArray(driver.driverLicense)
+      ? await Promise.all(driver.driverLicense.map((f) => uploadOrReturn(f, "license")))
+      : [];
+
+    return {
+      basicDriverDetails: {
+        fullName: driver.name || "",
+        phoneNo: driver.mobile || "",
+        email: driver.email || "",
+        age: driver.age || null,
+        experience: driver.experience || 0,
+        address: driver.address || "",
+      },
+      bankDetails: {
+        accountNumber: driver.accountNumber || "",
+        holderName: driver.accountHolderName || "",
+        document: bankAccountDetails,
+      },
+      vehicleDetails: {
+        model: driver.vehicleModel || "",
+        registrationNo: driver.vehicleRegistrationNumber || "",
+        vehicleType: "taxi",
+        insurance: vehicleInsurance,
+        registrationCertificate: vehicleRegistrationCertificate,
+        vehiclePhotos: vehiclePhotos.length ? vehiclePhotos[0] : null,
+        avatarPhotos: profilePhoto || null,
+      },
+      documents: [...idProofDocs.filter(Boolean), ...driverLicenseDocs.filter(Boolean)],
+    };
+  };
+
+
+
   const handleSubmit = async () => {
     try {
-      const payload = await buildDriverPayload(driver);
       if (mode === "post") {
+        const payload = await buildDriverPayload(driver);
         await axiosInstance.post("/driver-management/taxi-drivers/register", payload);
       } else if (mode === "edit") {
-        // First API: update driver details
         try {
+          // 1. Build payload for driver update
+          const payload = await buildPutDriverPayload(driver);
+          console.log("PUT payload:", JSON.stringify(payload, null, 2));
+
+          // 2. First API call -> Update driver details
           await axiosInstance.put(
             `/driver-management/taxi-drivers/${id}?vehicleType=taxi`,
             payload
           );
-          console.log("Driver details updated");
-        } catch (err) {
-          console.error("Error updating driver details:", err);
-        }
 
-        // Second API: update driver status
-        if (driver.status) {
-          try {
-            await axiosInstance.put(
-              `/driver-management/drivers/verify/${driver.driverId}`,
-              { status: driver.status }
-            );
-            console.log("Driver status updated");
-          } catch (err) {
-            console.error("Error updating driver status:", err);
-          }
+          // 3. Second API call -> Verify driver status
+          await axiosInstance.put(
+            `/driver-management/drivers/verify/${driver.driverId}`,
+            { status: driver.status }
+          );
+
+          // ✅ Success message / toast
+          console.log("Driver updated & verified successfully");
+        } catch (error) {
+          console.error("Error updating driver:", error);
         }
       }
       toast({

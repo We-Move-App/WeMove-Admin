@@ -4,8 +4,7 @@ const axiosInstance = axios.create({
   // Deployed URL
   // baseURL: "http://139.59.20.155:8000/api/v1/admin",
   // Local URL
-  baseURL:
-    "https://buffer-ancient-connect-crown.trycloudflare.com/api/v1/admin",
+  baseURL: "https://material-led-activated-wave.trycloudflare.com/api/v1/admin",
 
   headers: {
     "Content-Type": "application/json",

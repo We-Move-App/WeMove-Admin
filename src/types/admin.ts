@@ -158,6 +158,7 @@ export interface HotelManager {
 export interface HotelBooking {
   id: string;
   hotelId: string;
+  stayDuration?: string;
   customerName: string;
   customerPhone: string;
   customerEmail: string;

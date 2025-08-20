@@ -131,17 +131,17 @@ const UserDetails = () => {
     <>
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">User Details</h1>
+          <h1 className="text-2xl font-bold">Admin / Sub-admin Details</h1>
           {!isEditing && (
             <Button onClick={() => setIsEditing(true)}>
-              Edit User
+              Edit Admin / Sub-admin
             </Button>
           )}
         </div>
 
         <Tabs defaultValue="details" className="w-full">
           <TabsList className="mb-4">
-            <TabsTrigger value="details">User Details</TabsTrigger>
+            <TabsTrigger value="details">Admin / Sub-admin Details</TabsTrigger>
             <TabsTrigger value="permissions">Permissions</TabsTrigger>
             <TabsTrigger value="activity">Activity Log</TabsTrigger>
           </TabsList>
@@ -149,9 +149,9 @@ const UserDetails = () => {
           <TabsContent value="details">
             <Card>
               <CardHeader>
-                <CardTitle>User Information</CardTitle>
+                <CardTitle>Admin / Sub-admin Information</CardTitle>
                 <CardDescription>
-                  {isEditing ? "Edit user details" : "View user details"}
+                  {isEditing ? "Edit Admin / Sub-admin details" : "View Admin / Sub-admin details"}
                 </CardDescription>
               </CardHeader>
               <CardContent>

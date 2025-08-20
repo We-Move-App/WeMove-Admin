@@ -122,12 +122,12 @@ const Sidebar = () => {
     },
     {
       path: "/customer-management",
-      label: "Customer Management",
+      label: "User Management",
       icon: <Users size={20} />,
     },
     {
       path: "/user-management",
-      label: "User Management",
+      label: "Admin Management",
       icon: <UserCog size={20} />,
     },
     {
@@ -147,15 +147,13 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`admin-sidebar min-h-screen h-full ${
-        isOpen ? "w-64" : "w-20"
-      } flex flex-col fixed left-0 top-0 bottom-0 z-40 transition-all duration-300 ease-in-out overflow-hidden`}
+      className={`admin-sidebar min-h-screen h-full ${isOpen ? "w-64" : "w-20"
+        } flex flex-col fixed left-0 top-0 bottom-0 z-40 transition-all duration-300 ease-in-out overflow-hidden`}
     >
       <div className="flex items-center justify-between px-4 py-5 border-b border-white-100">
         <div
-          className={`flex items-center ${
-            isOpen ? "" : "justify-center w-full"
-          }`}
+          className={`flex items-center ${isOpen ? "" : "justify-center w-full"
+            }`}
         >
           {/* <BarChart className="text-blue-500" size={24} /> */}
           <img src={LogoImg} alt="" width={24} height={24} />
@@ -176,9 +174,8 @@ const Sidebar = () => {
                 <>
                   <button
                     onClick={() => toggleSubNav(item.path)}
-                    className={`sidebar-menu-item w-full justify-between ${
-                      activeNavItem === item.path ? "bg-green-900" : ""
-                    }`}
+                    className={`sidebar-menu-item w-full justify-between ${activeNavItem === item.path ? "bg-green-900" : ""
+                      }`}
                   >
                     <div className="flex items-center">
                       {item.icon}
@@ -186,11 +183,10 @@ const Sidebar = () => {
                     </div>
                     {isOpen && (
                       <span
-                        className={`transform transition-transform ${
-                          expandedSubNav === item.path
-                            ? "rotate-180"
-                            : "rotate-0"
-                        }`}
+                        className={`transform transition-transform ${expandedSubNav === item.path
+                          ? "rotate-180"
+                          : "rotate-0"
+                          }`}
                       >
                         <svg
                           width="20"
@@ -216,11 +212,10 @@ const Sidebar = () => {
                         <Link
                           key={subItem.path}
                           to={subItem.path}
-                          className={`block py-2 px-3 rounded-md text-sm ${
-                            location.pathname === subItem.path
-                              ? "bg-green-900 text-white"
-                              : "hover:bg-green-900"
-                          }`}
+                          className={`block py-2 px-3 rounded-md text-sm ${location.pathname === subItem.path
+                            ? "bg-green-900 text-white"
+                            : "hover:bg-green-900"
+                            }`}
                         >
                           {subItem.label}
                         </Link>
@@ -231,9 +226,8 @@ const Sidebar = () => {
               ) : (
                 <Link
                   to={item.path}
-                  className={`sidebar-menu-item ${
-                    location.pathname === item.path ? "bg-green-900" : ""
-                  }`}
+                  className={`sidebar-menu-item ${location.pathname === item.path ? "bg-green-900" : ""
+                    }`}
                 >
                   {item.icon}
                   {isOpen && <span className="ml-3">{item.label}</span>}

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye } from "lucide-react";
 // import Layout from '@/components/layout/Layout';
 import DataTable from "@/components/ui/DataTable";
-import { BikeBooking } from "@/types/admin";
+import { TaxiBooking } from "@/types/admin";
 import StatusBadge from "@/components/ui/StatusBadge";
 import {
   Sheet,
@@ -10,91 +10,97 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import axiosInstance from "@/api/axiosInstance";
 
 // Mock data for bike bookings
-const mockBikeBookings: BikeBooking[] = [
-  {
-    id: "1",
-    customerName: "John Doe",
-    riderName: "Alex Johnson",
-    from: "City Center",
-    to: "University Campus",
-    rideDate: "2023-10-15",
-    vehicleType: "Scooter",
-    amount: 20,
-    status: "Completed",
-  },
-  {
-    id: "2",
-    customerName: "Jane Smith",
-    riderName: "Sam Wilson",
-    from: "Shopping Mall",
-    to: "Residential Area",
-    rideDate: "2023-10-16",
-    vehicleType: "MotorBike",
-    amount: 25,
-    status: "Completed",
-  },
-  {
-    id: "3",
-    customerName: "David Wilson",
-    riderName: "Jake Miller",
-    from: "Hotel Zone",
-    to: "Tourist Spot",
-    rideDate: "2023-10-17",
-    vehicleType: "Scooter",
-    amount: 18,
-    status: "Cancelled",
-  },
-  {
-    id: "4",
-    customerName: "Sarah Johnson",
-    riderName: "Ryan Thomas",
-    from: "Metro Station",
-    to: "Office Park",
-    rideDate: "2023-10-18",
-    vehicleType: "MotorBike",
-    amount: 22,
-    status: "Pending",
-  },
-];
+// const mockBikeBookings: BikeBooking[] = [
+//   {
+//     id: "1",
+//     customerName: "John Doe",
+//     riderName: "Alex Johnson",
+//     from: "City Center",
+//     to: "University Campus",
+//     rideDate: "2023-10-15",
+//     vehicleType: "Scooter",
+//     amount: 20,
+//     status: "Completed",
+//   },
+//   {
+//     id: "2",
+//     customerName: "Jane Smith",
+//     riderName: "Sam Wilson",
+//     from: "Shopping Mall",
+//     to: "Residential Area",
+//     rideDate: "2023-10-16",
+//     vehicleType: "MotorBike",
+//     amount: 25,
+//     status: "Completed",
+//   },
+//   {
+//     id: "3",
+//     customerName: "David Wilson",
+//     riderName: "Jake Miller",
+//     from: "Hotel Zone",
+//     to: "Tourist Spot",
+//     rideDate: "2023-10-17",
+//     vehicleType: "Scooter",
+//     amount: 18,
+//     status: "Cancelled",
+//   },
+//   {
+//     id: "4",
+//     customerName: "Sarah Johnson",
+//     riderName: "Ryan Thomas",
+//     from: "Metro Station",
+//     to: "Office Park",
+//     rideDate: "2023-10-18",
+//     vehicleType: "MotorBike",
+//     amount: 22,
+//     status: "Pending",
+//   },
+// ];
 
 const BikeBookings = () => {
-  const [bookings] = useState<BikeBooking[]>(mockBikeBookings);
-  const [selectedBooking, setSelectedBooking] = useState<BikeBooking | null>(
+  // const [bookings] = useState<BikeBooking[]>(mockBikeBookings);
+  const [bookings, setBookings] = useState<TaxiBooking[]>([]);
+  const [selectedBooking, setSelectedBooking] = useState<TaxiBooking | null>(
     null
   );
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalBookings, setTotalBookings] = useState(0);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  const viewBookingDetails = (booking: BikeBooking) => {
+  const viewBookingDetails = (booking: TaxiBooking) => {
     setSelectedBooking(booking);
     setIsDetailsOpen(true);
   };
 
   const columns = [
-    { key: "id" as keyof BikeBooking, header: "Booking ID" },
-    { key: "customerName" as keyof BikeBooking, header: "Customer Name" },
-    { key: "riderName" as keyof BikeBooking, header: "Rider Name" },
-    { key: "from" as keyof BikeBooking, header: "From" },
-    { key: "to" as keyof BikeBooking, header: "To" },
-    { key: "rideDate" as keyof BikeBooking, header: "Ride Date" },
-    { key: "vehicleType" as keyof BikeBooking, header: "Vehicle Type" },
+    { key: "id" as keyof TaxiBooking, header: "Booking ID" },
+    { key: "customerName" as keyof TaxiBooking, header: "Customer Name" },
+    { key: "riderName" as keyof TaxiBooking, header: "Rider Name" },
+    { key: "from" as keyof TaxiBooking, header: "From" },
+    { key: "to" as keyof TaxiBooking, header: "To" },
+    { key: "rideDate" as keyof TaxiBooking, header: "Ride Date" },
+    { key: "vehicleType" as keyof TaxiBooking, header: "Vehicle Type" },
     {
-      key: "amount" as keyof BikeBooking,
+      key: "amount" as keyof TaxiBooking,
       header: "Amount",
-      render: (booking: BikeBooking) => (
+      render: (booking: TaxiBooking) => (
         <span>${booking.amount.toFixed(2)}</span>
       ),
     },
     {
-      key: "status" as keyof BikeBooking,
+      key: "status" as keyof TaxiBooking,
       header: "Status",
-      render: (booking: BikeBooking) => <StatusBadge status={booking.status} />,
+      render: (booking: TaxiBooking) => <StatusBadge status={booking.status} />,
     },
     {
       key: "actions" as "actions",
       header: "Actions",
-      render: (booking: BikeBooking) => (
+      render: (booking: TaxiBooking) => (
         <button
           className="action-button flex items-center"
           onClick={(e) => {
@@ -110,7 +116,7 @@ const BikeBookings = () => {
 
   const filterOptions = [
     {
-      key: "status" as keyof BikeBooking,
+      key: "status" as keyof TaxiBooking,
       label: "Status",
       options: [
         { label: "Completed", value: "Completed" },
@@ -119,7 +125,7 @@ const BikeBookings = () => {
       ],
     },
     {
-      key: "vehicleType" as keyof BikeBooking,
+      key: "vehicleType" as keyof TaxiBooking,
       label: "Vehicle Type",
       options: [
         { label: "Scooter", value: "Scooter" },
@@ -127,6 +133,38 @@ const BikeBookings = () => {
       ],
     },
   ];
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get(
+          "/driver-management/booking/allBookings",
+          {
+            params: {
+              vehicleType: "bike",
+              page: currentPage,
+              limit: pageSize,
+            },
+          }
+        );
+
+        if (response.data?.statusCode === 200) {
+          setBookings(response.data.data || []);
+          setTotalBookings(response.data?.totalBookings || 0);
+        } else {
+          setBookings([]);
+        }
+      } catch (error) {
+        console.error("Error fetching taxi bookings:", error);
+        setBookings([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, [currentPage, pageSize]);
 
   return (
     <>
@@ -137,70 +175,22 @@ const BikeBookings = () => {
         </div>
       </div>
 
-      <DataTable
-        columns={[
-          { key: "id" as keyof BikeBooking, header: "Booking ID" },
-          { key: "customerName" as keyof BikeBooking, header: "Customer Name" },
-          { key: "riderName" as keyof BikeBooking, header: "Rider Name" },
-          { key: "from" as keyof BikeBooking, header: "From" },
-          { key: "to" as keyof BikeBooking, header: "To" },
-          { key: "rideDate" as keyof BikeBooking, header: "Ride Date" },
-          { key: "vehicleType" as keyof BikeBooking, header: "Vehicle Type" },
-          {
-            key: "amount" as keyof BikeBooking,
-            header: "Amount",
-            render: (booking: BikeBooking) => (
-              <span>${booking.amount.toFixed(2)}</span>
-            ),
-          },
-          {
-            key: "status" as keyof BikeBooking,
-            header: "Status",
-            render: (booking: BikeBooking) => (
-              <StatusBadge status={booking.status} />
-            ),
-          },
-          {
-            key: "actions" as any,
-            header: "Actions",
-            render: (booking: BikeBooking) => (
-              <button
-                className="action-button flex items-center"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  viewBookingDetails(booking);
-                }}
-              >
-                <Eye size={16} className="mr-1" /> View Details
-              </button>
-            ),
-          },
-        ]}
-        data={bookings}
-        keyExtractor={(item) => item.id}
-        filterable={true}
-        // searchable={true}
-        // exportable={true}
-        filterOptions={[
-          {
-            key: "status" as keyof BikeBooking,
-            label: "Status",
-            options: [
-              { label: "Completed", value: "Completed" },
-              { label: "Cancelled", value: "Cancelled" },
-              { label: "Pending", value: "Pending" },
-            ],
-          },
-          {
-            key: "vehicleType" as keyof BikeBooking,
-            label: "Vehicle Type",
-            options: [
-              { label: "Scooter", value: "Scooter" },
-              { label: "MotorBike", value: "MotorBike" },
-            ],
-          },
-        ]}
-      />
+      {loading ? (
+        <p>Loading bookings...</p>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={bookings}
+          keyExtractor={(item) => item.bookingId}
+          filterable
+          filterOptions={filterOptions}
+          paginate
+          pageSize={pageSize}
+          currentPage={currentPage}
+          totalItems={totalBookings}
+          onPageChange={setCurrentPage}
+        />
+      )}
 
       {/* Booking Details Sheet */}
       <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
@@ -256,7 +246,7 @@ const BikeBookings = () => {
 
               <div className="pt-4 border-t">
                 <h3 className="font-semibold mb-2">Rider Information</h3>
-                <p className="font-medium">{selectedBooking.riderName}</p>
+                <p className="font-medium">{selectedBooking.driverName}</p>
               </div>
             </div>
           )}

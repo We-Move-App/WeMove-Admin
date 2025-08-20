@@ -16,23 +16,23 @@ import { toast } from '@/hooks/use-toast';
 const mockUsers: User[] = [
   {
     id: '1',
-    name: 'Admin User',
+    name: 'Admin',
     email: 'admin@example.com',
     role: 'Admin',
     permissions: ['all'],
     createdAt: '2023-01-01'
   },
-  {
-    id: '2',
-    name: 'Manager User',
-    email: 'manager@example.com',
-    role: 'Manager',
-    permissions: ['view_reports', 'manage_bookings'],
-    createdAt: '2023-03-15'
-  },
+  // {
+  //   id: '2',
+  //   name: 'Manager User',
+  //   email: 'manager@example.com',
+  //   role: 'Manager',
+  //   permissions: ['view_reports', 'manage_bookings'],
+  //   createdAt: '2023-03-15'
+  // },
   {
     id: '3',
-    name: 'Subadmin User',
+    name: 'Subadmin',
     email: 'subadmin@example.com',
     role: 'Subadmin',
     permissions: ['view_reports', 'manage_bookings', 'manage_customers'],
@@ -163,8 +163,8 @@ const UserManagement = () => {
     <>
       <div className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">User Management</h1>
-          <p className="text-gray-600">Manage admin users and their permissions</p>
+          <h1 className="text-2xl font-bold">Role Management</h1>
+          <p className="text-gray-600">Manage admin, sub-admin roles and their permissions</p>
         </div>
 
         <Button
@@ -172,7 +172,7 @@ const UserManagement = () => {
           className="flex items-center gap-2"
         >
           <Plus size={16} />
-          Add New User
+          Add Admin / Sub-admin
         </Button>
       </div>
 
