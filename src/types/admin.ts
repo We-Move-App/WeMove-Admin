@@ -288,6 +288,35 @@ export interface Customer {
     | "Pending";
 }
 
+// User related types
+
+export interface BusBookingUser {
+  busBookingId: string;
+  type: "bus";
+  busNumber: string | null;
+  route: string | null;
+  date: string;
+  amount: number;
+  status: string;
+}
+
+export interface HotelBookingUser {
+  id: string;
+  hotelId: string;
+  type: "hotel";
+  stayDuration: string;
+  amount: number;
+  status: string;
+}
+
+export interface RideBookingUser {
+  bookingId: string;
+  type: "ride";
+  rideDate: string;
+  amount: number;
+  status: string;
+}
+
 // Commission related types
 export interface Commission {
   id: string;

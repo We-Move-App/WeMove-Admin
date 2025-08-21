@@ -14,16 +14,19 @@ const CustomerManagement = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalUsers, setTotalUsers] = useState(0);
 
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
         const response = await axiosInstance.get("/user-management/users", {
-          params: { page: 1, limit: 10 }
+          params: { page: currentPage, limit: pageSize }
         });
 
         if (response.data.success) {
-          const apiUsers = response.data.userDetails.map((u: any) => ({
+          const apiUsers = response.data.data.map((u: any) => ({
             id: u._id,
             name: u.fullName,
             mobile: u.phoneNumber,
@@ -31,6 +34,7 @@ const CustomerManagement = () => {
             status: u.verificationStatus,
           }));
           setCustomers(apiUsers);
+          setTotalUsers(response.data?.total || 0);
         }
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -40,7 +44,7 @@ const CustomerManagement = () => {
     };
 
     fetchCustomers();
-  }, []);
+  }, [currentPage, pageSize]);
 
   const handleShowHistory = (customer: Customer) => {
     setSelectedCustomer(customer);
@@ -95,7 +99,11 @@ const CustomerManagement = () => {
           data={customers}
           keyExtractor={(item) => item.id}
           onRowClick={handleRowClick}
-          searchable={true}
+          paginate={true}
+          pageSize={10}
+          currentPage={currentPage}
+          totalItems={totalUsers}
+          onPageChange={(page) => setCurrentPage(page)}
         />
       )}
 

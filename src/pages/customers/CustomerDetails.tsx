@@ -23,46 +23,80 @@ import {
 } from "@/components/ui/tabs";
 
 import { Customer, BusBooking, HotelBooking } from "@/types/admin";
-import { ChevronLeft } from "lucide-react";
+import { ChevronDown, ChevronLeft } from "lucide-react";
 import { Button } from '@/components/ui/button';
-
-type ApiResponse = {
-  success: boolean;
-  message: string;
-  personalInfo: Customer;
-  bookingSummary: {
-    busBookings: number;
-    hotelBookings: number;
-    rideBookings: number;
-  };
-  busBookings: BusBooking[];
-  hotelBookings: HotelBooking[];
-  rideBookings: any[];
-  allBookings: (BusBooking | HotelBooking)[];
-};
+import StatusBadge from "@/components/ui/StatusBadge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SelectIcon } from "@radix-ui/react-select";
+import { StatusDropdown } from "@/components/ui/StatusDropdown";
 
 const CustomerDetails = () => {
   const { customerId } = useParams();
-  const [customerData, setCustomerData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [customerData, setCustomerData] = useState<any>(null)
+  // const [formData, setFormData] = useState({
+  //   status: "pending",
+  // });
+
+
+  interface NormalizedBooking {
+    id: string;
+    type: "bus" | "hotel" | "ride";
+    date: string;
+    amount: number;
+    status: string;
+    extra?: Record<string, any>;
+  }
 
   useEffect(() => {
-    const fetchCustomerDetails = async () => {
+    const fetchCustomer = async () => {
       try {
-        const res = await axiosInstance.get<ApiResponse>(
-          `/user-management/users/${customerId}`
-        );
-        setCustomerData(res.data);
+        const { data } = await axiosInstance.get(`/user-management/users/${customerId}`);
+
+        // Normalize bookings
+        const allBookings: NormalizedBooking[] = [
+          ...data.busBookings.map((b: any) => ({
+            id: b.busBookingId,
+            type: "bus",
+            date: b.date,
+            amount: b.amount,
+            status: b.status,
+            extra: b,
+          })),
+          ...data.hotelBookings.map((h: any) => ({
+            id: h.id,
+            type: "hotel",
+            date: h.stayDuration,
+            amount: h.amount,
+            status: h.status,
+            extra: h,
+          })),
+          ...data.rideBookings.map((r: any) => ({
+            id: r.bookingId,
+            type: "ride",
+            date: r.rideDate,
+            amount: r.amount,
+            status: r.status,
+            extra: r,
+          })),
+        ];
+
+        setCustomerData({
+          ...data,
+          status: data.status ?? data.personalInfo?.status ?? "pending",
+          allBookings,
+        });
       } catch (err) {
-        console.error("Error fetching customer details:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    if (customerId) fetchCustomerDetails();
+    fetchCustomer();
   }, [customerId]);
+
 
   if (loading) {
     return (
@@ -82,9 +116,24 @@ const CustomerDetails = () => {
     );
   }
 
-  const { personalInfo, bookingSummary, allBookings, busBookings, hotelBookings } =
-    customerData;
+  const handleStatusChange = async (nextStatus: string) => {
+    console.log("Sending PUT request with body:", { status: nextStatus });
 
+    try {
+      const res = await axiosInstance.put(
+        `/user-management/users/verify/${customerId}`,
+        { status: nextStatus }
+      );
+      console.log("API response:", res.data);
+
+      setCustomerData((prev) => ({ ...prev, status: nextStatus }));
+    } catch (err) {
+      console.error("Failed to update status", err);
+    }
+  };
+
+  const { personalInfo, bookingSummary, allBookings, busBookings, hotelBookings, rideBookings } =
+    customerData;
 
   return (
     <>
@@ -123,6 +172,15 @@ const CustomerDetails = () => {
                   <TableRow>
                     <TableCell className="font-medium">Mobile</TableCell>
                     <TableCell>{personalInfo.mobile}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">Status</TableCell>
+                    <TableCell>
+                      <StatusDropdown
+                        value={(customerData.status as any) || "pending"}
+                        onChange={handleStatusChange}
+                      />
+                    </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -165,6 +223,7 @@ const CustomerDetails = () => {
               <TabsTrigger value="all">All Bookings</TabsTrigger>
               <TabsTrigger value="bus">Bus Bookings</TabsTrigger>
               <TabsTrigger value="hotel">Hotel Bookings</TabsTrigger>
+              <TabsTrigger value="ride">Ride Bookings</TabsTrigger>
             </TabsList>
 
             {/* All Bookings */}
@@ -174,7 +233,7 @@ const CustomerDetails = () => {
                   <CardTitle>All Bookings</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {allBookings.length === 0 ? (
+                  {customerData.allBookings.length === 0 ? (
                     <p className="text-center py-4">No booking history found</p>
                   ) : (
                     <Table>
@@ -188,21 +247,11 @@ const CustomerDetails = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {allBookings.map((b) => (
+                        {customerData.allBookings.map((b: NormalizedBooking) => (
                           <TableRow key={b.id}>
                             <TableCell>{b.id}</TableCell>
-                            <TableCell>
-                              {"busRegistrationNumber" in b
-                                ? "Bus"
-                                : "Hotel"}
-                            </TableCell>
-                            <TableCell>
-                              <TableCell>
-                                {"journeyDate" in b
-                                  ? b.journeyDate
-                                  : (b as HotelBooking).stayDuration}
-                              </TableCell>
-                            </TableCell>
+                            <TableCell>{b.type}</TableCell>
+                            <TableCell>{b.date}</TableCell>
                             <TableCell>₹{b.amount}</TableCell>
                             <TableCell>{b.status}</TableCell>
                           </TableRow>
@@ -213,7 +262,6 @@ const CustomerDetails = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-
             {/* Bus Bookings */}
             <TabsContent value="bus">
               <Card>
@@ -237,13 +285,11 @@ const CustomerDetails = () => {
                       </TableHeader>
                       <TableBody>
                         {busBookings.map((b) => (
-                          <TableRow key={b.id}>
-                            <TableCell>{b.id}</TableCell>
-                            <TableCell>{b.busRegistrationNumber}</TableCell>
-                            <TableCell>
-                              {b.from} → {b.to}
-                            </TableCell>
-                            <TableCell>{b.journeyDate}</TableCell>
+                          <TableRow key={b.busBookingId}>
+                            <TableCell>{b.busBookingId}</TableCell>
+                            <TableCell>{b.busNumber || "-"}</TableCell>
+                            <TableCell>{b.route || "-"}</TableCell>
+                            <TableCell>{new Date(b.date).toLocaleDateString()}</TableCell>
                             <TableCell>₹{b.amount}</TableCell>
                             <TableCell>{b.status}</TableCell>
                           </TableRow>
@@ -254,7 +300,6 @@ const CustomerDetails = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-
             {/* Hotel Bookings */}
             <TabsContent value="hotel">
               <Card>
@@ -293,6 +338,40 @@ const CustomerDetails = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+            <TabsContent value="ride">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Ride Bookings</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {rideBookings.length === 0 ? (
+                    <p className="text-center py-4">No ride bookings found</p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>ID</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Amount</TableHead>
+                          <TableHead>Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {rideBookings.map((b) => (
+                          <TableRow key={b.bookingId}>
+                            <TableCell>{b.bookingId}</TableCell>
+                            <TableCell> {new Date(b.date).toLocaleDateString("en-GB")} </TableCell>
+                            <TableCell>₹{b.amount}</TableCell>
+                            <TableCell>{b.status}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
           </Tabs>
         </div>
       </div>

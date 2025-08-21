@@ -118,7 +118,6 @@ const TaxiDrivers = () => {
         totalItems={totalDrivers}
         onPageChange={(page) => setCurrentPage(page)}
       />
-
     </>
   );
 };

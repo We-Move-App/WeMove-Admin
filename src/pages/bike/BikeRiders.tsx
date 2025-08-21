@@ -61,20 +61,26 @@ const BikeRiders = () => {
   // const [riders] = useState<BikeRider[]>(mockBikeRiders);
   const [riders, setRiders] = useState<BikeRider[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const limit = 10;
-  const totalPages = Math.ceil(total / limit);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalDrivers, setTotalDrivers] = useState(0);
 
   useEffect(() => {
     const fetchRiders = async () => {
       try {
         const res = await axiosInstance.get(
-          `/driver-management/drivers/?vehicleType=bike&page=${page}&limit=10`
+          "/driver-management/drivers",
+          {
+            params: {
+              vehicleType: "bike",
+              page: currentPage,
+              limit: pageSize,
+            },
+          }
         );
 
         const apiData = res.data.data || [];
-        setTotal(res.data.total || 0);
+        // setTotal(res.data.total || 0);
 
         const mapped: BikeRider[] = apiData.map((rider: any) => ({
           driverId: rider.driverId,
@@ -87,6 +93,7 @@ const BikeRiders = () => {
         }));
 
         setRiders(mapped);
+        setTotalDrivers(res.data?.total || 0);
       } catch (err) {
         console.error("Error fetching bike riders:", err);
       } finally {
@@ -95,10 +102,10 @@ const BikeRiders = () => {
     };
 
     fetchRiders();
-  }, [page]);
+  }, [currentPage, pageSize]);
 
   const handleRowClick = (rider: BikeRider) => {
-    navigate(`/bike-management/riders/${rider.driverId}`);
+    navigate(`/ bike - management / riders / ${rider.driverId}`);
   };
 
   const columns = [
@@ -123,7 +130,7 @@ const BikeRiders = () => {
           className="action-button flex items-center"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/bike-management/riders/${rider.driverId}`);
+            navigate(`/ bike - management / riders / ${rider.driverId}`);
           }}
         >
           <Eye size={16} className="mr-1" /> View Details
@@ -194,7 +201,11 @@ const BikeRiders = () => {
           keyExtractor={(item) => item.driverId}
           filterable={true}
           filterOptions={filterOptions}
-          paginate={false}
+          paginate={true}
+          pageSize={10}
+          currentPage={currentPage}
+          totalItems={totalDrivers}
+          onPageChange={(page) => setCurrentPage(page)}
         />
       )}
     </>

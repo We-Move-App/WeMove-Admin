@@ -64,12 +64,11 @@ function DataTable<T>({
   filterOptions = [],
   paginate = true,
   pageSize = 10,
-  currentPage = 1,      // <-- add default
-  totalItems = data.length, // <-- fallback if not provided
+  currentPage = 1,
+  totalItems = data.length,
   onPageChange,
 }: DataTableProps<T>) {
   const [searchTerm, setSearchTerm] = useState("");
-  // const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<{
     key: keyof T | null;
     direction: "asc" | "desc";
