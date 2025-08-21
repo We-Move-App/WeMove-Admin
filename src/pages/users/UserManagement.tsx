@@ -1,16 +1,18 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // import Layout from '@/components/layout/Layout';
 import DataTable from '@/components/ui/DataTable';
 import { Eye, Plus, Check, X, ChevronLeft } from 'lucide-react';
-import { User } from '@/types/admin';
+import { Commission, User } from '@/types/admin';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
+import { Command, CommandGroup, CommandItem, CommandList, CommandInput } from "@/components/ui/command";
+import fileUploadInstance from '@/api/fileUploadInstance';
 
 // Mock user data
 const mockUsers: User[] = [
@@ -62,15 +64,38 @@ const UserManagement = () => {
     name: string;
     email: string;
     password: string;
-    role: 'Subadmin' | 'Manager';
+    role: 'Admin' | 'Subadmin';
     permissions: string[];
+    branchId: string;
+    branchName: string;
   }>({
     name: '',
     email: '',
     password: '',
-    role: 'Manager',
-    permissions: []
+    role: 'Admin',
+    permissions: [],
+    branchId: "",
+    branchName: "",
   });
+  const [branches, setBranches] = useState<{ id: string; name: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState("");
+  const [currentCommission, setCurrentCommission] = useState<Commission>({
+    id: '',
+    serviceType: 'Bus',
+    percentage: 0,
+    fixedRate: null,
+    commissionType: 'percentage',
+    effectiveFrom: new Date().toISOString().split('.')[0].slice(0, 16),
+    effectiveTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('.')[0].slice(0, 16),
+    isActive: true
+  });
+
+  const handleInputChange = (field: keyof Commission, value: any) => {
+    setCurrentCommission(prev => ({ ...prev, [field]: value }));
+  };
+
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleAddUser = () => {
     // Validate form
@@ -108,8 +133,10 @@ const UserManagement = () => {
       name: '',
       email: '',
       password: '',
-      role: 'Manager',
-      permissions: []
+      role: 'Admin',
+      permissions: [],
+      branchId: '',
+      branchName: '',
     });
   };
 
@@ -154,6 +181,36 @@ const UserManagement = () => {
       )
     }
   ];
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (query.trim().length > 2) {
+        fetchBranches(query);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounce);
+  }, [query]);
+
+  const fetchBranches = async (address: string) => {
+    setLoading(true);
+    try {
+      const res = await fileUploadInstance.get(`/google-search?address=${address}`);
+      if (res.data?.data) {
+        // Convert string[] → {id, name}[]
+        const formatted = res.data.data.map((item: string) => ({
+          id: item,
+          name: item,
+        }));
+        setBranches(formatted);
+      }
+    } catch (err) {
+      console.error("Failed to fetch branches:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleRowClick = (user: User) => {
     navigate(`/user-management/${user.id}`);
@@ -223,16 +280,72 @@ const UserManagement = () => {
               <label className="text-sm font-medium">Role</label>
               <Select
                 value={newUser.role}
-                onValueChange={(value: 'Subadmin' | 'Manager') => setNewUser({ ...newUser, role: value })}
+                onValueChange={(value: 'Admin' | 'Subadmin') => setNewUser({ ...newUser, role: value })}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Subadmin">Subadmin</SelectItem>
-                  <SelectItem value="Manager">Manager</SelectItem>
+                  <SelectItem value="Admin">Admin</SelectItem>
+                  <SelectItem value="Subadmin">Sub-Admin</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Service Type</label>
+              <Select
+                value={currentCommission.serviceType}
+                onValueChange={(value: any) => handleInputChange('serviceType', value)}
+                disabled={isEditing}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select service type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Bus">Bus</SelectItem>
+                  <SelectItem value="Hotel">Hotel</SelectItem>
+                  <SelectItem value="Taxi">Taxi</SelectItem>
+                  <SelectItem value="Bike">Bike</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Choose Branch</label>
+              <Command className="border rounded-md">
+                <CommandInput
+                  placeholder="Type city name..."
+                  value={query}
+                  onValueChange={(val) => setQuery(val)}
+                />
+                <CommandList>
+                  {loading && <div className="p-2 text-sm">Loading...</div>}
+                  {!loading && branches.length === 0 && query.length > 2 && (
+                    <div className="p-2 text-sm">No results found</div>
+                  )}
+                  <CommandGroup>
+                    {branches.map((branch) => (
+                      <CommandItem
+                        key={branch.id}
+                        onSelect={() =>
+                          setNewUser({
+                            ...newUser,
+                            branchId: branch.id,
+                            branchName: branch.name,
+                          })
+                        }
+                      >
+                        {branch.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+
+                </CommandList>
+              </Command>
+              {newUser.branchName && (
+                <p className="text-xs text-gray-400">Selected: {newUser.branchName}</p>
+              )}
             </div>
 
             <div className="space-y-2">

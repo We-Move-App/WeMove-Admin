@@ -6,6 +6,8 @@ export interface User {
   role: "Admin" | "Subadmin" | "Manager";
   permissions: string[];
   createdAt: string;
+  branchId?: string; // ✅ optional
+  branchName?: string; // ✅ optional
 }
 
 // Define a ChartData type for the charts
