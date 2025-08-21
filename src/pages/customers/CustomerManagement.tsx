@@ -6,6 +6,7 @@ import { Customer } from '@/types/admin';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import axiosInstance from '@/api/axiosInstance';
+import StatusBadge from '@/components/ui/StatusBadge';
 
 const CustomerManagement = () => {
   const navigate = useNavigate();
@@ -50,7 +51,12 @@ const CustomerManagement = () => {
     { key: 'name' as keyof Customer, header: 'Name' },
     { key: 'mobile' as keyof Customer, header: 'Mobile' },
     { key: 'email' as keyof Customer, header: 'Email ID' },
-    { key: 'status' as keyof Customer, header: 'Status' },
+    // { key: 'status' as keyof Customer, header: 'Status' },
+    {
+      key: "status" as keyof Customer,
+      header: "Status",
+      render: (driver: Customer) => <StatusBadge status={driver.status} />,
+    },
     {
       key: 'actions' as string,
       header: 'Actions',

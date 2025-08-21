@@ -27,7 +27,7 @@ const TaxiDriverDetails = () => {
     mobile: '',
     email: '',
     status: 'Approved',
-    vehicleType: 'Car',
+    vehicleType: '',
   });
 
   useEffect(() => {
@@ -75,6 +75,22 @@ const TaxiDriverDetails = () => {
     setDriver(prev => ({ ...prev, [field]: value }));
   };
 
+  // const uploadFiles = async (files: File | File[]) => {
+  //   const formData = new FormData();
+
+  //   if (Array.isArray(files)) {
+  //     files.forEach((file) => formData.append("image", file));
+  //   } else {
+  //     formData.append("image", files);
+  //   }
+
+  //   const res = await fileUploadInstance.post("/file/upload", formData, {
+  //     headers: { "Content-Type": "multipart/form-data" },
+  //   });
+
+  //   return res.data.data;
+  // };
+
   const uploadFiles = async (files: File | File[]) => {
     const formData = new FormData();
 
@@ -88,9 +104,259 @@ const TaxiDriverDetails = () => {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
+    console.log("Upload response:", res.data);
+
     return res.data.data;
   };
 
+  const handleSingleUpload = async (
+    file: File | File[] | null,
+    key: keyof TaxiDriver
+  ) => {
+    console.log(`handleSingleUpload called for key: ${key}`, file);
+
+    if (!file) return;
+
+    const fileToUpload = Array.isArray(file) ? file[0] : file;
+    console.log("File to upload:", fileToUpload);
+
+    // Upload the file
+    const uploaded = await uploadFiles(fileToUpload);
+    console.log("Uploaded response:", uploaded);
+
+    // Store as FileObject
+    handleChange(key, {
+      fileUrl: uploaded.url,
+      fileName: uploaded.fileName,
+    });
+
+    console.log(`Updated driver field ${key}:`, {
+      fileUrl: uploaded.url,
+      fileName: uploaded.fileName,
+    });
+  };
+
+  // const buildDriverPayload = async (driver: TaxiDriver) => {
+  //   const isFile = (file: any): file is File =>
+  //     file && typeof file === "object" && "name" in file;
+
+  //   const uploadOrReturn = async (
+  //     file: any,
+  //     documentType: string
+  //   ): Promise<any | null> => {
+  //     if (!file) return null;
+
+  //     if (isFile(file)) {
+  //       // New upload -> get uploaded object from API
+  //       const uploaded = await uploadFiles(file);
+  //       return uploaded ? { ...uploaded, documentType } : null;
+  //     }
+
+  //     if (typeof file === "string") {
+  //       // Already uploaded (just a URL from API)
+  //       return { fileUrl: file, documentType };
+  //     }
+
+  //     if (typeof file === "object" && "fileUrl" in file) {
+  //       // Already in correct object form
+  //       return { ...file, documentType };
+  //     }
+
+  //     return null;
+  //   };
+
+
+  //   // Uploads
+  //   // const profilePhoto = await uploadOrReturn(driver.profilePhoto, "avatar");
+
+  //   // const idProofDocs = Array.isArray(driver.idProofs)
+  //   //   ? await Promise.all(
+  //   //     driver.idProofs.map((f) => uploadOrReturn(f, "id_card"))
+  //   //   )
+  //   //   : [];
+
+  //   // const driverLicenseDocs = Array.isArray(driver.driverLicense)
+  //   //   ? await Promise.all(
+  //   //     driver.driverLicense.map((f) => uploadOrReturn(f, "license"))
+  //   //   )
+  //   //   : [];
+
+  //   // const vehiclePhotos = Array.isArray(driver.vehiclePhotos)
+  //   //   ? await Promise.all(
+  //   //     driver.vehiclePhotos.map((f) => uploadOrReturn(f, "vehicle_photo"))
+  //   //   )
+  //   //   : [];
+
+  //   // const vehicleInsurance = await uploadOrReturn(
+  //   //   driver.vehicleInsurance,
+  //   //   "insurance"
+  //   // );
+
+  //   // const vehicleRegistrationCertificate = await uploadOrReturn(
+  //   //   driver.vehicleRegistrationCertificate,
+  //   //   "registration"
+  //   // );
+
+  //   // const bankAccountDetails = await uploadOrReturn(
+  //   //   driver.bankAccountDetails,
+  //   //   "passbook"
+  //   // );
+
+  //   const profilePhoto = await uploadOrReturn(driver.profilePhoto, "avatar");
+
+  //   const idProofDoc = driver.idProofs
+  //     ? await uploadOrReturn(driver.idProofs, "id_card")
+  //     : null;
+
+  //   const driverLicenseDoc = driver.driverLicense
+  //     ? await uploadOrReturn(driver.driverLicense, "license")
+  //     : null;
+
+  //   const vehiclePhotos = driver.vehiclePhotos
+  //     ? await uploadOrReturn(driver.vehiclePhotos, "vehicle_photo")
+  //     : null;
+
+  //   const vehicleInsurance = driver.vehicleInsurance
+  //     ? await uploadOrReturn(driver.vehicleInsurance, "insurance")
+  //     : null;
+
+  //   const vehicleRegistrationCertificate = driver.vehicleRegistrationCertificate
+  //     ? await uploadOrReturn(
+  //       driver.vehicleRegistrationCertificate,
+  //       "registration"
+  //     )
+  //     : null;
+
+  //   const bankAccountDetails = driver.bankAccountDetails
+  //     ? await uploadOrReturn(driver.bankAccountDetails, "passbook")
+  //     : null;
+
+
+  //   // Build payload
+  //   const payload = {
+  //     basicDriverDetails: {
+  //       fullName: driver.name || "",
+  //       phoneNo: driver.mobile || "",
+  //       email: driver.email || "",
+  //       age: driver.age || null,
+  //       experience: driver.experience || 0,
+  //       address: driver.address || "",
+  //     },
+  //     bankDetails: {
+  //       accountNumber: driver.accountNumber || "",
+  //       holderName: driver.accountHolderName || "",
+  //       document: bankAccountDetails,
+  //     },
+  //     vehicleDetails: {
+  //       model: driver.vehicleModel || "",
+  //       registrationNo: driver.vehicleRegistrationNumber || "",
+  //       vehicleType: "taxi",
+  //       insurance: vehicleInsurance,
+  //       registrationCertificate: vehicleRegistrationCertificate,
+  //       vehiclePhotos: vehiclePhotos.length ? vehiclePhotos[0] : null,
+  //       avatarPhotos: profilePhoto,
+  //     },
+  //     documents: [
+  //       ...(idProofDoc ? [idProofDoc] : []),
+  //       ...(driverLicenseDoc ? [driverLicenseDoc] : []),
+  //     ],
+  //   };
+
+  //   console.log("Driver Payload:", payload);
+  //   return payload;
+  // };
+
+  // For PUT (Update existing driver)
+  // const buildPutDriverPayload = async (driver: TaxiDriver) => {
+  //   const isFile = (file: any): file is File =>
+  //     file && typeof file === "object" && "name" in file;
+
+  //   const uploadOrReturn = async (file: any, documentType: string) => {
+  //     if (!file) return null;
+
+  //     // Case 1: New file (File object)
+  //     if (isFile(file)) {
+  //       const uploaded = await uploadFiles(file);
+  //       return uploaded
+  //         ? {
+  //           fileUrl: uploaded.fileUrl,
+  //           fileName: uploaded.fileName || file.name,
+  //           documentType,
+  //         }
+  //         : null;
+  //     }
+
+  //     // Case 2: Already uploaded string URL
+  //     if (typeof file === "string") {
+  //       return {
+  //         fileUrl: file,
+  //         fileName: file.split("/").pop() || "unknown",
+  //         documentType,
+  //       };
+  //     }
+
+  //     // Case 3: Object from backend (fileUrl or url)
+  //     if (typeof file === "object") {
+  //       return {
+  //         fileUrl: file.fileUrl || file.url, // ✅ supports both keys
+  //         fileName:
+  //           file.fileName || file.fileUrl?.split("/").pop() || file.url?.split("/").pop() || "unknown",
+  //         documentType,
+  //       };
+  //     }
+
+  //     return null;
+  //   };
+
+  //   const profilePhoto = await uploadOrReturn(driver.profilePhoto, "avatar");
+  //   console.log("driver.profilePhoto:", driver.profilePhoto);
+  //   const vehiclePhotos = Array.isArray(driver.vehiclePhotos)
+  //     ? await Promise.all(
+  //       driver.vehiclePhotos.map((f) => uploadOrReturn(f, "vehicle_photo"))
+  //     )
+  //     : [];
+
+  //   const vehicleInsurance = await uploadOrReturn(driver.vehicleInsurance, "insurance");
+  //   const vehicleRegistrationCertificate = await uploadOrReturn(
+  //     driver.vehicleRegistrationCertificate,
+  //     "registration"
+  //   );
+  //   const bankAccountDetails = await uploadOrReturn(driver.bankAccountDetails, "passbook");
+
+  //   const idProofDocs = Array.isArray(driver.idProofs)
+  //     ? await Promise.all(driver.idProofs.map((f) => uploadOrReturn(f, "id_card")))
+  //     : [];
+
+  //   const driverLicenseDocs = Array.isArray(driver.driverLicense)
+  //     ? await Promise.all(driver.driverLicense.map((f) => uploadOrReturn(f, "license")))
+  //     : [];
+
+  //   return {
+  //     basicDriverDetails: {
+  //       fullName: driver.name || "",
+  //       phoneNo: driver.mobile || "",
+  //       email: driver.email || "",
+  //       age: driver.age || null,
+  //       experience: driver.experience || 0,
+  //       address: driver.address || "",
+  //     },
+  //     bankDetails: {
+  //       accountNumber: driver.accountNumber || "",
+  //       holderName: driver.accountHolderName || "",
+  //       document: bankAccountDetails,
+  //     },
+  //     vehicleDetails: {
+  //       model: driver.vehicleModel || "",
+  //       registrationNo: driver.vehicleRegistrationNumber || "",
+  //       vehicleType: "taxi",
+  //       insurance: vehicleInsurance,
+  //       registrationCertificate: vehicleRegistrationCertificate,
+  //       vehiclePhotos: vehiclePhotos.length ? vehiclePhotos[0] : null,
+  //       avatarPhotos: profilePhoto || null,
+  //     },
+  //     documents: [...idProofDocs.filter(Boolean), ...driverLicenseDocs.filter(Boolean)],
+  //   };
+  // };
   const buildDriverPayload = async (driver: TaxiDriver) => {
     const isFile = (file: any): file is File =>
       file && typeof file === "object" && "name" in file;
@@ -102,18 +368,22 @@ const TaxiDriverDetails = () => {
       if (!file) return null;
 
       if (isFile(file)) {
-        // New upload -> get uploaded object from API
         const uploaded = await uploadFiles(file);
-        return uploaded ? { ...uploaded, documentType } : null;
+        return uploaded
+          ? {
+            documentType,
+            fileUrl: uploaded.url,
+            fileName: uploaded.fileName
+          }
+          : null;
       }
 
+
       if (typeof file === "string") {
-        // Already uploaded (just a URL from API)
-        return { fileUrl: file, documentType };
+        return { documentType, fileUrl: file, fileName: file.split("/").pop() };
       }
 
       if (typeof file === "object" && "fileUrl" in file) {
-        // Already in correct object form
         return { ...file, documentType };
       }
 
@@ -124,38 +394,32 @@ const TaxiDriverDetails = () => {
     // Uploads
     const profilePhoto = await uploadOrReturn(driver.profilePhoto, "avatar");
 
-    const idProofDocs = Array.isArray(driver.idProofs)
-      ? await Promise.all(
-        driver.idProofs.map((f) => uploadOrReturn(f, "id_card"))
+    const idProofDoc = driver.idProofs
+      ? await uploadOrReturn(driver.idProofs, "id_card")
+      : null;
+
+    const driverLicenseDoc = driver.driverLicense
+      ? await uploadOrReturn(driver.driverLicense, "license")
+      : null;
+
+    const vehiclePhotos = driver.vehiclePhotos
+      ? await uploadOrReturn(driver.vehiclePhotos, "vehicle_photo")
+      : null;
+
+    const vehicleInsurance = driver.vehicleInsurance
+      ? await uploadOrReturn(driver.vehicleInsurance, "insurance")
+      : null;
+
+    const vehicleRegistrationCertificate = driver.vehicleRegistrationCertificate
+      ? await uploadOrReturn(
+        driver.vehicleRegistrationCertificate,
+        "registration"
       )
-      : [];
+      : null;
 
-    const driverLicenseDocs = Array.isArray(driver.driverLicense)
-      ? await Promise.all(
-        driver.driverLicense.map((f) => uploadOrReturn(f, "license"))
-      )
-      : [];
-
-    const vehiclePhotos = Array.isArray(driver.vehiclePhotos)
-      ? await Promise.all(
-        driver.vehiclePhotos.map((f) => uploadOrReturn(f, "vehicle_photo"))
-      )
-      : [];
-
-    const vehicleInsurance = await uploadOrReturn(
-      driver.vehicleInsurance,
-      "insurance"
-    );
-
-    const vehicleRegistrationCertificate = await uploadOrReturn(
-      driver.vehicleRegistrationCertificate,
-      "registration"
-    );
-
-    const bankAccountDetails = await uploadOrReturn(
-      driver.bankAccountDetails,
-      "passbook"
-    );
+    const bankAccountDetails = driver.bankAccountDetails
+      ? await uploadOrReturn(driver.bankAccountDetails, "passbook")
+      : null;
 
     // Build payload
     const payload = {
@@ -178,12 +442,13 @@ const TaxiDriverDetails = () => {
         vehicleType: "taxi",
         insurance: vehicleInsurance,
         registrationCertificate: vehicleRegistrationCertificate,
-        vehiclePhotos: vehiclePhotos.length ? vehiclePhotos[0] : null,
+        // vehiclePhotos: vehiclePhotos.length ? vehiclePhotos[0] : null,
+        vehiclePhotos: vehiclePhotos,
         avatarPhotos: profilePhoto,
       },
       documents: [
-        ...idProofDocs.filter(Boolean),
-        ...driverLicenseDocs.filter(Boolean),
+        ...(idProofDoc ? [idProofDoc] : []),
+        ...(driverLicenseDoc ? [driverLicenseDoc] : []),
       ],
     };
 
@@ -191,7 +456,7 @@ const TaxiDriverDetails = () => {
     return payload;
   };
 
-  // For PUT (Update existing driver)
+
   const buildPutDriverPayload = async (driver: TaxiDriver) => {
     const isFile = (file: any): file is File =>
       file && typeof file === "object" && "name" in file;
@@ -232,29 +497,34 @@ const TaxiDriverDetails = () => {
 
       return null;
     };
-
     const profilePhoto = await uploadOrReturn(driver.profilePhoto, "avatar");
-    console.log("driver.profilePhoto:", driver.profilePhoto);
-    const vehiclePhotos = Array.isArray(driver.vehiclePhotos)
-      ? await Promise.all(
-        driver.vehiclePhotos.map((f) => uploadOrReturn(f, "vehicle_photo"))
+
+    const idProofDoc = driver.idProofs
+      ? await uploadOrReturn(driver.idProofs, "id_card")
+      : null;
+
+    const driverLicenseDoc = driver.driverLicense
+      ? await uploadOrReturn(driver.driverLicense, "license")
+      : null;
+
+    const vehiclePhotos = driver.vehiclePhotos
+      ? await uploadOrReturn(driver.vehiclePhotos, "vehicle_photo")
+      : null;
+
+    const vehicleInsurance = driver.vehicleInsurance
+      ? await uploadOrReturn(driver.vehicleInsurance, "insurance")
+      : null;
+
+    const vehicleRegistrationCertificate = driver.vehicleRegistrationCertificate
+      ? await uploadOrReturn(
+        driver.vehicleRegistrationCertificate,
+        "registration"
       )
-      : [];
+      : null;
 
-    const vehicleInsurance = await uploadOrReturn(driver.vehicleInsurance, "insurance");
-    const vehicleRegistrationCertificate = await uploadOrReturn(
-      driver.vehicleRegistrationCertificate,
-      "registration"
-    );
-    const bankAccountDetails = await uploadOrReturn(driver.bankAccountDetails, "passbook");
-
-    const idProofDocs = Array.isArray(driver.idProofs)
-      ? await Promise.all(driver.idProofs.map((f) => uploadOrReturn(f, "id_card")))
-      : [];
-
-    const driverLicenseDocs = Array.isArray(driver.driverLicense)
-      ? await Promise.all(driver.driverLicense.map((f) => uploadOrReturn(f, "license")))
-      : [];
+    const bankAccountDetails = driver.bankAccountDetails
+      ? await uploadOrReturn(driver.bankAccountDetails, "passbook")
+      : null;
 
     return {
       basicDriverDetails: {
@@ -276,21 +546,23 @@ const TaxiDriverDetails = () => {
         vehicleType: "taxi",
         insurance: vehicleInsurance,
         registrationCertificate: vehicleRegistrationCertificate,
-        vehiclePhotos: vehiclePhotos.length ? vehiclePhotos[0] : null,
+        vehiclePhotos: vehiclePhotos,
         avatarPhotos: profilePhoto || null,
       },
-      documents: [...idProofDocs.filter(Boolean), ...driverLicenseDocs.filter(Boolean)],
+      documents: [
+        ...(idProofDoc ? [idProofDoc] : []),
+        ...(driverLicenseDoc ? [driverLicenseDoc] : []),
+      ],
     };
   };
-
-
 
   const handleSubmit = async () => {
     try {
       if (mode === "post") {
         const payload = await buildDriverPayload(driver);
         await axiosInstance.post("/driver-management/taxi-drivers/register", payload);
-      } else if (mode === "edit") {
+      }
+      else if (mode === "edit") {
         try {
           // 1. Build payload for driver update
           const payload = await buildPutDriverPayload(driver);
@@ -392,15 +664,13 @@ const TaxiDriverDetails = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Profile Photo */}
                 <div className="col-span-2">
-                  <UploadField
+                  {/* <UploadField
                     label="Profile Photo"
                     value={driver.profilePhoto || null}
                     disabled={isReadOnly}
                     multiple={false}
                     onChange={async (file) => {
                       if (!file) return;
-
-                      // Ensure we have an array to handle multiple files (even if multiple=false)
                       const filesArray = Array.isArray(file) ? file : [file];
 
                       // Upload all selected files
@@ -410,6 +680,27 @@ const TaxiDriverDetails = () => {
 
                       // Since this is single file, pick the first uploaded file
                       handleChange("profilePhoto", uploadedFiles[0]);
+                    }}
+                  /> */}
+
+                  <UploadField
+                    label="Profile Photo"
+                    value={driver.profilePhoto || null}
+                    disabled={isReadOnly}
+                    multiple={false}
+                    onChange={async (file) => {
+                      if (!file) return;
+
+                      const fileToUpload = Array.isArray(file) ? file[0] : file;
+
+                      const uploaded = await uploadFiles(fileToUpload);
+                      console.log("Uploaded file:", uploaded);
+
+                      // Store as FileObject
+                      handleChange("profilePhoto", {
+                        fileUrl: uploaded.url,       // backend expects this
+                        fileName: uploaded.fileName, // backend expects this
+                      });
                     }}
                   />
 
@@ -476,7 +767,7 @@ const TaxiDriverDetails = () => {
                 </div>
                 <div className='col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div>
-                    <UploadField
+                    {/* <UploadField
                       disabled={isReadOnly}
                       label="ID Proofs"
                       multiple={true}
@@ -501,11 +792,19 @@ const TaxiDriverDetails = () => {
                           idProofs: uploadedFiles,
                         });
                       }}
+                    /> */}
+
+                    <UploadField
+                      label="ID Proofs"
+                      value={driver.idProofs || null} // single file now
+                      disabled={isReadOnly}
+                      multiple={false}
+                      onChange={(file) => handleSingleUpload(file, "idProofs")}
                     />
 
 
                     <div>
-                      <UploadField
+                      {/* <UploadField
                         label="Driver License"
                         value={driver.driverLicense || []}
                         disabled={isReadOnly}
@@ -518,9 +817,15 @@ const TaxiDriverDetails = () => {
                           );
                           handleChange('driverLicense', uploadedFiles);
                         }}
+                      /> */}
+
+                      <UploadField
+                        label="Driver License"
+                        value={driver.driverLicense || null} // single file now
+                        disabled={isReadOnly}
+                        multiple={false}
+                        onChange={(file) => handleSingleUpload(file, "driverLicense")}
                       />
-
-
                     </div>
                   </div>
                 </div>
@@ -551,7 +856,7 @@ const TaxiDriverDetails = () => {
                   />
                 </div>
                 <div>
-                  <UploadField
+                  {/* <UploadField
                     label="Vehicle Insurance"
                     value={driver.vehicleInsurance}
                     disabled={isReadOnly}
@@ -562,10 +867,18 @@ const TaxiDriverDetails = () => {
                       const uploadedFiles = await Promise.all(filesArray.map(f => uploadFiles(f)));
                       handleChange('vehicleInsurance', uploadedFiles[0]);
                     }}
+                  /> */}
+
+                  <UploadField
+                    label="Vehicle Insurance"
+                    value={driver.vehicleInsurance || null} // single file now
+                    disabled={isReadOnly}
+                    multiple={false}
+                    onChange={(file) => handleSingleUpload(file, "vehicleInsurance")}
                   />
                 </div>
                 <div>
-                  <UploadField
+                  {/* <UploadField
                     label="Registration Certificate"
                     value={driver.vehicleRegistrationCertificate}
                     disabled={isReadOnly}
@@ -576,10 +889,18 @@ const TaxiDriverDetails = () => {
                       const uploadedFiles = await Promise.all(filesArray.map(f => uploadFiles(f)));
                       handleChange('vehicleRegistrationCertificate', uploadedFiles[0]);
                     }}
+                  /> */}
+
+                  <UploadField
+                    label="Registration Certificate"
+                    value={driver.vehicleRegistrationCertificate || null} // single file now
+                    disabled={isReadOnly}
+                    multiple={false}
+                    onChange={(file) => handleSingleUpload(file, "vehicleRegistrationCertificate")}
                   />
                 </div>
                 <div className="col-span-2">
-                  <UploadField
+                  {/* <UploadField
                     label="Vehicle Photos"
                     value={driver.vehiclePhotos || []}
                     disabled={isReadOnly}
@@ -590,6 +911,13 @@ const TaxiDriverDetails = () => {
                       const uploadedFiles = await Promise.all(filesArray.map(f => uploadFiles(f)));
                       handleChange('vehiclePhotos', uploadedFiles);
                     }}
+                  /> */}
+                  <UploadField
+                    label="Vehicle Photos"
+                    value={driver.vehiclePhotos || null} // single file now
+                    disabled={isReadOnly}
+                    multiple={false}
+                    onChange={(file) => handleSingleUpload(file, "vehiclePhotos")}
                   />
                 </div>
               </div>
@@ -619,7 +947,7 @@ const TaxiDriverDetails = () => {
                   />
                 </div>
                 <div className='col-span-2'>
-                  <UploadField
+                  {/* <UploadField
                     label="Bank Account Details"
                     value={driver.bankAccountDetails}
                     disabled={isReadOnly}
@@ -630,6 +958,13 @@ const TaxiDriverDetails = () => {
                       const uploadedFiles = await Promise.all(filesArray.map(f => uploadFiles(f)));
                       handleChange('bankAccountDetails', uploadedFiles[0]);
                     }}
+                  /> */}
+                  <UploadField
+                    label="Bank Account Details"
+                    value={driver.bankAccountDetails || null} // single file now
+                    disabled={isReadOnly}
+                    multiple={false}
+                    onChange={(file) => handleSingleUpload(file, "bankAccountDetails")}
                   />
                 </div>
               </div>

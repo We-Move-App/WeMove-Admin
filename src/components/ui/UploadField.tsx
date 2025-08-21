@@ -4,7 +4,8 @@ import { Upload, X, FileText } from 'lucide-react';
 interface UploadFieldProps {
   label: string;
   accept?: string;
-  onChange: (files: File[] | File | null) => void;
+  // onChange: (files: File[] | File | null) => void;
+  onChange: (file: File | File[]) => void;
   value: string | string[] | { name?: string; fileUrl?: string } | { name?: string; fileUrl?: string }[] | File | File[] | null;
   multiple?: boolean;
   showCloseButton?: boolean;
@@ -37,6 +38,7 @@ const UploadField = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("handleFileChange triggered", event.target.files);
     const selectedFiles = event.target.files ? Array.from(event.target.files) : [];
     if (selectedFiles.length === 0) return;
 
@@ -119,8 +121,8 @@ const UploadField = ({
   const renderPreview = (src: string, idx: number) => {
     const file = files[idx];
 
-    // If value is just plain text like "No Driver License uploaded"
-    if (src.startsWith("No ")) {
+    // Show placeholder text ONLY in view mode
+    if (disabled && src.startsWith("No ")) {
       return (
         <div
           key={idx}
@@ -145,7 +147,6 @@ const UploadField = ({
       fileName = (value as any).fileName || (value as any).name || fileName;
     }
 
-    // PDF detection
     const mimeType =
       file?.type ||
       (Array.isArray(value) && value[idx] && (value[idx] as any).mimeType) ||
@@ -202,46 +203,49 @@ const UploadField = ({
     );
   };
 
+
   return (
     <div className="mb-4">
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
-      {previews.length > 0 ? (
-        <div className="flex flex-wrap gap-2">{previews.map(renderPreview)}</div>
-      ) : (
-        !disabled && (
-          <div className="mt-1 relative">
-            <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex justify-center">
-              <div className="space-y-1 text-center">
-                <div className="mx-auto h-12 w-12 text-gray-400 flex items-center justify-center">
-                  <Upload size={24} />
+      {/* {previews.length > 0  */}
+      {(previews.length > 0 && !(previews.length === 1 && previews[0].startsWith("No ") && !disabled))
+        ? (
+          <div className="flex flex-wrap gap-2">{previews.map(renderPreview)}</div>
+        ) : (
+          !disabled && (
+            <div className="mt-1 relative">
+              <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex justify-center">
+                <div className="space-y-1 text-center">
+                  <div className="mx-auto h-12 w-12 text-gray-400 flex items-center justify-center">
+                    <Upload size={24} />
+                  </div>
+                  <div className="flex text-sm text-gray-600">
+                    <label
+                      htmlFor={`file-upload-${label.replace(/\s+/g, "-").toLowerCase()}`}
+                      className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500"
+                    >
+                      <span>{multiple ? "Upload files" : "Upload a file"}</span>
+                      <input
+                        ref={fileInputRef}
+                        id={`file-upload-${label.replace(/\s+/g, "-").toLowerCase()}`}
+                        name="file-upload"
+                        type="file"
+                        className="sr-only"
+                        accept={accept}
+                        onChange={handleFileChange}
+                        multiple={multiple}
+                      />
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
                 </div>
-                <div className="flex text-sm text-gray-600">
-                  <label
-                    htmlFor={`file-upload-${label.replace(/\s+/g, "-").toLowerCase()}`}
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500"
-                  >
-                    <span>{multiple ? "Upload files" : "Upload a file"}</span>
-                    <input
-                      ref={fileInputRef}
-                      id={`file-upload-${label.replace(/\s+/g, "-").toLowerCase()}`}
-                      name="file-upload"
-                      type="file"
-                      className="sr-only"
-                      accept={accept}
-                      onChange={handleFileChange}
-                      multiple={multiple}
-                    />
-                  </label>
-                  <p className="pl-1">or drag and drop</p>
-                </div>
-                <p className="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
               </div>
             </div>
-          </div>
-        )
-      )}
+          )
+        )}
     </div>
   );
 };

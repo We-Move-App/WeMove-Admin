@@ -202,7 +202,7 @@ export interface TaxiDriver {
   accountNumber?: string;
   accountHolderName?: string;
 
-  profilePhoto?: string;
+  profilePhoto?: string | FileObject;
   idProofs?: string[];
   driverLicense?: string;
   vehiclePhotos?: string[];
@@ -277,6 +277,15 @@ export interface Customer {
   name: string;
   mobile: string;
   email: string;
+  status:
+    | "active"
+    | "inactive"
+    | "pending"
+    | "Approved"
+    | "Rejected"
+    | "Submitted"
+    | "Blocked"
+    | "Pending";
 }
 
 // Commission related types

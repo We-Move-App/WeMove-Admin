@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 // import Layout from '@/components/layout/Layout';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User } from '@/types/admin';
 import { toast } from '@/hooks/use-toast';
+import { ChevronLeft } from 'lucide-react';
 
 // Mock user data
 const mockUsers: User[] = [
@@ -54,6 +55,7 @@ const availablePermissions = [
 ];
 
 const UserDetails = () => {
+  const navigate = useNavigate();
   const { userId } = useParams();
   const user = mockUsers.find(u => u.id === userId);
   const [isEditing, setIsEditing] = useState(false);
@@ -129,6 +131,15 @@ const UserDetails = () => {
 
   return (
     <>
+
+      <Button
+        variant="ghost"
+        className="mb-4"
+        onClick={() => navigate('/user-management')}
+      >
+        <ChevronLeft className="mr-2 h-4 w-4" /> Back to All Admins / Sub-admins
+      </Button>
+
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Admin / Sub-admin Details</h1>

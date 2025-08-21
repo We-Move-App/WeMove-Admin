@@ -15,25 +15,6 @@ import UploadField from '@/components/ui/UploadField';
 import axiosInstance from '@/api/axiosInstance';
 import fileUploadInstance from '@/api/fileUploadInstance';
 
-
-// Mock data for a bike rider
-// const mockBikeRider: BikeRider = {
-//   id: "1",
-//   name: "Alex Johnson",
-//   email: "alex.j@example.com",
-//   mobile: "9876543210",
-//   status: "Approved",
-//   age: 28,
-//   address: "456 Park Avenue, Chennai",
-//   experience: 5,
-//   idProofs: ["/placeholder.svg", "/placeholder.svg"],
-//   vehicleType: "Scooter",
-//   vehicleRegistrationNumber: "TN-01-AB-5678",
-//   vehicleInsurance: "/placeholder.svg",
-//   vehicleRegistrationCertificate: "/placeholder.svg",
-//   vehiclePhotos: ["/placeholder.svg", "/placeholder.svg"]
-// };
-
 const BikeRiderDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -47,7 +28,7 @@ const BikeRiderDetails = () => {
     mobile: '',
     email: '',
     status: 'Approved',
-    vehicleType: 'Car',
+    vehicleType: '',
   });
 
   // GET API
@@ -112,12 +93,38 @@ const BikeRiderDetails = () => {
 
     console.log("Upload response:", res.data);
 
-    return res.data.data || res.data;
+    return res.data.data;
+  };
 
-    // return res.data.data;
+  const handleSingleUpload = async (
+    file: File | File[] | null,
+    key: keyof TaxiDriver
+  ) => {
+    console.log(`handleSingleUpload called for key: ${key}`, file);
+
+    if (!file) return;
+
+    const fileToUpload = Array.isArray(file) ? file[0] : file;
+    console.log("File to upload:", fileToUpload);
+
+    // Upload the file
+    const uploaded = await uploadFiles(fileToUpload);
+    console.log("Uploaded response:", uploaded);
+
+    // Store as FileObject
+    handleChange(key, {
+      fileUrl: uploaded.url,
+      fileName: uploaded.fileName,
+    });
+
+    console.log(`Updated driver field ${key}:`, {
+      fileUrl: uploaded.url,
+      fileName: uploaded.fileName,
+    });
   };
 
   // POST API Payload Builder
+
   const buildDriverPayload = async (driver: TaxiDriver) => {
     const isFile = (file: any): file is File =>
       file && typeof file === "object" && "name" in file;
@@ -151,56 +158,170 @@ const BikeRiderDetails = () => {
       return null;
     };
 
-    // Upload docs (✅ single objects, not arrays)
-    const profilePhoto = await uploadOrReturn(driver.profilePhoto, "avatar");
-    const idCard = await uploadOrReturn(driver.idProofs?.[0], "id_card");
-    const license = await uploadOrReturn(driver.driverLicense?.[0], "license");
-    const vehiclePhotos = await uploadOrReturn(driver.vehiclePhotos?.[0], "vehicle_photo");
-    const vehicleInsurance = await uploadOrReturn(driver.vehicleInsurance, "insurance");
-    const vehicleRegistrationCertificate = await uploadOrReturn(
-      driver.vehicleRegistrationCertificate,
-      "registration"
-    );
-    const bankPassbook = await uploadOrReturn(driver.bankAccountDetails, "passbook");
 
+    // Uploads
+    const profilePhoto = await uploadOrReturn(driver.profilePhoto, "avatar");
+
+    const idProofDoc = driver.idProofs
+      ? await uploadOrReturn(driver.idProofs, "id_card")
+      : null;
+
+    const driverLicenseDoc = driver.driverLicense
+      ? await uploadOrReturn(driver.driverLicense, "license")
+      : null;
+
+    const vehiclePhotos = driver.vehiclePhotos
+      ? await uploadOrReturn(driver.vehiclePhotos, "vehicle_photo")
+      : null;
+
+    const vehicleInsurance = driver.vehicleInsurance
+      ? await uploadOrReturn(driver.vehicleInsurance, "insurance")
+      : null;
+
+    const vehicleRegistrationCertificate = driver.vehicleRegistrationCertificate
+      ? await uploadOrReturn(
+        driver.vehicleRegistrationCertificate,
+        "registration"
+      )
+      : null;
+
+    const bankAccountDetails = driver.bankAccountDetails
+      ? await uploadOrReturn(driver.bankAccountDetails, "passbook")
+      : null;
+
+    // Build payload
     const payload = {
       basicDriverDetails: {
         fullName: driver.name || "",
         phoneNo: driver.mobile || "",
         email: driver.email || "",
-        // gender: driver.gender || "",
-        // dob: driver.dob || "",
         age: driver.age || null,
         experience: driver.experience || 0,
         address: driver.address || "",
-        termsAccepted: true,
-        ratings: 1,
       },
-
       bankDetails: {
         accountNumber: driver.accountNumber || "",
         holderName: driver.accountHolderName || "",
-        document: bankPassbook,
+        document: bankAccountDetails,
       },
-
       vehicleDetails: {
         model: driver.vehicleModel || "",
         registrationNo: driver.vehicleRegistrationNumber || "",
-        vehicleType: driver.vehicleType || "bike",
+        vehicleType: "bike",
         insurance: vehicleInsurance,
         registrationCertificate: vehicleRegistrationCertificate,
         vehiclePhotos: vehiclePhotos,
         avatarPhotos: profilePhoto,
       },
-
       documents: [
-        ...(idCard ? [idCard] : []),
-        ...(license ? [license] : []),
+        ...(idProofDoc ? [idProofDoc] : []),
+        ...(driverLicenseDoc ? [driverLicenseDoc] : []),
       ],
     };
 
-    console.log("Driver Payload:", JSON.stringify(payload, null, 2));
+    console.log("Driver Payload:", payload);
     return payload;
+  };
+
+  // PUT API Payload Builder
+
+  const buildPutDriverPayload = async (driver: TaxiDriver) => {
+    const isFile = (file: any): file is File =>
+      file && typeof file === "object" && "name" in file;
+
+    const uploadOrReturn = async (file: any, documentType: string) => {
+      if (!file) return null;
+
+      // Case 1: New file (File object)
+      if (isFile(file)) {
+        const uploaded = await uploadFiles(file);
+        return uploaded
+          ? {
+            fileUrl: uploaded.fileUrl,
+            fileName: uploaded.fileName || file.name,
+            documentType,
+          }
+          : null;
+      }
+
+      // Case 2: Already uploaded string URL
+      if (typeof file === "string") {
+        return {
+          fileUrl: file,
+          fileName: file.split("/").pop() || "unknown",
+          documentType,
+        };
+      }
+
+      // Case 3: Object from backend (fileUrl or url)
+      if (typeof file === "object") {
+        return {
+          fileUrl: file.fileUrl || file.url, // ✅ supports both keys
+          fileName:
+            file.fileName || file.fileUrl?.split("/").pop() || file.url?.split("/").pop() || "unknown",
+          documentType,
+        };
+      }
+
+      return null;
+    };
+    const profilePhoto = await uploadOrReturn(driver.profilePhoto, "avatar");
+
+    const idProofDoc = driver.idProofs
+      ? await uploadOrReturn(driver.idProofs, "id_card")
+      : null;
+
+    const driverLicenseDoc = driver.driverLicense
+      ? await uploadOrReturn(driver.driverLicense, "license")
+      : null;
+
+    const vehiclePhotos = driver.vehiclePhotos
+      ? await uploadOrReturn(driver.vehiclePhotos, "vehicle_photo")
+      : null;
+
+    const vehicleInsurance = driver.vehicleInsurance
+      ? await uploadOrReturn(driver.vehicleInsurance, "insurance")
+      : null;
+
+    const vehicleRegistrationCertificate = driver.vehicleRegistrationCertificate
+      ? await uploadOrReturn(
+        driver.vehicleRegistrationCertificate,
+        "registration"
+      )
+      : null;
+
+    const bankAccountDetails = driver.bankAccountDetails
+      ? await uploadOrReturn(driver.bankAccountDetails, "passbook")
+      : null;
+
+    return {
+      basicDriverDetails: {
+        fullName: driver.name || "",
+        phoneNo: driver.mobile || "",
+        email: driver.email || "",
+        age: driver.age || null,
+        experience: driver.experience || 0,
+        address: driver.address || "",
+      },
+      bankDetails: {
+        accountNumber: driver.accountNumber || "",
+        holderName: driver.accountHolderName || "",
+        document: bankAccountDetails,
+      },
+      vehicleDetails: {
+        model: driver.vehicleModel || "",
+        registrationNo: driver.vehicleRegistrationNumber || "",
+        vehicleType: "bike",
+        insurance: vehicleInsurance,
+        registrationCertificate: vehicleRegistrationCertificate,
+        vehiclePhotos: vehiclePhotos,
+        avatarPhotos: profilePhoto || null,
+      },
+      documents: [
+        ...(idProofDoc ? [idProofDoc] : []),
+        ...(driverLicenseDoc ? [driverLicenseDoc] : []),
+      ],
+    };
   };
 
   const handleSubmit = async () => {
@@ -209,30 +330,30 @@ const BikeRiderDetails = () => {
         const payload = await buildDriverPayload(driver);
         await axiosInstance.post("/driver-management/bike-drivers/register", payload);
       }
-      // } else if (mode === "edit") {
-      //   try {
-      //     // 1. Build payload for driver update
-      //     const payload = await buildPutDriverPayload(driver);
-      //     console.log("PUT payload:", JSON.stringify(payload, null, 2));
+      else if (mode === "edit") {
+        try {
+          // 1. Build payload for driver update
+          const payload = await buildPutDriverPayload(driver);
+          console.log("PUT payload:", JSON.stringify(payload, null, 2));
 
-      //     // 2. First API call -> Update driver details
-      //     await axiosInstance.put(
-      //       `/driver-management/bike-drivers/${id}?vehicleType=bike`,
-      //       payload
-      //     );
+          // 2. First API call -> Update driver details
+          await axiosInstance.put(
+            `/driver-management/bike-drivers/${id}?vehicleType=bike`,
+            payload
+          );
 
-      //     // 3. Second API call -> Verify driver status
-      //     await axiosInstance.put(
-      //       `/driver-management/drivers/verify/${driver.driverId}`,
-      //       { status: driver.status }
-      //     );
+          // 3. Second API call -> Verify driver status
+          await axiosInstance.put(
+            `/driver-management/drivers/verify/${driver.driverId}`,
+            { status: driver.status }
+          );
 
-      //     // ✅ Success message / toast
-      //     console.log("Driver updated & verified successfully");
-      //   } catch (error) {
-      //     console.error("Error updating driver:", error);
-      //   }
-      // }
+          // ✅ Success message / toast
+          console.log("Driver updated & verified successfully");
+        } catch (error) {
+          console.error("Error updating driver:", error);
+        }
+      }
       toast({
         title: mode === "post" ? "Driver Created" : "Driver Updated",
         description: driver.name,
@@ -319,19 +440,18 @@ const BikeRiderDetails = () => {
                     onChange={async (file) => {
                       if (!file) return;
 
-                      // Ensure we have an array to handle multiple files (even if multiple=false)
-                      const filesArray = Array.isArray(file) ? file : [file];
+                      const fileToUpload = Array.isArray(file) ? file[0] : file;
 
-                      // Upload all selected files
-                      const uploadedFiles = await Promise.all(
-                        filesArray.map(async (f) => await uploadFiles(f))
-                      );
+                      const uploaded = await uploadFiles(fileToUpload);
+                      console.log("Uploaded file:", uploaded);
 
-                      // Since this is single file, pick the first uploaded file
-                      handleChange("profilePhoto", uploadedFiles[0]);
+                      // Store as FileObject
+                      handleChange("profilePhoto", {
+                        fileUrl: uploaded.url,       // backend expects this
+                        fileName: uploaded.fileName, // backend expects this
+                      });
                     }}
                   />
-
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Name</label>
@@ -396,50 +516,20 @@ const BikeRiderDetails = () => {
                 <div className='col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div>
                     <UploadField
-                      disabled={isReadOnly}
                       label="ID Proofs"
-                      multiple={true}
-                      value={driver.idProofs || []}
-                      onChange={async (files) => {
-                        if (!files) return;
-
-                        // Normalize to an array
-                        const filesArray = Array.isArray(files) ? files : [files];
-
-                        // Upload all files and get uploaded data
-                        const uploadedFiles = await Promise.all(
-                          filesArray.map(async (file) => {
-                            const uploadedData = await uploadFiles(file);
-                            return uploadedData;
-                          })
-                        );
-
-                        // Update driver state with uploaded file data
-                        setDriver({
-                          ...driver,
-                          idProofs: uploadedFiles,
-                        });
-                      }}
+                      value={driver.idProofs || null}
+                      disabled={isReadOnly}
+                      multiple={false}
+                      onChange={(file) => handleSingleUpload(file, "idProofs")}
                     />
-
-
                     <div>
                       <UploadField
                         label="Driver License"
-                        value={driver.driverLicense || []}
+                        value={driver.driverLicense || null}
                         disabled={isReadOnly}
-                        multiple={true}
-                        onChange={async (files) => {
-                          if (!files) return;
-                          const filesArray = Array.isArray(files) ? files : [files];
-                          const uploadedFiles = await Promise.all(
-                            filesArray.map(async (f) => await uploadFiles(f))
-                          );
-                          handleChange('driverLicense', uploadedFiles);
-                        }}
+                        multiple={false}
+                        onChange={(file) => handleSingleUpload(file, "driverLicense")}
                       />
-
-
                     </div>
                   </div>
                 </div>
@@ -472,43 +562,28 @@ const BikeRiderDetails = () => {
                 <div>
                   <UploadField
                     label="Vehicle Insurance"
-                    value={driver.vehicleInsurance}
+                    value={driver.vehicleInsurance || null}
                     disabled={isReadOnly}
                     multiple={false}
-                    onChange={async (file) => {
-                      if (!file) return;
-                      const filesArray = Array.isArray(file) ? file : [file];
-                      const uploadedFiles = await Promise.all(filesArray.map(f => uploadFiles(f)));
-                      handleChange('vehicleInsurance', uploadedFiles[0]);
-                    }}
+                    onChange={(file) => handleSingleUpload(file, "vehicleInsurance")}
                   />
                 </div>
                 <div>
                   <UploadField
                     label="Registration Certificate"
-                    value={driver.vehicleRegistrationCertificate}
+                    value={driver.vehicleRegistrationCertificate || null}
                     disabled={isReadOnly}
                     multiple={false}
-                    onChange={async (file) => {
-                      if (!file) return;
-                      const filesArray = Array.isArray(file) ? file : [file];
-                      const uploadedFiles = await Promise.all(filesArray.map(f => uploadFiles(f)));
-                      handleChange('vehicleRegistrationCertificate', uploadedFiles[0]);
-                    }}
+                    onChange={(file) => handleSingleUpload(file, "vehicleRegistrationCertificate")}
                   />
                 </div>
                 <div className="col-span-2">
                   <UploadField
                     label="Vehicle Photos"
-                    value={driver.vehiclePhotos || []}
+                    value={driver.vehiclePhotos || null}
                     disabled={isReadOnly}
-                    multiple={true}
-                    onChange={async (files) => {
-                      if (!files) return;
-                      const filesArray = Array.isArray(files) ? files : [files];
-                      const uploadedFiles = await Promise.all(filesArray.map(f => uploadFiles(f)));
-                      handleChange('vehiclePhotos', uploadedFiles);
-                    }}
+                    multiple={false}
+                    onChange={(file) => handleSingleUpload(file, "vehiclePhotos")}
                   />
                 </div>
               </div>
@@ -540,15 +615,10 @@ const BikeRiderDetails = () => {
                 <div className='col-span-2'>
                   <UploadField
                     label="Bank Account Details"
-                    value={driver.bankAccountDetails}
+                    value={driver.bankAccountDetails || null}
                     disabled={isReadOnly}
                     multiple={false}
-                    onChange={async (file) => {
-                      if (!file) return;
-                      const filesArray = Array.isArray(file) ? file : [file];
-                      const uploadedFiles = await Promise.all(filesArray.map(f => uploadFiles(f)));
-                      handleChange('bankAccountDetails', uploadedFiles[0]);
-                    }}
+                    onChange={(file) => handleSingleUpload(file, "bankAccountDetails")}
                   />
                 </div>
               </div>
