@@ -1,13 +1,25 @@
 // Admin related types
+
+export interface Branch {
+  branchId: string; // ✅ matches backend
+  name: string;
+  location: string;
+  coordinates?: {
+    latitude: number | null;
+    longitude: number | null;
+  };
+}
+
 export interface User {
   id: string;
-  name: string;
+  userName: string;
   email: string;
-  role: "Admin" | "Subadmin" | "Manager";
+  role: "Admin" | "Subadmin";
   permissions: string[];
   createdAt: string;
   branchId?: string; // ✅ optional
   branchName?: string; // ✅ optional
+  branch?: Branch;
 }
 
 // Define a ChartData type for the charts

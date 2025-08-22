@@ -13,56 +13,61 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
 import { Command, CommandGroup, CommandItem, CommandList, CommandInput } from "@/components/ui/command";
 import fileUploadInstance from '@/api/fileUploadInstance';
+import axiosInstance from '@/api/axiosInstance';
+import { permission } from 'process';
 
 // Mock user data
-const mockUsers: User[] = [
-  {
-    id: '1',
-    name: 'Admin',
-    email: 'admin@example.com',
-    role: 'Admin',
-    permissions: ['all'],
-    createdAt: '2023-01-01'
-  },
-  // {
-  //   id: '2',
-  //   name: 'Manager User',
-  //   email: 'manager@example.com',
-  //   role: 'Manager',
-  //   permissions: ['view_reports', 'manage_bookings'],
-  //   createdAt: '2023-03-15'
-  // },
-  {
-    id: '3',
-    name: 'Subadmin',
-    email: 'subadmin@example.com',
-    role: 'Subadmin',
-    permissions: ['view_reports', 'manage_bookings', 'manage_customers'],
-    createdAt: '2023-04-20'
-  }
-];
+// const mockUsers: User[] = [
+//   {
+//     id: '1',
+//     name: 'Admin',
+//     email: 'admin@example.com',
+//     role: 'Admin',
+//     permissions: ['all'],
+//     createdAt: '2023-01-01'
+//   },
+//   // {
+//   //   id: '2',
+//   //   name: 'Manager User',
+//   //   email: 'manager@example.com',
+//   //   role: 'Manager',
+//   //   permissions: ['view_reports', 'manage_bookings'],
+//   //   createdAt: '2023-03-15'
+//   // },
+//   {
+//     id: '3',
+//     name: 'Subadmin',
+//     email: 'subadmin@example.com',
+//     role: 'Subadmin',
+//     permissions: ['view_reports', 'manage_bookings', 'manage_customers'],
+//     createdAt: '2023-04-20'
+//   }
+// ];
 
 // Available permissions
 const availablePermissions = [
-  { id: 'view_reports', label: 'Dashboard' },
-  { id: 'manage_operators', label: 'Manage Bus Operators' },
-  { id: 'manage_hotels', label: 'Manage Hotels' },
-  { id: 'manage_taxis', label: 'Manage Taxis' },
-  { id: 'manage_bikes', label: 'Manage Bikes' },
-  { id: 'manage_users', label: 'Manage Users' },
-  { id: 'manage_subadmin', label: 'Manage Sub-admins' },
-  { id: 'manage_commissions', label: 'Manage Commissions' },
-  { id: 'manage_coupons', label: 'Manage Coupons' }
+  { id: 'reportsAnalytics', label: 'Dashboard' },
+  { id: 'busManagement', label: 'Manage Bus Operators' },
+  { id: 'hotelManagement', label: 'Manage Hotels' },
+  { id: 'taxiManagement', label: 'Manage Taxis' },
+  { id: 'bikeManagement', label: 'Manage Bikes' },
+  { id: 'userManagement', label: 'Manage Users' },
+  // { id: 'subadminManagement', label: 'Manage Sub-admins' },
+  { id: 'commissionManagement', label: 'Manage Commissions' },
+  { id: 'couponManagement', label: 'Manage Coupons' },
+  { id: 'notifications', label: 'Manage Notifications' },
+  { id: 'walletManagement', label: 'Wallet Management' } // <-- missing
 ];
 
 const UserManagement = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [users, setUsers] = useState<User[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newUser, setNewUser] = useState<{
     name: string;
     email: string;
-    password: string;
+    phoneNumber: string;
+    // password: string;
     role: 'Admin' | 'Subadmin';
     permissions: string[];
     branchId: string;
@@ -70,7 +75,8 @@ const UserManagement = () => {
   }>({
     name: '',
     email: '',
-    password: '',
+    phoneNumber: '',
+    // password: '',
     role: 'Admin',
     permissions: [],
     branchId: "",
@@ -89,54 +95,53 @@ const UserManagement = () => {
     effectiveTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('.')[0].slice(0, 16),
     isActive: true
   });
+  const [isEditing, setIsEditing] = useState(false);
+  const [admins, setAdmins] = useState<{ id: string; name: string }[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (query.trim().length > 2) {
+        fetchBranches(query);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounce);
+  }, [query]);
+
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      setLoading(true)
+      setError(null);
+
+      try {
+        const res = await axiosInstance.get('/auth/all-admins');
+        console.log('Fetched admins:', res.data);
+        if (res.data?.data?.users) {
+          setUsers(res.data.data.users.map((user: any) => ({
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            // permissions: Array(user.permissionsCount).fill('dummy'),
+            permissionsCount: user.permissionsCount,
+            createdAt: user.createdAt,
+            branch: user.branch,
+          })));
+        }
+      } catch (err: any) {
+        console.error('Failed to fetch users:', err);
+        setError(err?.response?.data?.message || 'Failed to fetch users');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAdmins();
+  }, [])
 
   const handleInputChange = (field: keyof Commission, value: any) => {
     setCurrentCommission(prev => ({ ...prev, [field]: value }));
-  };
-
-  const [isEditing, setIsEditing] = useState(false);
-
-  const handleAddUser = () => {
-    // Validate form
-    if (!newUser.name || !newUser.email || !newUser.password) {
-      toast({
-        title: "Error",
-        description: "Please fill all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Add new user
-    const user: User = {
-      id: Date.now().toString(),
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-      permissions: newUser.permissions,
-      createdAt: new Date().toISOString().split('T')[0]
-    };
-
-    setUsers([...users, user]);
-    setIsDialogOpen(false);
-    resetForm();
-
-    toast({
-      title: "Success",
-      description: "User has been created successfully",
-    });
-  };
-
-  const resetForm = () => {
-    setNewUser({
-      name: '',
-      email: '',
-      password: '',
-      role: 'Admin',
-      permissions: [],
-      branchId: '',
-      branchName: '',
-    });
   };
 
   const togglePermission = (permission: string) => {
@@ -156,13 +161,22 @@ const UserManagement = () => {
     {
       key: 'permissions' as keyof User,
       header: 'Permissions',
-      render: (user: User) => (
+      render: (user: any) => (
         <span className="text-sm">
-          {user.role === 'Admin' ? 'Full Access' : `${user.permissions.length} permissions`}
+          {user.role === 'SuperAdmin' ? 'Full Access' : `${user.permissionsCount} permissions`}
         </span>
       )
     },
-    { key: 'createdAt' as keyof User, header: 'Created At' },
+    // { key: 'createdAt' as keyof User, header: 'Created At' },
+    {
+      key: 'branch' as keyof User,
+      header: 'Branch',
+      render: (user: any) => (
+        <span className="text-sm">
+          {user.branch?.location || 'N/A'}
+        </span>
+      )
+    },
     {
       key: 'actions' as 'actions',
       header: 'Actions',
@@ -180,17 +194,6 @@ const UserManagement = () => {
       )
     }
   ];
-
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      if (query.trim().length > 2) {
-        fetchBranches(query);
-      }
-    }, 400);
-
-    return () => clearTimeout(delayDebounce);
-  }, [query]);
-
   const fetchBranches = async (address: string) => {
     setLoading(true);
     try {
@@ -210,6 +213,78 @@ const UserManagement = () => {
     }
   };
 
+  const handleAddUser = async () => {
+    if (!newUser.name || !newUser.email || !newUser.phoneNumber || !newUser.branchName) {
+      toast({ title: "Please fill in all required fields.." });
+      return;
+    }
+
+    try {
+      // 1️⃣ Create branch (or confirm branch exists)
+      const branchPayload = {
+        name: newUser.branchName,
+        location: query,
+      };
+
+      const branchRes = await axiosInstance.post('/branch', branchPayload);
+      const branchId = branchRes.data?.data?.branch?._id;
+      console.log("Branch created/confirmed with ID:", branchId);
+
+      const allBackendKeys = [
+        'reportsAnalytics', 'busManagement', 'hotelManagement', 'taxiManagement',
+        'bikeManagement', 'userManagement', 'roleManagement', 'commissionManagement',
+        'couponManagement', 'notifications', 'walletManagement'
+      ];
+
+      const permissionsPayload: Record<string, boolean> = {};
+
+      allBackendKeys.forEach(key => {
+        if (key === 'reportsAnalytics') {
+          permissionsPayload[key] = true;
+        } else {
+          permissionsPayload[key] = newUser.permissions.includes(key);
+        }
+      });
+
+      // 2️⃣ Create user/admin with branchId
+      const userPayload = {
+        email: newUser.email,
+        userName: newUser.name,
+        phoneNumber: newUser.phoneNumber,
+        // password: newUser.password,
+        branch: branchId,
+        role: newUser.role,
+        permissions: permissionsPayload,
+      };
+      console.log("Creating user with payload:", userPayload);
+
+      const userRes = await axiosInstance.post('/auth/add-admin', userPayload);
+
+      // toast.success("Admin/Sub-admin created successfully!");
+      toast({ title: "Admin/Sub-admin created successfully!" });
+
+      // Update local state to show new user in the table
+      setUsers(prev => [...prev, { ...userRes.data, id: userRes.data.id || Date.now().toString() }]);
+
+      // Reset form
+      setNewUser({
+        name: '',
+        email: '',
+        phoneNumber: '',
+        // password: '',
+        role: 'Admin',
+        permissions: [],
+        branchId: '',
+        branchName: '',
+      });
+      setQuery('');
+      setIsDialogOpen(false);
+    } catch (error: any) {
+      console.error(error);
+      // toast.error(error?.response?.data?.message || "Failed to create admin/sub-admin.");
+      toast({ title: "Failed to create admin/sub-admin." });
+    }
+  };
 
   const handleRowClick = (user: User) => {
     navigate(`/user-management/${user.id}`);
@@ -256,6 +331,15 @@ const UserManagement = () => {
             </div>
 
             <div className="space-y-2">
+              <label className="text-sm font-medium">Mobile Number</label>
+              <Input
+                value={newUser.phoneNumber}
+                onChange={(e) => setNewUser({ ...newUser, phoneNumber: e.target.value })}
+                placeholder="Enter mobile number"
+              />
+            </div>
+
+            <div className="space-y-2">
               <label className="text-sm font-medium">Email</label>
               <Input
                 type="email"
@@ -265,7 +349,7 @@ const UserManagement = () => {
               />
             </div>
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <label className="text-sm font-medium">Password</label>
               <Input
                 type="password"
@@ -273,7 +357,7 @@ const UserManagement = () => {
                 onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                 placeholder="Create password"
               />
-            </div>
+            </div> */}
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Role</label>
@@ -351,21 +435,28 @@ const UserManagement = () => {
               <label className="text-sm font-medium">Permissions</label>
               <div className="border rounded-md p-4 max-h-48 overflow-y-auto">
                 <div className="space-y-2">
-                  {availablePermissions.map((permission) => (
-                    <div key={permission.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`permission-${permission.id}`}
-                        checked={newUser.permissions.includes(permission.id)}
-                        onCheckedChange={() => togglePermission(permission.id)}
-                      />
-                      <label
-                        htmlFor={`permission-${permission.id}`}
-                        className="text-sm font-medium leading-none cursor-pointer"
-                      >
-                        {permission.label}
-                      </label>
-                    </div>
-                  ))}
+                  {availablePermissions.map((permission) => {
+                    const isDashboard = permission.id === 'reportsAnalytics';
+                    return (
+                      <div key={permission.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`permission-${permission.id}`}
+                          checked={isDashboard || newUser.permissions.includes(permission.id)}
+                          disabled={isDashboard}
+                          onCheckedChange={() => {
+                            if (!isDashboard) togglePermission(permission.id);
+                          }}
+                        />
+                        <label
+                          htmlFor={`permission-${permission.id}`}
+                          className="text-sm font-medium leading-none cursor-pointer"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    );
+                  })}
+
                 </div>
               </div>
             </div>

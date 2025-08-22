@@ -2,30 +2,15 @@ import { useState, useEffect } from "react";
 import { Bell, Search, Menu, User, LogOut } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "@/api/axiosInstance";
+import { Link } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ adminProfile }) => {
   const navigate = useNavigate();
   const { isOpen, toggleSidebar } = useSidebar();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [adminProfile, setAdminProfile] = useState(null);
-
-  useEffect(() => {
-    const fetchAdminProfile = async () => {
-      try {
-        const response = await axiosInstance.get("/auth/my-profile");
-        if (response.data.success) {
-          setAdminProfile(response.data.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch admin profile:", error);
-      }
-    };
-
-    fetchAdminProfile();
-  }, []);
 
   const handleSignOut = () => {
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("accessToken");
     navigate("/");
   };
@@ -94,14 +79,22 @@ const Navbar = () => {
                   aria-orientation="vertical"
                   aria-labelledby="user-menu"
                 >
-                  <a
+                  {/* <a
                     href="#"
                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     role="menuitem"
                   >
                     <User className="mr-2" size={16} />
                     <span>Your Profile</span>
-                  </a>
+                  </a> */}
+                  <Link
+                    to="/profile"
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-[#14542e] hover:text-white"
+                    role="menuitem"
+                  >
+                    <User className="mr-2" size={16} />
+                    <span>Your Profile</span>
+                  </Link>
                   <button
                     type="button"
                     onClick={handleSignOut}

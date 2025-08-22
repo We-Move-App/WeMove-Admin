@@ -5,6 +5,10 @@ import ProtectedLayout from "@/components/layout/ProtectedLayout"
 import Login from "@/pages/login/Login";
 import NotFound from "@/pages/NotFound";
 
+
+// Profile
+import Profile from "@/pages/profile/Profile";
+
 // Dashboard
 import Dashboard from "@/pages/Dashboard";
 
@@ -53,6 +57,9 @@ const AppRoutes = () => (
     {/* Protected routes */}
     <Route element={<ProtectedLayout />}>
       <Route path="/dashboard" element={<Dashboard />} />
+
+      {/* Profile */}
+      <Route path="/profile" element={<Profile />} />
 
       {/* Bus Management */}
       <Route path="/bus-management/operators" element={<BusOperators />} />
