@@ -44,14 +44,13 @@ const mockUsers: User[] = [
 
 // Available permissions
 const availablePermissions = [
-  { id: 'view_reports', label: 'View Reports' },
-  { id: 'manage_bookings', label: 'Manage Bookings' },
-  { id: 'manage_customers', label: 'Manage Customers' },
+  { id: 'view_reports', label: 'Dashboard' },
   { id: 'manage_operators', label: 'Manage Bus Operators' },
   { id: 'manage_hotels', label: 'Manage Hotels' },
   { id: 'manage_taxis', label: 'Manage Taxis' },
   { id: 'manage_bikes', label: 'Manage Bikes' },
   { id: 'manage_users', label: 'Manage Users' },
+  { id: 'manage_subadmin', label: 'Manage Sub-admins' },
   { id: 'manage_commissions', label: 'Manage Commissions' },
   { id: 'manage_coupons', label: 'Manage Coupons' }
 ];
@@ -244,7 +243,7 @@ const UserManagement = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New User</DialogTitle>
+            <DialogTitle>Add New Admin / Sub-admin</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -373,7 +372,7 @@ const UserManagement = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleAddUser}>Add User</Button>
+            <Button onClick={handleAddUser}>Add Admin / Sub-admin</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
