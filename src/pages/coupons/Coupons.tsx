@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Tag, Percent, DollarSign } from 'lucide-react';
 // import Layout from '@/components/layout/Layout';
 import DataTable from '@/components/ui/DataTable';
@@ -11,61 +11,62 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import axiosInstance from '@/api/axiosInstance';
 
 // Modified mock data for coupons to include discount type
-const mockCoupons: Coupon[] = [
-  {
-    id: "1",
-    name: "WELCOME10",
-    code: "WELCOME10",
-    serviceType: "All",
-    discountType: "percentage",
-    discountPercentage: 10,
-    discountAmount: null,
-    startDate: "2023-06-01T00:00",
-    expiryDate: "2023-12-31T23:59",
-    isActive: true
-  },
-  {
-    id: "2",
-    name: "SUMMER20",
-    code: "SUMMER20",
-    serviceType: "Hotel",
-    discountType: "percentage",
-    discountPercentage: 20,
-    discountAmount: null,
-    startDate: "2023-05-01T00:00",
-    expiryDate: "2023-09-30T23:59",
-    isActive: true
-  },
-  {
-    id: "3",
-    name: "RIDE15",
-    code: "RIDE15",
-    serviceType: "Taxi",
-    discountType: "percentage",
-    discountPercentage: 15,
-    discountAmount: null,
-    startDate: "2023-07-01T00:00",
-    expiryDate: "2023-10-15T23:59",
-    isActive: true
-  },
-  {
-    id: "4",
-    name: "BUS100",
-    code: "BUS100",
-    serviceType: "Bus",
-    discountType: "fixed",
-    discountPercentage: null,
-    discountAmount: 100,
-    startDate: "2023-06-15T00:00",
-    expiryDate: "2023-11-30T23:59",
-    isActive: false
-  }
-];
+// const mockCoupons: Coupon[] = [
+//   {
+//     id: "1",
+//     name: "WELCOME10",
+//     code: "WELCOME10",
+//     serviceType: "All",
+//     discountType: "percentage",
+//     discountPercentage: 10,
+//     discountAmount: null,
+//     startDate: "2023-06-01T00:00",
+//     expiryDate: "2023-12-31T23:59",
+//     isActive: true
+//   },
+//   {
+//     id: "2",
+//     name: "SUMMER20",
+//     code: "SUMMER20",
+//     serviceType: "Hotel",
+//     discountType: "percentage",
+//     discountPercentage: 20,
+//     discountAmount: null,
+//     startDate: "2023-05-01T00:00",
+//     expiryDate: "2023-09-30T23:59",
+//     isActive: true
+//   },
+//   {
+//     id: "3",
+//     name: "RIDE15",
+//     code: "RIDE15",
+//     serviceType: "Taxi",
+//     discountType: "percentage",
+//     discountPercentage: 15,
+//     discountAmount: null,
+//     startDate: "2023-07-01T00:00",
+//     expiryDate: "2023-10-15T23:59",
+//     isActive: true
+//   },
+//   {
+//     id: "4",
+//     name: "BUS100",
+//     code: "BUS100",
+//     serviceType: "Bus",
+//     discountType: "fixed",
+//     discountPercentage: null,
+//     discountAmount: 100,
+//     startDate: "2023-06-15T00:00",
+//     expiryDate: "2023-11-30T23:59",
+//     isActive: false
+//   }
+// ];
 
 const Coupons = () => {
-  const [coupons, setCoupons] = useState<Coupon[]>(mockCoupons);
+  // const [coupons, setCoupons] = useState<Coupon[]>(mockCoupons);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentCoupon, setCurrentCoupon] = useState<Coupon>({
@@ -73,6 +74,7 @@ const Coupons = () => {
     name: '',
     code: '',
     serviceType: 'All',
+    discount: '',
     discountType: 'percentage',
     discountPercentage: 0,
     discountAmount: null,
@@ -81,6 +83,55 @@ const Coupons = () => {
     isActive: true
   });
 
+  const [coupons, setCoupons] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      setLoading(true);
+      try {
+        const response = await axiosInstance.get('/auth/all-coupons');
+
+        const mapped = response.data.data.map((item: any) => {
+          // handle discount parsing
+          let discountType: "percentage" | "amount" = "amount";
+          let discountAmount: number | null = null;
+          let discountPercentage: number | null = null;
+
+          if (item.discount.includes("%")) {
+            discountType = "percentage";
+            discountPercentage = parseInt(item.discount.replace("%", ""), 10);
+          } else if (item.discount.includes("₹")) {
+            discountType = "amount";
+            discountAmount = parseInt(item.discount.replace("₹", ""), 10);
+          }
+
+          return {
+            id: item.actions.update.split("/").pop(), // extract ID from API path
+            name: item.couponName,
+            code: item.couponCode,
+            serviceType: item.serviceType,
+            discountType,
+            discountAmount,
+            discountPercentage,
+            startDate: item.startDate,
+            expiryDate: item.expiryDate,
+            isActive: item.status.toLowerCase() === "active",
+            actions: item.actions
+          };
+        });
+
+        setCoupons(mapped);
+      } catch (error) {
+        console.error("Error fetching coupons:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCoupons();
+  }, []);
+
   const handleAddNew = () => {
     setIsEditing(false);
     setCurrentCoupon({
@@ -88,6 +139,7 @@ const Coupons = () => {
       name: '',
       code: '',
       serviceType: 'All',
+      discount: "",
       discountType: 'percentage',
       discountPercentage: 0,
       discountAmount: null,
@@ -98,11 +150,61 @@ const Coupons = () => {
     setIsDialogOpen(true);
   };
 
-  const handleEditCoupon = (coupon: Coupon) => {
-    setIsEditing(true);
-    setCurrentCoupon({ ...coupon });
-    setIsDialogOpen(true);
+  // const handleEditCoupon = (coupon: Coupon) => {
+  //   setIsEditing(true);
+  //   setCurrentCoupon({ ...coupon });
+  //   setIsDialogOpen(true);
+  // };
+
+  const handleEditCoupon = async (couponId: string) => {
+    try {
+      const res = await axiosInstance.get(`/auth/get-coupon/${couponId}`);
+      const formatDateForInput = (isoString: string) => {
+        if (!isoString) return "";
+        const date = new Date(isoString);
+        // toISOString gives: 2025-08-28T03:38:00.000Z
+        // slice(0,16) -> 2025-08-28T03:38
+        return date.toISOString().slice(0, 16);
+      };
+
+
+      if (res.data?.success && res.data.data?.length > 0) {
+        const coupon = res.data.data[0];
+
+        // Determine discount type
+        let discountType: "percentage" | "fixed" = "fixed";
+        let discountPercentage: number | undefined;
+        let discountAmount: number | undefined;
+
+        if (coupon.discount.includes("%")) {
+          discountType = "percentage";
+          discountPercentage = parseFloat(coupon.discount.replace("%", ""));
+        } else {
+          discountType = "fixed";
+          discountAmount = parseFloat(coupon.discount.replace(/[^0-9.]/g, ""));
+        }
+
+        setIsEditing(true);
+        setCurrentCoupon({
+          id: couponId,
+          name: coupon.couponName,
+          code: coupon.couponCode,
+          serviceType: coupon.serviceType,
+          discount: coupon.discount,
+          discountType,
+          discountPercentage,
+          discountAmount,
+          startDate: formatDateForInput(coupon.startDate),
+          expiryDate: formatDateForInput(coupon.expiryDate),
+          isActive: coupon.status === "Active",
+        });
+        setIsDialogOpen(true);
+      }
+    } catch (error) {
+      console.error("Failed to fetch coupon details", error);
+    }
   };
+
 
   const handleInputChange = (field: keyof Coupon, value: any) => {
     setCurrentCoupon(prev => ({ ...prev, [field]: value }));
@@ -128,81 +230,86 @@ const Coupons = () => {
     });
   };
 
-  const handleSaveCoupon = () => {
-    // Validate form
-    if (!currentCoupon.name || !currentCoupon.code) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
-        variant: "destructive"
-      });
-      return;
-    }
+  const handleSaveCoupon = async () => {
+    try {
+      if (isEditing) {
+        // Call PUT update API (you can implement later)
+        return;
+      }
 
-    // Validate discount values
-    if (currentCoupon.discountType === 'percentage' &&
-      (currentCoupon.discountPercentage === null || currentCoupon.discountPercentage <= 0)) {
-      toast({
-        title: "Invalid Discount",
-        description: "Please enter a valid percentage greater than 0",
-        variant: "destructive"
-      });
-      return;
-    }
+      const payload = {
+        couponName: currentCoupon.name,
+        couponCode: currentCoupon.code,
+        // minOrderAmount: currentCoupon.minOrderAmount || 0,
+        serviceType: currentCoupon.serviceType,
+        discountType: currentCoupon.discountType === "percentage" ? "Percentage" : "Fixed Amount",
+        discountPercentage: currentCoupon.discountType === "percentage" ? currentCoupon.discountPercentage : undefined,
+        discountAmount: currentCoupon.discountType === "fixed" ? currentCoupon.discountAmount : undefined,
+        startDate: new Date(currentCoupon.startDate).toISOString(),
+        expiryDate: new Date(currentCoupon.expiryDate).toISOString(),
+        status: currentCoupon.isActive ? "Active" : "Inactive",
+        // maxUsage: currentCoupon.maxUsage || 1,
+      };
 
-    if (currentCoupon.discountType === 'fixed' &&
-      (currentCoupon.discountAmount === null || currentCoupon.discountAmount <= 0)) {
-      toast({
-        title: "Invalid Discount",
-        description: "Please enter a valid discount amount greater than 0",
-        variant: "destructive"
-      });
-      return;
-    }
+      const res = await axiosInstance.post("/auth/create-coupon", payload);
 
-    // Validate the dates
-    const startDate = new Date(currentCoupon.startDate!);
-    const endDate = new Date(currentCoupon.expiryDate);
+      if (res.status === 200 || res.status === 201) {
+        toast({
+          title: "Coupon Created",
+          description: `${res.data.data.couponName} has been added successfully.`,
+        });
 
-    if (endDate <= startDate) {
-      toast({
-        title: "Invalid Date Range",
-        description: "Expiry date must be after start date",
-        variant: "destructive"
-      });
-      return;
-    }
+        setIsDialogOpen(false);
+        // fetchCoupons();
+      }
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to create coupon.";
 
-    if (isEditing) {
-      setCoupons(prev => prev.map(item => item.id === currentCoupon.id ? currentCoupon : item));
       toast({
-        title: "Coupon Updated",
-        description: `Coupon ${currentCoupon.name} updated successfully`,
+        title: "Error",
+        description: message,
+        variant: "destructive",
       });
-    } else {
-      setCoupons(prev => [...prev, currentCoupon]);
-      toast({
-        title: "Coupon Created",
-        description: `New coupon ${currentCoupon.name} created successfully`,
-      });
+
+      console.error("Coupon creation failed:", error.response || error);
     }
-    setIsDialogOpen(false);
   };
 
-  const toggleCouponStatus = (id: string) => {
-    setCoupons(prev =>
-      prev.map(item =>
-        item.id === id
-          ? { ...item, isActive: !item.isActive }
-          : item
-      )
-    );
 
+  const toggleCouponStatus = async (id: string) => {
     const coupon = coupons.find(c => c.id === id);
-    if (coupon) {
+    if (!coupon) return;
+
+    try {
+      // Call API
+      const response = await axiosInstance.put(`/auth/update-couponStatus/${id}`, {
+        status: coupon.isActive ? "Inactive" : "Active", // sending new status
+      });
+
+      if (response.data.success) {
+        // Update UI state only if API succeeds
+        setCoupons(prev =>
+          prev.map(item =>
+            item.id === id
+              ? { ...item, isActive: !item.isActive }
+              : item
+          )
+        );
+
+        toast({
+          title: coupon.isActive ? "Coupon Deactivated" : "Coupon Activated",
+          description: `Coupon ${coupon.name} has been ${coupon.isActive ? "deactivated" : "activated"}.`,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to update coupon status:", error);
       toast({
-        title: coupon.isActive ? "Coupon Deactivated" : "Coupon Activated",
-        description: `Coupon ${coupon.name} has been ${coupon.isActive ? 'deactivated' : 'activated'}.`,
+        title: "Error",
+        description: "Failed to update coupon status. Please try again.",
+        variant: "destructive",
       });
     }
   };
@@ -254,7 +361,7 @@ const Coupons = () => {
         <div className="flex items-center space-x-2">
           <button
             className="action-button"
-            onClick={() => handleEditCoupon(coupon)}
+            onClick={() => handleEditCoupon(coupon.id)}
           >
             Edit
           </button>
@@ -292,7 +399,7 @@ const Coupons = () => {
             key: 'serviceType' as keyof Coupon,
             label: 'Service Type',
             options: [
-              { label: 'All', value: 'All' },
+              { label: 'All Services', value: 'All Services' },
               { label: 'Bus', value: 'Bus' },
               { label: 'Hotel', value: 'Hotel' },
               { label: 'Taxi', value: 'Taxi' },
@@ -348,7 +455,7 @@ const Coupons = () => {
                   <SelectValue placeholder="Select service type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="All">All Services</SelectItem>
+                  <SelectItem value="All Services">All Services</SelectItem>
                   <SelectItem value="Bus">Bus</SelectItem>
                   <SelectItem value="Hotel">Hotel</SelectItem>
                   <SelectItem value="Taxi">Taxi</SelectItem>

@@ -371,7 +371,7 @@ const UserDetails = () => {
                                   setEditedUser({
                                     ...editedUser,
                                     branch: {
-                                      branchId: editedUser.branch?.branchId || "", // keep old id if available
+                                      branchId: editedUser.branch?.branchId || "",
                                       name: branchName,
                                       location: branchName,
                                     },

@@ -94,7 +94,7 @@ const Sidebar = ({ adminProfile }) => {
     { path: "/commission-management", label: "Commission Management", icon: <Percent size={20} />, requiredPermission: "commissionManagement" },
     { path: "/coupons", label: "Coupons", icon: <Tag size={20} />, requiredPermission: "couponManagement" },
     { path: "/wallet", label: "Wallet", icon: <Wallet size={20} />, requiredPermission: "walletManagement" },
-    { path: "/notifications", label: "Notifications & Alerts", icon: <Bell size={20} />, requiredPermission: "notifications" },
+    // { path: "/notifications", label: "Notifications & Alerts", icon: <Bell size={20} />, requiredPermission: "notifications" },
   ];
 
   useEffect(() => {
@@ -244,7 +244,7 @@ const Sidebar = ({ adminProfile }) => {
       </nav>
 
 
-      <div className="p-4 border-t border-white-100">
+      {/* <div className="p-4 border-t border-white-100">
         {isOpen ? (
           <div className="flex items-center">
             {adminProfile?.avatar?.url ? (
@@ -282,7 +282,55 @@ const Sidebar = ({ adminProfile }) => {
             )}
           </div>
         )}
+      </div> */}
+      <div className="p-4 border-t border-white-100">
+        {isOpen ? (
+          <div className="flex items-center">
+            {adminProfile?.avatar?.url ? (
+              <img
+                src={adminProfile.avatar.url}
+                alt="Avatar"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-green-900 flex items-center justify-center text-white font-medium">
+                {adminProfile?.userName
+                  ? adminProfile.userName.charAt(0).toUpperCase()
+                  : adminProfile?.email
+                    ? adminProfile.email.charAt(0).toUpperCase()
+                    : "A"}
+              </div>
+            )}
+            <div className="ml-3">
+              <div className="text-sm font-medium text-white">
+                {adminProfile?.userName || "Admin User"}
+              </div>
+              <div className="text-xs text-gray-400">
+                {adminProfile?.email || "admin@example.com"}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            {adminProfile?.avatar?.url ? (
+              <img
+                src={adminProfile.avatar.url}
+                alt="Avatar"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-green-900 flex items-center justify-center text-white font-medium">
+                {adminProfile?.userName
+                  ? adminProfile.userName.charAt(0).toUpperCase()
+                  : adminProfile?.email
+                    ? adminProfile.email.charAt(0).toUpperCase()
+                    : "A"}
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
     </div>
   );
 };

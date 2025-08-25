@@ -74,20 +74,28 @@ import axiosInstance from '@/api/axiosInstance';
 // ];
 
 const Wallet = () => {
-  const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
+  // const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
+
+  // For the cards
+  const [totalTransactions, setTotalTransactions] = useState<number>(0);
+  const [totalCredits, setTotalCredits] = useState<number>(0);
+  const [totalDebits, setTotalDebits] = useState<number>(0);
+  const [pendingWithdrawals, setPendingWithdrawals] = useState<number>(0);
+
   // Calculate summary stats
-  const totalTransactions = transactions.length;
-  const totalCredits = transactions
-    .filter(t => t.type === 'Credit' && t.status === 'Completed')
-    .reduce((sum, t) => sum + t.amount, 0);
-  const totalDebits = transactions
-    .filter(t => t.type === 'Debit' && t.status === 'Completed')
-    .reduce((sum, t) => sum + t.amount, 0);
-  const pendingWithdrawals = transactions
-    .filter(t => t.type === 'Withdrawal' && t.status === 'Pending')
-    .reduce((sum, t) => sum + t.amount, 0);
+  // const totalTransactions = transactions.length;
+  // const totalCredits = transactions
+  //   .filter(t => t.type === 'Credit' && t.status === 'Completed')
+  //   .reduce((sum, t) => sum + t.amount, 0);
+  // const totalDebits = transactions
+  //   .filter(t => t.type === 'Debit' && t.status === 'Completed')
+  //   .reduce((sum, t) => sum + t.amount, 0);
+  // const pendingWithdrawals = transactions
+  //   .filter(t => t.type === 'Withdrawal' && t.status === 'Pending')
+  //   .reduce((sum, t) => sum + t.amount, 0);
 
   const columns = [
     { key: 'id' as keyof WalletTransaction, header: 'Transaction ID' },
@@ -146,31 +154,34 @@ const Wallet = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
-        const res = await axios.get(
-          "http://139.59.20.155:8000/api/v1/wallet/transactions/admin",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const res = await axiosInstance.get("/auth/getAlltransactions");
+
+        // API structure
+        const apiResponse = res.data?.message || {};
+        const apiTransactions = apiResponse.transactions || [];
+
+        // Set aggregates for your cards
+        setTotalTransactions(apiResponse.pagination?.totalCount || 0);
+        setTotalCredits(apiResponse.aggregates?.totalCredits || 0);
+        setTotalDebits(apiResponse.aggregates?.totalDebits || 0);
+        setPendingWithdrawals(apiResponse.aggregates?.pendingWithdrawals || 0);
+
+        // Convert API shape to table rows
+        const formattedTransactions: WalletTransaction[] = apiTransactions.map(
+          (txn: any) => ({
+            id: txn.transactionId,
+            userId: txn.user,
+            userName: txn.user || "N/A",
+            type: txn.type === "CREDIT" ? "Credit" : "Debit",
+            amount: txn.amount,
+            date: new Date(txn.date).toLocaleDateString(),
+            status: txn.status === "SUCCESS" ? "Completed" : txn.status,
+            description: txn.description,
+          })
         );
 
-        const apiTransactions = res.data?.data?.transactions || [];
-
-        // Convert API shape to your table format if needed
-        const formattedTransactions: WalletTransaction[] = apiTransactions.map((txn) => ({
-          id: txn.transactionId,
-          userId: txn.adminId,
-          userName: "Admin", // or null/empty string
-          type: txn.type === "CREDIT" ? "Credit" : "Debit", // Adjust if needed
-          amount: txn.amount,
-          date: new Date(txn.createdAt).toLocaleDateString(),
-          status: txn.status === "SUCCESS" ? "Completed" : txn.status,
-          description: txn.description,
-        }));
-        console.log("API Transaction:", apiTransactions);
         setTransactions(formattedTransactions);
+        console.log("API Transactions:", apiTransactions);
       } catch (err) {
         console.error("Failed to fetch transactions:", err);
       } finally {
@@ -180,6 +191,7 @@ const Wallet = () => {
 
     fetchTransactions();
   }, []);
+
 
   return (
     <>

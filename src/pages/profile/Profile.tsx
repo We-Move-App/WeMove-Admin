@@ -1,225 +1,351 @@
-import React, { useState } from 'react';
-import { ArrowLeft, User, Mail, Phone, Lock, Eye, EyeOff, Edit3 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { User, Mail, Phone, Lock, Camera, ArrowLeft, Eye, EyeOff, Key, AlertCircle } from 'lucide-react';
 
-interface UserProfile {
-    fullName: string;
-    email: string;
-    phone: string;
-    password: string;
-    role: string;
+interface ProfileProps {
+    onBack?: () => void;
 }
 
-const Profile: React.FC = () => {
-    const [profile, setProfile] = useState<UserProfile>({
-        fullName: 'Super Admin',
+const Profile: React.FC<ProfileProps> = ({ onBack }) => {
+    const [profile, setProfile] = useState({
+        name: 'Super Admin',
         email: 'superadmin@example.com',
         phone: '+1234567890',
-        password: '••••••••••••',
-        role: 'Administrator'
+        avatar: ''
     });
 
     const [isEditing, setIsEditing] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [editForm, setEditForm] = useState<UserProfile>(profile);
+    const [showResetModal, setShowResetModal] = useState(false);
+    const [showForgotModal, setShowForgotModal] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [resetEmail, setResetEmail] = useState('');
 
-    const handleInputChange = (field: keyof UserProfile, value: string) => {
-        setEditForm(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
+    useEffect(() => {
+        const storedProfile = localStorage.getItem("adminProfile");
+        if (storedProfile) {
+            const parsed = JSON.parse(storedProfile);
+            setProfile({
+                name: parsed?.userName || 'Admin',
+                email: parsed?.email || '',
+                phone: parsed?.phoneNumber || '',
+                avatar: parsed?.avatar || ''
+            });
+        }
+    }, []);
 
-    const handleSave = () => {
-        setProfile(editForm);
+    const handleProfileUpdate = (e: React.FormEvent) => {
+        e.preventDefault();
+        // Handle profile update logic here
         setIsEditing(false);
+        alert('Profile updated successfully!');
     };
 
-    const handleCancel = () => {
-        setEditForm(profile);
-        setIsEditing(false);
+    const handlePasswordReset = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (newPassword !== confirmPassword) {
+            alert('New passwords do not match!');
+            return;
+        }
+        // Handle password reset logic here
+        setShowResetModal(false);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        alert('Password updated successfully!');
     };
 
-    const getInitials = (name: string): string => {
-        return name
-            .split(' ')
-            .map(n => n[0])
-            .join('')
-            .toUpperCase()
-            .slice(0, 2);
+    const handleForgotPassword = (e: React.FormEvent) => {
+        e.preventDefault();
+        // Handle forgot password logic here
+        setShowForgotModal(false);
+        setResetEmail('');
+        alert('Password reset link sent to your email!');
+    };
+
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setProfile(prev => ({ ...prev, avatar: e.target?.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="bg-white shadow-sm border-b">
+            {/* <div className="bg-white shadow-sm border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
-                        <div className="flex items-center space-x-4">
-                            <button className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
-                                <ArrowLeft className="w-5 h-5 mr-2" />
+                        <div className="flex items-center">
+                            <button
+                                onClick={onBack}
+                                className="flex items-center text-gray-600 hover:text-green-600 transition-colors"
+                            >
+                                <ArrowLeft className="h-5 w-5 mr-2" />
                                 Back to Dashboard
                             </button>
                         </div>
                         <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
-            {/* Main Content */}
             <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-                <div className="bg-white rounded-lg shadow-sm border">
-                    {/* Profile Header */}
-                    <div className="px-6 py-8 border-b border-gray-200">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-6">
-                                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                                    <span className="text-2xl font-semibold text-green-700">
-                                        {getInitials(profile.fullName)}
-                                    </span>
+                <div className="space-y-8">
+                    {/* Profile Information Card */}
+                    <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+                        <div className="px-6 py-8">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
+                                <button
+                                    onClick={() => setIsEditing(!isEditing)}
+                                    className="px-4 py-2 bg-green-900 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                >
+                                    {isEditing ? 'Cancel' : 'Edit Profile'}
+                                </button>
+                            </div>
+
+                            <div className="flex items-center mb-8">
+                                <div className="relative">
+                                    <div className="h-24 w-24 rounded-full bg-green-100 flex items-center justify-center overflow-hidden">
+                                        {profile.avatar ? (
+                                            <img src={profile.avatar} alt="Avatar" className="h-24 w-24 object-cover" />
+                                        ) : (
+                                            <User className="h-12 w-12 text-green-900" />
+                                        )}
+                                    </div>
+                                    {isEditing && (
+                                        <label className="absolute bottom-0 right-0 bg-green-900 rounded-full p-2 cursor-pointer hover:bg-green-700 transition-colors">
+                                            <Camera className="h-4 w-4 text-white" />
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleAvatarChange}
+                                                className="hidden"
+                                            />
+                                        </label>
+                                    )}
                                 </div>
-                                <div>
-                                    <h2 className="text-3xl font-bold text-gray-900">{profile.fullName}</h2>
-                                    <p className="text-gray-600 text-lg">{profile.role}</p>
+                                <div className="ml-6">
+                                    <h3 className="text-2xl font-bold text-gray-900">{profile.name}</h3>
+                                    <p className="text-gray-600">Administrator</p>
                                 </div>
                             </div>
-                            <button
-                                onClick={() => setIsEditing(!isEditing)}
-                                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                            >
-                                <Edit3 className="w-4 h-4 mr-2" />
-                                {isEditing ? 'Cancel Edit' : 'Edit Profile'}
-                            </button>
+
+                            <form onSubmit={handleProfileUpdate} className="space-y-6">
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <User className="inline h-4 w-4 mr-1" />
+                                            Full Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={profile.name}
+                                            onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
+                                            disabled={!isEditing}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-50 transition-colors"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <Mail className="inline h-4 w-4 mr-1" />
+                                            Email Address
+                                        </label>
+                                        <input
+                                            type="email"
+                                            value={profile.email}
+                                            onChange={(e) => setProfile(prev => ({ ...prev, email: e.target.value }))}
+                                            disabled={!isEditing}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-50 transition-colors"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <Phone className="inline h-4 w-4 mr-1" />
+                                            Phone Number
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            value={profile.phone}
+                                            onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
+                                            disabled={!isEditing}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-50 transition-colors"
+                                        />
+                                    </div>
+                                    {/* <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <Lock className="inline h-4 w-4 mr-1" />
+                                            Password
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                type={showPassword ? 'text' : 'password'}
+                                                value="••••••••••••"
+                                                disabled
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 pr-12"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                            >
+                                                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                            </button>
+                                        </div>
+                                    </div> */}
+                                </div>
+
+                                {isEditing && (
+                                    <div className="flex justify-end">
+                                        <button
+                                            type="submit"
+                                            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                        >
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                )}
+                            </form>
                         </div>
                     </div>
 
-                    {/* Personal Information */}
-                    <div className="px-6 py-8">
-                        <h3 className="text-xl font-semibold text-gray-900 mb-6">Personal Information</h3>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Full Name */}
-                            <div className="space-y-2">
-                                <label className="flex items-center text-sm font-medium text-gray-700">
-                                    <User className="w-4 h-4 mr-2" />
-                                    Full Name
-                                </label>
-                                {isEditing ? (
-                                    <input
-                                        type="text"
-                                        value={editForm.fullName}
-                                        onChange={(e) => handleInputChange('fullName', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                    />
-                                ) : (
-                                    <div className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
-                                        {profile.fullName}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Email Address */}
-                            <div className="space-y-2">
-                                <label className="flex items-center text-sm font-medium text-gray-700">
-                                    <Mail className="w-4 h-4 mr-2" />
-                                    Email Address
-                                </label>
-                                {isEditing ? (
-                                    <input
-                                        type="email"
-                                        value={editForm.email}
-                                        onChange={(e) => handleInputChange('email', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                    />
-                                ) : (
-                                    <div className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
-                                        {profile.email}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Phone Number */}
-                            <div className="space-y-2">
-                                <label className="flex items-center text-sm font-medium text-gray-700">
-                                    <Phone className="w-4 h-4 mr-2" />
-                                    Phone Number
-                                </label>
-                                {isEditing ? (
-                                    <input
-                                        type="tel"
-                                        value={editForm.phone}
-                                        onChange={(e) => handleInputChange('phone', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                    />
-                                ) : (
-                                    <div className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
-                                        {profile.phone}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Password */}
-                            <div className="space-y-2">
-                                <label className="flex items-center text-sm font-medium text-gray-700">
-                                    <Lock className="w-4 h-4 mr-2" />
-                                    Password
-                                </label>
-                                {isEditing ? (
-                                    <div className="relative">
-                                        <input
-                                            type={showPassword ? 'text' : 'password'}
-                                            value={editForm.password}
-                                            onChange={(e) => handleInputChange('password', e.target.value)}
-                                            className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                        >
-                                            {showPassword ? (
-                                                <EyeOff className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-                                            ) : (
-                                                <Eye className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-                                            )}
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="relative">
-                                        <div className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
-                                            {profile.password}
+                    {/* Security Settings Card */}
+                    <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+                        <div className="px-6 py-8">
+                            <h2 className="text-xl font-semibold text-gray-900 mb-6">Security Settings</h2>
+                            <div className="space-y-4">
+                                <button
+                                    onClick={() => setShowResetModal(true)}
+                                    className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors group"
+                                >
+                                    <div className="flex items-center">
+                                        <Key className="h-5 w-5 text-gray-400 group-hover:text-green-600 mr-3" />
+                                        <div className="text-left">
+                                            <p className="font-medium text-gray-900">Reset Password</p>
+                                            <p className="text-sm text-gray-500">Change your current password</p>
                                         </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                        >
-                                            <Eye className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-                                        </button>
                                     </div>
-                                )}
+                                    <ArrowLeft className="h-5 w-5 text-gray-400 group-hover:text-green-600 rotate-180" />
+                                </button>
+
+                                <button
+                                    onClick={() => setShowForgotModal(true)}
+                                    className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors group"
+                                >
+                                    <div className="flex items-center">
+                                        <AlertCircle className="h-5 w-5 text-gray-400 group-hover:text-green-600 mr-3" />
+                                        <div className="text-left">
+                                            <p className="font-medium text-gray-900">Forgot Password</p>
+                                            <p className="text-sm text-gray-500">Send password reset link to email</p>
+                                        </div>
+                                    </div>
+                                    <ArrowLeft className="h-5 w-5 text-gray-400 group-hover:text-green-600 rotate-180" />
+                                </button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        {/* Action Buttons */}
-                        {isEditing && (
-                            <div className="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+            {/* Reset Password Modal */}
+            {showResetModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg max-w-md w-full p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Reset Password</h3>
+                        <form onSubmit={handlePasswordReset} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                                <input
+                                    type="password"
+                                    value={currentPassword}
+                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                                <input
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    required
+                                />
+                            </div>
+                            <div className="flex justify-end space-x-3 pt-4">
                                 <button
-                                    onClick={handleCancel}
-                                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                    type="button"
+                                    onClick={() => setShowResetModal(false)}
+                                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    onClick={handleSave}
-                                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                    type="submit"
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                                 >
-                                    Save Changes
+                                    Reset Password
                                 </button>
                             </div>
-                        )}
+                        </form>
                     </div>
                 </div>
-            </div>
+            )}
+
+            {/* Forgot Password Modal */}
+            {showForgotModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg max-w-md w-full p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Forgot Password</h3>
+                        <p className="text-gray-600 mb-4">Enter your email address and we'll send you a link to reset your password.</p>
+                        <form onSubmit={handleForgotPassword} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                <input
+                                    type="email"
+                                    value={resetEmail}
+                                    onChange={(e) => setResetEmail(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    placeholder="Enter your email"
+                                    required
+                                />
+                            </div>
+                            <div className="flex justify-end space-x-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowForgotModal(false)}
+                                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                >
+                                    Send Reset Link
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

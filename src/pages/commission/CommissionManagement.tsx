@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Percent, DollarSign } from 'lucide-react';
 // import Layout from '@/components/layout/Layout';
 import DataTable from '@/components/ui/DataTable';
@@ -12,6 +12,7 @@ import { toast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import axiosInstance from '@/api/axiosInstance';
 
 // Modified mock data to include commission type
 const mockCommissions: Commission[] = [
@@ -58,7 +59,7 @@ const mockCommissions: Commission[] = [
 ];
 
 const CommissionManagement = () => {
-  const [commissions, setCommissions] = useState<Commission[]>(mockCommissions);
+  // const [commissions, setCommissions] = useState<Commission[]>(mockCommissions);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentCommission, setCurrentCommission] = useState<Commission>({
@@ -71,6 +72,37 @@ const CommissionManagement = () => {
     effectiveTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('.')[0].slice(0, 16),
     isActive: true
   });
+
+  const [commissions, setCommissions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchCommissions = async () => {
+      setLoading(true);
+      try {
+        const response = await axiosInstance.get('/commission-management/get-all');
+
+        const mapped = response.data.data.map((item: any) => ({
+          id: item._id,
+          serviceType: item.serviceType,
+          commissionType: item.commissionType,
+          percentage: item.commissionType === "percentage" ? item.commissionPercentage : null,
+          fixedRate: item.commissionType === "fixed" ? item.commissionRate : null,
+          effectiveFrom: item.startDate,
+          effectiveTo: item.endDate,
+          isActive: item.status === "active",
+        }));
+
+        setCommissions(mapped);
+      } catch (error) {
+        console.error("Error fetching commissions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCommissions();
+  }, []);
 
   const handleAddNew = () => {
     setIsEditing(false);
@@ -87,10 +119,32 @@ const CommissionManagement = () => {
     setIsDialogOpen(true);
   };
 
-  const handleEditCommission = (commission: Commission) => {
+  const handleEditCommission = async (commission: Commission) => {
     setIsEditing(true);
-    setCurrentCommission({ ...commission });
-    setIsDialogOpen(true);
+
+    try {
+      const res = await axiosInstance.get(`/commission-management/get/${commission.id}`);
+
+      if (res.status === 200) {
+        const data = res.data.data;
+
+        const mappedCommission: Commission = {
+          id: data._id,
+          serviceType: data.serviceType.charAt(0).toUpperCase() + data.serviceType.slice(1), // e.g. "bus" -> "Bus"
+          commissionType: data.commissionType,
+          percentage: data.commissionType === "percentage" ? data.commissionPercentage : null,
+          fixedRate: data.commissionType === "fixed" ? data.commissionRate : null,
+          effectiveFrom: new Date(data.startDate).toISOString().slice(0, 16), // format for datetime-local
+          effectiveTo: new Date(data.endDate).toISOString().slice(0, 16),
+          isActive: data.status === "active"
+        };
+
+        setCurrentCommission(mappedCommission);
+        setIsDialogOpen(true);
+      }
+    } catch (error) {
+      console.error("Error fetching commission:", error);
+    }
   };
 
   const handleInputChange = (field: keyof Commission, value: any) => {
@@ -106,74 +160,103 @@ const CommissionManagement = () => {
     }));
   };
 
-  const handleSaveCommission = () => {
-    // Validate the dates
-    const startDate = new Date(currentCommission.effectiveFrom);
-    const endDate = new Date(currentCommission.effectiveTo!);
+  const handleSaveCommission = async () => {
+    try {
+      let payload: any = {
+        commissionType: currentCommission.commissionType,
+        startDate: new Date(currentCommission.effectiveFrom).toISOString(),
+        endDate: new Date(currentCommission.effectiveTo).toISOString(),
+        status: currentCommission.isActive ? "active" : "in_active",
+      };
 
-    if (endDate <= startDate) {
-      toast({
-        title: "Invalid Date Range",
-        description: "End date must be after start date",
-        variant: "destructive"
-      });
-      return;
-    }
+      if (currentCommission.commissionType === "fixed") {
+        payload.commissionRate = currentCommission.fixedRate;
+      } else if (currentCommission.commissionType === "percentage") {
+        payload.commissionPercentage = currentCommission.percentage;
+      }
 
-    // Validate that either percentage or fixed rate is set based on commission type
-    if (currentCommission.commissionType === 'percentage' &&
-      (currentCommission.percentage === null || currentCommission.percentage <= 0)) {
-      toast({
-        title: "Invalid Commission",
-        description: "Please enter a valid percentage greater than 0",
-        variant: "destructive"
-      });
-      return;
-    }
+      let res;
+      if (currentCommission.id) {
+        // 🔹 UPDATE (no serviceType in payload)
+        console.log("Updating commission:", payload);
+        res = await axiosInstance.put(
+          `/commission-management/update/${currentCommission.id}`,
+          payload
+        );
+      } else {
+        // 🔹 CREATE (include serviceType)
+        payload.serviceType = currentCommission.serviceType?.toLowerCase();
+        console.log("Creating commission:", payload);
+        res = await axiosInstance.post(
+          "/commission-management/create",
+          payload
+        );
+      }
 
-    if (currentCommission.commissionType === 'fixed' &&
-      (currentCommission.fixedRate === null || currentCommission.fixedRate <= 0)) {
-      toast({
-        title: "Invalid Commission",
-        description: "Please enter a valid fixed rate greater than 0",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (isEditing) {
-      setCommissions(prev => prev.map(item => item.id === currentCommission.id ? currentCommission : item));
-      toast({
-        title: "Commission Updated",
-        description: `${currentCommission.serviceType} commission updated successfully`,
-      });
-    } else {
-      setCommissions(prev => [...prev, currentCommission]);
-      toast({
-        title: "Commission Added",
-        description: `New ${currentCommission.serviceType} commission added successfully`,
-      });
-    }
-    setIsDialogOpen(false);
-  };
-
-  const toggleCommissionStatus = (id: string) => {
-    setCommissions(prev =>
-      prev.map(item =>
-        item.id === id
-          ? { ...item, isActive: !item.isActive }
-          : item
-      )
-    );
-
-    const commission = commissions.find(c => c.id === id);
-    if (commission) {
-      toast({
-        title: commission.isActive ? "Commission Deactivated" : "Commission Activated",
-        description: `${commission.serviceType} commission has been ${commission.isActive ? 'deactivated' : 'activated'}.`,
-      });
+      if (res.status === 200 || res.status === 201) {
+        console.log("Commission saved:", res.data);
+        // await fetchCommissions();
+        setIsDialogOpen(false);
+      }
+    } catch (error: any) {
+      console.error("Error saving commission:", error);
     }
   };
+
+  // const toggleCommissionStatus = (id: string) => {
+  //   setCommissions(prev =>
+  //     prev.map(item =>
+  //       item.id === id
+  //         ? { ...item, isActive: !item.isActive }
+  //         : item
+  //     )
+  //   );
+
+  //   const commission = commissions.find(c => c.id === id);
+  //   if (commission) {
+  //     toast({
+  //       title: commission.isActive ? "Commission Deactivated" : "Commission Activated",
+  //       description: `${commission.serviceType} commission has been ${commission.isActive ? 'deactivated' : 'activated'}.`,
+  //     });
+  //   }
+  // };
+
+
+  const toggleCommissionStatus = async (id: string) => {
+    try {
+      // find the commission
+      const commission = commissions.find(c => c.id === id);
+      if (!commission) return;
+
+      // prepare payload with only status
+      const newStatus = commission.isActive ? "in_active" : "active";
+      const payload = { status: newStatus };
+
+      // call API
+      await axiosInstance.put(`/commission-management/update/${id}`, payload);
+
+      // update local state
+      setCommissions(prev =>
+        prev.map(item =>
+          item.id === id ? { ...item, isActive: newStatus === "active" } : item
+        )
+      );
+
+      // toast message
+      toast({
+        title: newStatus === "active" ? "Commission Activated" : "Commission Deactivated",
+        description: `${commission.serviceType} commission has been ${newStatus === "active" ? "activated" : "deactivated"}.`,
+      });
+    } catch (error: any) {
+      console.error("Error toggling commission status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update commission status. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
 
   const formatDateTime = (dateTimeString: string) => {
     const date = new Date(dateTimeString);
@@ -206,14 +289,32 @@ const CommissionManagement = () => {
       )
     },
     {
-      key: 'effectiveFrom' as keyof Commission,
+      key: 'effectiveFrom',
       header: 'Effective From',
-      render: (commission: Commission) => <span>{formatDateTime(commission.effectiveFrom)}</span>
+      render: (commission: Commission) => (
+        <span>
+          {new Date(commission.effectiveFrom).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
+        </span>
+      )
     },
     {
-      key: 'effectiveTo' as keyof Commission,
+      key: 'effectiveTo',
       header: 'Effective To',
-      render: (commission: Commission) => <span>{commission.effectiveTo ? formatDateTime(commission.effectiveTo) : 'No End Date'}</span>
+      render: (commission: Commission) => (
+        <span>
+          {commission.effectiveTo
+            ? new Date(commission.effectiveTo).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })
+            : "No End Date"}
+        </span>
+      )
     },
     {
       key: 'isActive' as keyof Commission,
@@ -254,7 +355,7 @@ const CommissionManagement = () => {
           onClick={handleAddNew}
           className="flex items-center gap-2"
         >
-          <Plus size={16} /> Add New Commission
+          <Plus size={16} />Add New Commission
         </Button>
       </div>
 

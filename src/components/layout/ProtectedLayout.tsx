@@ -7,7 +7,11 @@ import axiosInstance from "@/api/axiosInstance";
 
 const ProtectedLayout = () => {
     const { isOpen } = useSidebar();
-    const [adminProfile, setAdminProfile] = useState(null);
+
+    const [adminProfile, setAdminProfile] = useState(() => {
+        const storedProfile = localStorage.getItem("adminProfile");
+        return storedProfile ? JSON.parse(storedProfile) : null;
+    });
 
     useEffect(() => {
         const fetchAdminProfile = async () => {
@@ -15,14 +19,20 @@ const ProtectedLayout = () => {
                 const response = await axiosInstance.get("/auth/my-profile");
                 if (response.data.success) {
                     setAdminProfile(response.data.data);
+                    localStorage.setItem(
+                        "adminProfile",
+                        JSON.stringify(response.data.data)
+                    );
                 }
             } catch (error) {
                 console.error("Failed to fetch admin profile:", error);
             }
         };
+        if (!adminProfile) {
+            fetchAdminProfile();
+        }
+    }, [adminProfile]);
 
-        fetchAdminProfile();
-    }, []);
 
     return (
         <div className="flex min-h-screen bg-gray-100 w-full">

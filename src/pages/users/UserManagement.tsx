@@ -68,7 +68,7 @@ const UserManagement = () => {
     email: string;
     phoneNumber: string;
     // password: string;
-    role: 'Admin' | 'Subadmin';
+    role: 'Admin' | 'SubAdmin';
     permissions: string[];
     branchId: string;
     branchName: string;
@@ -123,7 +123,6 @@ const UserManagement = () => {
             name: user.name,
             email: user.email,
             role: user.role,
-            // permissions: Array(user.permissionsCount).fill('dummy'),
             permissionsCount: user.permissionsCount,
             createdAt: user.createdAt,
             branch: user.branch,
@@ -213,6 +212,7 @@ const UserManagement = () => {
     }
   };
 
+
   const handleAddUser = async () => {
     if (!newUser.name || !newUser.email || !newUser.phoneNumber || !newUser.branchName) {
       toast({ title: "Please fill in all required fields.." });
@@ -230,6 +230,7 @@ const UserManagement = () => {
       const branchId = branchRes.data?.data?.branch?._id;
       console.log("Branch created/confirmed with ID:", branchId);
 
+      // 2️⃣ Permissions payload
       const allBackendKeys = [
         'reportsAnalytics', 'busManagement', 'hotelManagement', 'taxiManagement',
         'bikeManagement', 'userManagement', 'roleManagement', 'commissionManagement',
@@ -237,7 +238,6 @@ const UserManagement = () => {
       ];
 
       const permissionsPayload: Record<string, boolean> = {};
-
       allBackendKeys.forEach(key => {
         if (key === 'reportsAnalytics') {
           permissionsPayload[key] = true;
@@ -246,32 +246,35 @@ const UserManagement = () => {
         }
       });
 
-      // 2️⃣ Create user/admin with branchId
+      // 3️⃣ Build user payload
       const userPayload = {
         email: newUser.email,
         userName: newUser.name,
         phoneNumber: newUser.phoneNumber,
-        // password: newUser.password,
         branch: branchId,
         role: newUser.role,
         permissions: permissionsPayload,
       };
       console.log("Creating user with payload:", userPayload);
 
-      const userRes = await axiosInstance.post('/auth/add-admin', userPayload);
+      // 4️⃣ Call different API based on role
+      let userRes;
+      if (newUser.role === "Admin") {
+        userRes = await axiosInstance.post('/auth/add-admin', userPayload);
+      } else if (newUser.role === "SubAdmin") {
+        userRes = await axiosInstance.post('/auth/add-SubAdmin', userPayload);
+      }
 
-      // toast.success("Admin/Sub-admin created successfully!");
-      toast({ title: "Admin/Sub-admin created successfully!" });
+      toast({ title: `${newUser.role} created successfully!` });
 
-      // Update local state to show new user in the table
-      setUsers(prev => [...prev, { ...userRes.data, id: userRes.data.id || Date.now().toString() }]);
+      // Update local state
+      setUsers(prev => [...prev, { ...userRes!.data, id: userRes!.data.id || Date.now().toString() }]);
 
       // Reset form
       setNewUser({
         name: '',
         email: '',
         phoneNumber: '',
-        // password: '',
         role: 'Admin',
         permissions: [],
         branchId: '',
@@ -281,10 +284,10 @@ const UserManagement = () => {
       setIsDialogOpen(false);
     } catch (error: any) {
       console.error(error);
-      // toast.error(error?.response?.data?.message || "Failed to create admin/sub-admin.");
-      toast({ title: "Failed to create admin/sub-admin." });
+      toast({ title: `Failed to create ${newUser.role}.` });
     }
   };
+
 
   const handleRowClick = (user: User) => {
     navigate(`/user-management/${user.id}`);
@@ -349,28 +352,18 @@ const UserManagement = () => {
               />
             </div>
 
-            {/* <div className="space-y-2">
-              <label className="text-sm font-medium">Password</label>
-              <Input
-                type="password"
-                value={newUser.password}
-                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                placeholder="Create password"
-              />
-            </div> */}
-
             <div className="space-y-2">
               <label className="text-sm font-medium">Role</label>
               <Select
                 value={newUser.role}
-                onValueChange={(value: 'Admin' | 'Subadmin') => setNewUser({ ...newUser, role: value })}
+                onValueChange={(value: 'Admin' | 'SubAdmin') => setNewUser({ ...newUser, role: value })}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Admin">Admin</SelectItem>
-                  <SelectItem value="Subadmin">Sub-Admin</SelectItem>
+                  <SelectItem value="SubAdmin">Sub-Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>

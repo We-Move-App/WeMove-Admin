@@ -1,7 +1,7 @@
 // Admin related types
 
 export interface Branch {
-  branchId: string; // ✅ matches backend
+  branchId: string;
   name: string;
   location: string;
   coordinates?: {
@@ -17,8 +17,8 @@ export interface User {
   role: "Admin" | "Subadmin";
   permissions: string[];
   createdAt: string;
-  branchId?: string; // ✅ optional
-  branchName?: string; // ✅ optional
+  branchId?: string;
+  branchName?: string;
   branch?: Branch;
 }
 
@@ -349,6 +349,7 @@ export interface Coupon {
   name: string;
   code: string;
   serviceType: string;
+  discount: string;
   discountType: "percentage" | "fixed";
   discountPercentage: number | null;
   discountAmount: number | null;

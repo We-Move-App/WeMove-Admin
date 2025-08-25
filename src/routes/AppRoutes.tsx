@@ -95,8 +95,8 @@ const AppRoutes = () => (
       <Route path="/commission-management" element={<CommissionManagement />} />
       <Route path="/coupons" element={<Coupons />} />
       <Route path="/wallet" element={<Wallet />} />
-      <Route path="/notifications" element={<NotificationsManagement />} />
-      <Route path="/settings" element={<Settings />} />
+      {/* <Route path="/notifications" element={<NotificationsManagement />} />
+      <Route path="/settings" element={<Settings />} /> */}
     </Route>
 
     {/* 404 Fallback */}
