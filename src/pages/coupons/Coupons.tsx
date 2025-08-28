@@ -107,7 +107,8 @@ const Coupons = () => {
           }
 
           return {
-            id: item.actions.update.split("/").pop(), // extract ID from API path
+            // id: item.actions.update.split("/").pop(), 
+            id: item.couponId,
             name: item.couponName,
             code: item.couponCode,
             serviceType: item.serviceType,
@@ -135,7 +136,7 @@ const Coupons = () => {
   const handleAddNew = () => {
     setIsEditing(false);
     setCurrentCoupon({
-      id: Date.now().toString(),
+      id: undefined,
       name: '',
       code: '',
       serviceType: 'All',

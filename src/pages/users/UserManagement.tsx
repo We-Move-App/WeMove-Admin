@@ -72,6 +72,7 @@ const UserManagement = () => {
     permissions: string[];
     branchId: string;
     branchName: string;
+    adminId: string;
   }>({
     name: '',
     email: '',
@@ -81,6 +82,7 @@ const UserManagement = () => {
     permissions: [],
     branchId: "",
     branchName: "",
+    adminId: "",
   });
   const [branches, setBranches] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
@@ -96,8 +98,10 @@ const UserManagement = () => {
     isActive: true
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [admins, setAdmins] = useState<{ id: string; name: string }[]>([]);
+  // const [admins, setAdmins] = useState<{ id: string; name: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [admins, setAdmins] = useState<any[]>([]);
+  const [loadingAdmins, setLoadingAdmins] = useState(false);
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -117,17 +121,16 @@ const UserManagement = () => {
       try {
         const res = await axiosInstance.get('/auth/all-admins');
         console.log('Fetched admins:', res.data);
-        if (res.data?.data?.users) {
-          setUsers(res.data.data.users.map((user: any) => ({
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            permissionsCount: user.permissionsCount,
-            createdAt: user.createdAt,
-            branch: user.branch,
-          })));
-        }
+        const usersData = res.data?.data?.data || [];
+        setUsers(usersData.map((user: any) => ({
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          permissionsCount: user.permissionsCount,
+          createdAt: user.createdAt,
+          branch: user.branch,
+        })));
       } catch (err: any) {
         console.error('Failed to fetch users:', err);
         setError(err?.response?.data?.message || 'Failed to fetch users');
@@ -138,6 +141,25 @@ const UserManagement = () => {
 
     fetchAdmins();
   }, [])
+
+  useEffect(() => {
+    if (newUser.role === "SubAdmin") {
+      const fetchAdmins = async () => {
+        setLoadingAdmins(true);
+        try {
+          const res = await axiosInstance.get("/auth/all-admins?role=Admin");
+          const adminsData = res.data?.data?.data || [];
+          setAdmins(adminsData);
+        } catch (err) {
+          console.error("Failed to fetch admins:", err);
+        } finally {
+          setLoadingAdmins(false);
+        }
+      };
+
+      fetchAdmins();
+    }
+  }, [newUser.role]);
 
   const handleInputChange = (field: keyof Commission, value: any) => {
     setCurrentCommission(prev => ({ ...prev, [field]: value }));
@@ -213,80 +235,180 @@ const UserManagement = () => {
   };
 
 
+  // const handleAddUser = async () => {
+  //   if (!newUser.name || !newUser.email || !newUser.phoneNumber || !newUser.branchName) {
+  //     toast({ title: "Please fill in all required fields.." });
+  //     return;
+  //   }
+
+  //   try {
+  //     // 1️⃣ Create branch (or confirm branch exists)
+  //     const branchPayload = {
+  //       name: newUser.branchName,
+  //       location: query,
+  //     };
+
+  //     const branchRes = await axiosInstance.post('/branch', branchPayload);
+  //     const branchId = branchRes.data?.data?.branch?._id;
+  //     console.log("Branch created/confirmed with ID:", branchId);
+
+  //     // 2️⃣ Permissions payload
+  //     const allBackendKeys = [
+  //       'reportsAnalytics', 'busManagement', 'hotelManagement', 'taxiManagement',
+  //       'bikeManagement', 'userManagement', 'roleManagement', 'commissionManagement',
+  //       'couponManagement', 'notifications', 'walletManagement'
+  //     ];
+
+  //     const permissionsPayload: Record<string, boolean> = {};
+  //     allBackendKeys.forEach(key => {
+  //       if (key === 'reportsAnalytics') {
+  //         permissionsPayload[key] = true;
+  //       } else {
+  //         permissionsPayload[key] = newUser.permissions.includes(key);
+  //       }
+  //     });
+
+  //     // 3️⃣ Build user payload
+  //     const userPayload = {
+  //       email: newUser.email,
+  //       userName: newUser.name,
+  //       phoneNumber: newUser.phoneNumber,
+  //       branch: branchId,
+  //       role: newUser.role,
+  //       permissions: permissionsPayload,
+  //       ...(newUser.role === "SubAdmin" && { admin: newUser.adminId }),
+  //     };
+  //     console.log("Creating user with payload:", userPayload);
+
+  //     // 4️⃣ Call different API based on role
+  //     let userRes;
+  //     if (newUser.role === "Admin") {
+  //       userRes = await axiosInstance.post('/auth/add-admin', userPayload);
+  //     } else if (newUser.role === "SubAdmin") {
+  //       userRes = await axiosInstance.post('/auth/add-SubAdmin', userPayload);
+  //     }
+
+  //     toast({ title: `${newUser.role} created successfully!` });
+
+  //     // Update local state
+  //     setUsers(prev => [...prev, { ...userRes!.data, id: userRes!.data.id || Date.now().toString() }]);
+
+  //     // Reset form
+  //     setNewUser({
+  //       name: '',
+  //       email: '',
+  //       phoneNumber: '',
+  //       role: 'Admin',
+  //       permissions: [],
+  //       branchId: '',
+  //       branchName: '',
+  //     });
+  //     setQuery('');
+  //     setIsDialogOpen(false);
+  //   } catch (error: any) {
+  //     console.error(error);
+  //     toast({ title: `Failed to create ${newUser.role}.` });
+  //   }
+  // };
+
   const handleAddUser = async () => {
-    if (!newUser.name || !newUser.email || !newUser.phoneNumber || !newUser.branchName) {
+    if (!newUser.name || !newUser.email || !newUser.phoneNumber) {
       toast({ title: "Please fill in all required fields.." });
       return;
     }
 
     try {
-      // 1️⃣ Create branch (or confirm branch exists)
-      const branchPayload = {
-        name: newUser.branchName,
-        location: query,
-      };
+      let branchId = newUser.branchId;
 
-      const branchRes = await axiosInstance.post('/branch', branchPayload);
-      const branchId = branchRes.data?.data?.branch?._id;
-      console.log("Branch created/confirmed with ID:", branchId);
+      // Only Admins can create/select branch
+      if (newUser.role === "Admin") {
+        if (!newUser.branchName) {
+          toast({ title: "Please select a branch for Admin" });
+          return;
+        }
 
-      // 2️⃣ Permissions payload
+        const branchPayload = {
+          name: newUser.branchName,
+          location: query,
+        };
+
+        const branchRes = await axiosInstance.post("/branch", branchPayload);
+        branchId = branchRes.data?.data?.branch?._id;
+        console.log("Branch created/confirmed with ID:", branchId);
+      }
+
+      //  Permissions payload
       const allBackendKeys = [
-        'reportsAnalytics', 'busManagement', 'hotelManagement', 'taxiManagement',
-        'bikeManagement', 'userManagement', 'roleManagement', 'commissionManagement',
-        'couponManagement', 'notifications', 'walletManagement'
+        "reportsAnalytics",
+        "busManagement",
+        "hotelManagement",
+        "taxiManagement",
+        "bikeManagement",
+        "userManagement",
+        "roleManagement",
+        "commissionManagement",
+        "couponManagement",
+        "notifications",
+        "walletManagement",
       ];
 
       const permissionsPayload: Record<string, boolean> = {};
-      allBackendKeys.forEach(key => {
-        if (key === 'reportsAnalytics') {
-          permissionsPayload[key] = true;
-        } else {
-          permissionsPayload[key] = newUser.permissions.includes(key);
-        }
+      allBackendKeys.forEach((key) => {
+        permissionsPayload[key] =
+          key === "reportsAnalytics" ? true : newUser.permissions.includes(key);
       });
 
-      // 3️⃣ Build user payload
-      const userPayload = {
+      // Build user payload
+      const userPayload: any = {
         email: newUser.email,
         userName: newUser.name,
         phoneNumber: newUser.phoneNumber,
-        branch: branchId,
         role: newUser.role,
         permissions: permissionsPayload,
+        branch: branchId,
       };
+
+      if (newUser.role === "SubAdmin") {
+        userPayload.reportingManger = newUser.adminId; // ✅ admin id
+      }
+
       console.log("Creating user with payload:", userPayload);
 
-      // 4️⃣ Call different API based on role
+      // API call
       let userRes;
       if (newUser.role === "Admin") {
-        userRes = await axiosInstance.post('/auth/add-admin', userPayload);
+        userRes = await axiosInstance.post("/auth/add-admin", userPayload);
       } else if (newUser.role === "SubAdmin") {
-        userRes = await axiosInstance.post('/auth/add-SubAdmin', userPayload);
+        userRes = await axiosInstance.post("/auth/add-SubAdmin", userPayload);
       }
 
       toast({ title: `${newUser.role} created successfully!` });
 
       // Update local state
-      setUsers(prev => [...prev, { ...userRes!.data, id: userRes!.data.id || Date.now().toString() }]);
+      setUsers((prev) => [
+        ...prev,
+        { ...userRes!.data, id: userRes!.data.id || Date.now().toString() },
+      ]);
 
       // Reset form
       setNewUser({
-        name: '',
-        email: '',
-        phoneNumber: '',
-        role: 'Admin',
+        name: "",
+        email: "",
+        phoneNumber: "",
+        role: "Admin",
         permissions: [],
-        branchId: '',
-        branchName: '',
+        branchId: "",
+        branchName: "",
+        adminId: "",
       });
-      setQuery('');
+      setQuery("");
       setIsDialogOpen(false);
     } catch (error: any) {
       console.error(error);
       toast({ title: `Failed to create ${newUser.role}.` });
     }
   };
+
 
 
   const handleRowClick = (user: User) => {
@@ -368,61 +490,84 @@ const UserManagement = () => {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Service Type</label>
-              <Select
-                value={currentCommission.serviceType}
-                onValueChange={(value: any) => handleInputChange('serviceType', value)}
-                disabled={isEditing}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select service type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Bus">Bus</SelectItem>
-                  <SelectItem value="Hotel">Hotel</SelectItem>
-                  <SelectItem value="Taxi">Taxi</SelectItem>
-                  <SelectItem value="Bike">Bike</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {newUser.role === "SubAdmin" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Assign Admin</label>
+                <Select
+                  value={newUser.adminId || ""}
+                  onValueChange={(value) => {
+                    const selectedAdmin = admins.find((admin) => admin._id === value);
+                    if (selectedAdmin) {
+                      console.log("Admin ID:", selectedAdmin._id);
+                      console.log("Branch ID:", selectedAdmin.branch.branchId);
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Choose Branch</label>
-              <Command className="border rounded-md">
-                <CommandInput
-                  placeholder="Type city name..."
-                  value={query}
-                  onValueChange={(val) => setQuery(val)}
-                />
-                <CommandList>
-                  {loading && <div className="p-2 text-sm">Loading...</div>}
-                  {!loading && branches.length === 0 && query.length > 2 && (
-                    <div className="p-2 text-sm">No results found</div>
-                  )}
-                  <CommandGroup>
-                    {branches.map((branch) => (
-                      <CommandItem
-                        key={branch.id}
-                        onSelect={() =>
-                          setNewUser({
-                            ...newUser,
-                            branchId: branch.id,
-                            branchName: branch.name,
-                          })
-                        }
-                      >
-                        {branch.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                      setNewUser({
+                        ...newUser,
+                        adminId: selectedAdmin._id,
+                        branchId: selectedAdmin.branch.branchId, // store branch id as well
+                      });
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an Admin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {loadingAdmins ? (
+                      <div className="p-2 text-sm">Loading admins...</div>
+                    ) : admins.length === 0 ? (
+                      <div className="p-2 text-sm">No admins found</div>
+                    ) : (
+                      admins.map((admin) => (
+                        <SelectItem key={admin._id} value={admin._id}>
+                          {admin.name} ({admin.branch.location})
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
-                </CommandList>
-              </Command>
-              {newUser.branchName && (
-                <p className="text-xs text-gray-400">Selected: {newUser.branchName}</p>
-              )}
-            </div>
+
+            {newUser.role === "Admin" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Choose Branch</label>
+                <Command className="border rounded-md">
+                  <CommandInput
+                    placeholder="Type city name..."
+                    value={query}
+                    onValueChange={(val) => setQuery(val)}
+                  />
+                  <CommandList>
+                    {loading && <div className="p-2 text-sm">Loading...</div>}
+                    {!loading && branches.length === 0 && query.length > 2 && (
+                      <div className="p-2 text-sm">No results found</div>
+                    )}
+                    <CommandGroup>
+                      {branches.map((branch) => (
+                        <CommandItem
+                          key={branch.id}
+                          onSelect={() =>
+                            setNewUser({
+                              ...newUser,
+                              branchId: branch.id,
+                              branchName: branch.name,
+                            })
+                          }
+                        >
+                          {branch.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+                {newUser.branchName && (
+                  <p className="text-xs text-gray-400">Selected: {newUser.branchName}</p>
+                )}
+              </div>
+            )}
+
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Permissions</label>

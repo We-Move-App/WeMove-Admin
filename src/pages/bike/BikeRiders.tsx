@@ -130,7 +130,7 @@ const BikeRiders = () => {
           className="action-button flex items-center"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/ bike - management / riders / ${rider.driverId}`);
+            navigate(`/bike-management/riders/${rider.driverId}`);
           }}
         >
           <Eye size={16} className="mr-1" /> View Details

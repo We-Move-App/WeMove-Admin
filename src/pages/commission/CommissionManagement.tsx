@@ -107,7 +107,7 @@ const CommissionManagement = () => {
   const handleAddNew = () => {
     setIsEditing(false);
     setCurrentCommission({
-      id: Date.now().toString(),
+      id: undefined,
       serviceType: 'Bus',
       percentage: 0,
       fixedRate: null,
@@ -177,16 +177,14 @@ const CommissionManagement = () => {
 
       let res;
       if (currentCommission.id) {
-        // 🔹 UPDATE (no serviceType in payload)
-        console.log("Updating commission:", payload);
+        // 🔹 UPDATE
         res = await axiosInstance.put(
           `/commission-management/update/${currentCommission.id}`,
           payload
         );
       } else {
-        // 🔹 CREATE (include serviceType)
+        // 🔹 CREATE
         payload.serviceType = currentCommission.serviceType?.toLowerCase();
-        console.log("Creating commission:", payload);
         res = await axiosInstance.post(
           "/commission-management/create",
           payload
@@ -194,33 +192,27 @@ const CommissionManagement = () => {
       }
 
       if (res.status === 200 || res.status === 201) {
-        console.log("Commission saved:", res.data);
-        // await fetchCommissions();
+        toast({
+          title: "Success",
+          description: "Commission saved successfully",
+        });
         setIsDialogOpen(false);
+        // await fetchCommissions();
       }
     } catch (error: any) {
       console.error("Error saving commission:", error);
+
+      // extract backend message if available
+      const message =
+        error.response?.data?.message || "Failed to save commission";
+
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: message,
+      });
     }
   };
-
-  // const toggleCommissionStatus = (id: string) => {
-  //   setCommissions(prev =>
-  //     prev.map(item =>
-  //       item.id === id
-  //         ? { ...item, isActive: !item.isActive }
-  //         : item
-  //     )
-  //   );
-
-  //   const commission = commissions.find(c => c.id === id);
-  //   if (commission) {
-  //     toast({
-  //       title: commission.isActive ? "Commission Deactivated" : "Commission Activated",
-  //       description: `${commission.serviceType} commission has been ${commission.isActive ? 'deactivated' : 'activated'}.`,
-  //     });
-  //   }
-  // };
-
 
   const toggleCommissionStatus = async (id: string) => {
     try {

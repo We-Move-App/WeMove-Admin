@@ -20,6 +20,7 @@ export interface User {
   branchId?: string;
   branchName?: string;
   branch?: Branch;
+  adminId?: string;
 }
 
 // Define a ChartData type for the charts

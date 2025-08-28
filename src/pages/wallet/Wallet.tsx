@@ -84,6 +84,9 @@ const Wallet = () => {
   const [totalCredits, setTotalCredits] = useState<number>(0);
   const [totalDebits, setTotalDebits] = useState<number>(0);
   const [pendingWithdrawals, setPendingWithdrawals] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+
 
   // Calculate summary stats
   // const totalTransactions = transactions.length;
@@ -99,7 +102,7 @@ const Wallet = () => {
 
   const columns = [
     { key: 'id' as keyof WalletTransaction, header: 'Transaction ID' },
-    { key: 'userName' as keyof WalletTransaction, header: 'User' },
+    // { key: 'userName' as keyof WalletTransaction, header: 'User' },
     {
       key: 'type' as keyof WalletTransaction,
       header: 'Type',
@@ -151,37 +154,92 @@ const Wallet = () => {
     }
   ];
 
+  // useEffect(() => {
+  //   const fetchTransactions = async () => {
+  //     try {
+  //       const res = await axiosInstance.get("/auth/getAlltransactions");
+
+  //       // API structure
+  //       const apiResponse = res.data?.message || {};
+  //       const apiTransactions = apiResponse.transactions || [];
+
+  //       // Set aggregates for your cards
+  //       setTotalTransactions(apiResponse.pagination?.totalCount || 0);
+  //       setTotalCredits(apiResponse.aggregates?.totalCredits || 0);
+  //       setTotalDebits(apiResponse.aggregates?.totalDebits || 0);
+  //       setPendingWithdrawals(apiResponse.aggregates?.pendingWithdrawals || 0);
+
+  //       // Convert API shape to table rows
+  //       const formattedTransactions: WalletTransaction[] = apiTransactions.map(
+  //         (txn: any) => ({
+  //           id: txn.transactionId,
+  //           userId: txn.user,
+  //           userName: txn.user || "N/A",
+  //           type: txn.type === "CREDIT" ? "Credit" : "Debit",
+  //           amount: txn.amount,
+  //           date: new Date(txn.date).toLocaleDateString(),
+  //           status: txn.status === "SUCCESS" ? "Completed" : txn.status,
+  //           description: txn.description,
+  //         })
+  //       );
+
+  //       setTransactions(formattedTransactions);
+  //       console.log("API Transactions:", apiTransactions);
+  //     } catch (err) {
+  //       console.error("Failed to fetch transactions:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchTransactions();
+  // }, []);
+
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await axiosInstance.get("/auth/getAlltransactions");
+        setLoading(true);
 
-        // API structure
-        const apiResponse = res.data?.message || {};
-        const apiTransactions = apiResponse.transactions || [];
+        const res = await axiosInstance.get("/auth/getAlltransactions", {
+          params: {
+            page: currentPage,
+            limit: pageSize,
+          },
+        });
 
-        // Set aggregates for your cards
-        setTotalTransactions(apiResponse.pagination?.totalCount || 0);
-        setTotalCredits(apiResponse.aggregates?.totalCredits || 0);
-        setTotalDebits(apiResponse.aggregates?.totalDebits || 0);
-        setPendingWithdrawals(apiResponse.aggregates?.pendingWithdrawals || 0);
+        // ✅ Currency parser
+        const parseCurrency = (val: string | number | undefined | null) => {
+          if (!val) return 0;
+          if (typeof val === "number") return val;
+          return parseFloat(val.replace(/[^0-9.-]+/g, "")) || 0;
+        };
 
-        // Convert API shape to table rows
+        const walletData = res.data?.walletManagement || {};
+        const transactionHistory = res.data?.transactionHistory || {};
+        const apiTransactions = transactionHistory.transactions || [];
+
+        // ✅ Set aggregates
+        setTotalTransactions(walletData.totalTransactions || 0);
+        setTotalCredits(parseCurrency(walletData.totalCredits));
+        setTotalDebits(parseCurrency(walletData.totalDebits));
+        setPendingWithdrawals(parseCurrency(walletData.pendingWithdrawals));
+
+        // ✅ Format transactions
         const formattedTransactions: WalletTransaction[] = apiTransactions.map(
           (txn: any) => ({
             id: txn.transactionId,
             userId: txn.user,
             userName: txn.user || "N/A",
-            type: txn.type === "CREDIT" ? "Credit" : "Debit",
-            amount: txn.amount,
+            type: txn.type === "Credit" ? "Credit" : "Debit",
+            amount: parseCurrency(txn.amount),
             date: new Date(txn.date).toLocaleDateString(),
-            status: txn.status === "SUCCESS" ? "Completed" : txn.status,
+            status: txn.status === "Completed" ? "Completed" : txn.status,
             description: txn.description,
           })
         );
 
         setTransactions(formattedTransactions);
-        console.log("API Transactions:", apiTransactions);
+        console.log("API Transactions:", formattedTransactions);
       } catch (err) {
         console.error("Failed to fetch transactions:", err);
       } finally {
@@ -190,7 +248,9 @@ const Wallet = () => {
     };
 
     fetchTransactions();
-  }, []);
+  }, [currentPage, pageSize]); // 👈 dependency array
+
+
 
 
   return (
@@ -265,6 +325,11 @@ const Wallet = () => {
           exportable={true}
           filterable={true}
           filterOptions={filterOptions}
+          paginate={true}
+          pageSize={10}
+          currentPage={currentPage}
+          totalItems={totalTransactions}
+          onPageChange={(page) => setCurrentPage(page)}
         />
       </div>
     </>
