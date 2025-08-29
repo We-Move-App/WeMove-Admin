@@ -39,7 +39,7 @@ interface NavItem {
   | "bikeManagement";
 }
 
-const Sidebar = ({ adminProfile }) => {
+const Sidebar = ({ adminProfile, adminAvatar }) => {
   const { isOpen } = useSidebar();
   const location = useLocation();
   const [activeNavItem, setActiveNavItem] = useState("");
@@ -183,11 +183,11 @@ const Sidebar = ({ adminProfile }) => {
           <img src={LogoImg} alt="" width={24} height={24} />
           {isOpen && <span className="ml-3 font-bold text-lg">WeMove</span>}
         </div>
-        {isOpen && (
+        {/* {isOpen && (
           <div className="lg:hidden">
             <X className="cursor-pointer" size={20} />
           </div>
-        )}
+        )} */}
       </div>
 
 
@@ -286,9 +286,9 @@ const Sidebar = ({ adminProfile }) => {
       <div className="p-4 border-t border-white-100">
         {isOpen ? (
           <div className="flex items-center">
-            {adminProfile?.avatar?.url ? (
+            {adminAvatar ? (
               <img
-                src={adminProfile.avatar.url}
+                src={adminAvatar}
                 alt="Avatar"
                 className="w-10 h-10 rounded-full object-cover"
               />
@@ -312,9 +312,9 @@ const Sidebar = ({ adminProfile }) => {
           </div>
         ) : (
           <div className="flex justify-center">
-            {adminProfile?.avatar?.url ? (
+            {adminAvatar ? (
               <img
-                src={adminProfile.avatar.url}
+                src={adminAvatar}
                 alt="Avatar"
                 className="w-10 h-10 rounded-full object-cover"
               />
@@ -330,7 +330,6 @@ const Sidebar = ({ adminProfile }) => {
           </div>
         )}
       </div>
-
     </div>
   );
 };

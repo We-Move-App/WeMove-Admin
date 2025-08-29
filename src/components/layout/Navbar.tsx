@@ -4,7 +4,7 @@ import { useSidebar } from "@/context/SidebarContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-const Navbar = ({ adminProfile }) => {
+const Navbar = ({ adminProfile, adminAvatar }) => {
   const navigate = useNavigate();
   const { isOpen, toggleSidebar } = useSidebar();
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -12,6 +12,8 @@ const Navbar = ({ adminProfile }) => {
   const handleSignOut = () => {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("adminProfile");
+    localStorage.removeItem("adminAvatar");
     navigate("/");
   };
 
@@ -55,9 +57,9 @@ const Navbar = ({ adminProfile }) => {
               onClick={() => setShowUserMenu(!showUserMenu)}
               className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-lg"
             >
-              {adminProfile?.avatar?.url ? (
+              {adminAvatar ? (
                 <img
-                  src={adminProfile.avatar.url}
+                  src={adminAvatar}
                   alt="Avatar"
                   className="w-8 h-8 rounded-full object-cover"
                 />
@@ -66,6 +68,7 @@ const Navbar = ({ adminProfile }) => {
                   {adminProfile?.userName?.charAt(0) || "A"}
                 </div>
               )}
+
               <span className="hidden md:block text-sm font-medium">
                 {adminProfile?.userName || "Admin User"}
               </span>

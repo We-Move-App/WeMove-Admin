@@ -1,60 +1,160 @@
 import React, { useEffect, useState } from 'react';
 import { User, Mail, Phone, Lock, Camera, ArrowLeft, Eye, EyeOff, Key, AlertCircle } from 'lucide-react';
+import axiosInstance from '@/api/axiosInstance';
+import { toast } from '@/hooks/use-toast';
 
 interface ProfileProps {
     onBack?: () => void;
 }
 
+interface ProfileState {
+    name: string;
+    email: string;
+    phone: string;
+    avatar: string | null;
+    avatarFile: File | null;
+    avatarPreview: string | null;
+}
+
+
 const Profile: React.FC<ProfileProps> = ({ onBack }) => {
-    const [profile, setProfile] = useState({
-        name: 'Super Admin',
-        email: 'superadmin@example.com',
-        phone: '+1234567890',
-        avatar: ''
+    const [profile, setProfile] = useState<ProfileState>({
+        name: "",
+        email: "",
+        phone: "",
+        avatar: '',
+        avatarFile: null,
+        avatarPreview: null,
     });
 
     const [isEditing, setIsEditing] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [showOld, setShowOld] = useState(false);
+    const [showNew, setShowNew] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
     const [showResetModal, setShowResetModal] = useState(false);
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [loading, setLoading] = useState(false);
     const [showForgotModal, setShowForgotModal] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     const [resetEmail, setResetEmail] = useState('');
 
     useEffect(() => {
         const storedProfile = localStorage.getItem("adminProfile");
+        const storedAvatar = localStorage.getItem("adminAvatar");
+
         if (storedProfile) {
             const parsed = JSON.parse(storedProfile);
             setProfile({
-                name: parsed?.userName || 'Admin',
-                email: parsed?.email || '',
-                phone: parsed?.phoneNumber || '',
-                avatar: parsed?.avatar || ''
+                name: parsed?.userName || "Admin",
+                email: parsed?.email || "",
+                phone: parsed?.phoneNumber || "",
+                avatar: storedAvatar || null,
+                avatarFile: null,
+                avatarPreview: storedAvatar || null,
             });
         }
     }, []);
 
-    const handleProfileUpdate = (e: React.FormEvent) => {
+    const handleProfileUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle profile update logic here
         setIsEditing(false);
-        alert('Profile updated successfully!');
+
+        try {
+            if (profile.avatarFile) {
+                const formData = new FormData();
+                formData.append("avatar", profile.avatarFile);
+
+                await axiosInstance.put("/auth/add-avatar", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+
+                const res = await axiosInstance.get("/auth/avtatar");
+                if (res.data.success) {
+                    const newAvatarUrl = res.data.data.url;
+                    localStorage.setItem("adminAvatar", newAvatarUrl);
+                    setProfile(prev => ({
+                        ...prev,
+                        avatar: newAvatarUrl,
+                        avatarPreview: newAvatarUrl,
+                        avatarFile: null,
+                    }));
+                }
+
+                toast({
+                    title: "Profile updated",
+                    description: "Your avatar has been updated successfully!",
+                });
+            } else {
+                toast({
+                    title: "No new avatar",
+                    description: "Please upload a valid avatar file before saving.",
+                    variant: "destructive",
+                });
+            }
+        } catch (error: any) {
+            console.error("Error updating profile:", error);
+            toast({
+                title: "Update failed",
+                description: "Something went wrong. Please try again.",
+                variant: "destructive",
+            });
+        }
     };
 
-    const handlePasswordReset = (e: React.FormEvent) => {
+    const handlePasswordReset = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (newPassword !== confirmPassword) {
-            alert('New passwords do not match!');
+
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            toast({
+                title: "Error",
+                description: "All fields are required",
+                variant: "destructive",
+            });
             return;
         }
-        // Handle password reset logic here
-        setShowResetModal(false);
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-        alert('Password updated successfully!');
+
+        if (newPassword !== confirmPassword) {
+            toast({
+                title: "Error",
+                description: "Passwords do not match",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const res = await axiosInstance.put("/auth/change-password", {
+                oldPassword,
+                newPassword,
+                confirmPassword,
+            });
+
+            if (res.data.success) {
+                toast({
+                    title: "Password Updated",
+                    description: "Your password has been changed successfully",
+                });
+                setShowResetModal(false);
+                setOldPassword("");
+                setNewPassword("");
+                setConfirmPassword("");
+            }
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description:
+                    error.response?.data?.message || "Failed to update password",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     const handleForgotPassword = (e: React.FormEvent) => {
         e.preventDefault();
@@ -69,7 +169,11 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                setProfile(prev => ({ ...prev, avatar: e.target?.result as string }));
+                setProfile(prev => ({
+                    ...prev,
+                    avatarFile: file,
+                    avatarPreview: e.target?.result as string,
+                }));
             };
             reader.readAsDataURL(file);
         }
@@ -113,11 +217,16 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
                             <div className="flex items-center mb-8">
                                 <div className="relative">
                                     <div className="h-24 w-24 rounded-full bg-green-100 flex items-center justify-center overflow-hidden">
-                                        {profile.avatar ? (
-                                            <img src={profile.avatar} alt="Avatar" className="h-24 w-24 object-cover" />
+                                        {profile.avatarPreview ? (
+                                            <img
+                                                src={profile.avatarPreview}
+                                                alt="Avatar"
+                                                className="h-24 w-24 object-cover"
+                                            />
                                         ) : (
                                             <User className="h-12 w-12 text-green-900" />
                                         )}
+
                                     </div>
                                     {isEditing && (
                                         <label className="absolute bottom-0 right-0 bg-green-900 rounded-full p-2 cursor-pointer hover:bg-green-700 transition-colors">
@@ -258,7 +367,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg max-w-md w-full p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Reset Password</h3>
-                        <form onSubmit={handlePasswordReset} className="space-y-4">
+                        {/* <form onSubmit={handlePasswordReset} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
                                 <input
@@ -304,10 +413,142 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
                                     Reset Password
                                 </button>
                             </div>
+                        </form> */}
+                        <form onSubmit={handlePasswordReset} className="space-y-4">
+                            {/* Current Password */}
+                            <div className="relative">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Current Password
+                                </label>
+                                <input
+                                    type={showOld ? "text" : "password"}
+                                    value={oldPassword}
+                                    onChange={(e) => setOldPassword(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 pr-10"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowOld(!showOld)}
+                                    className="absolute right-3 top-9 text-gray-500 hover:text-gray-700"
+                                >
+                                    {showOld ? <Eye size={18} /> : <EyeOff size={18} />}
+                                </button>
+                            </div>
+
+                            {/* New Password */}
+                            <div className="relative">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    New Password
+                                </label>
+                                <input
+                                    type={showNew ? "text" : "password"}
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 pr-10"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowNew(!showNew)}
+                                    className="absolute right-3 top-9 text-gray-500 hover:text-gray-700"
+                                >
+                                    {showNew ? <Eye size={18} /> : <EyeOff size={18} />}
+                                </button>
+                            </div>
+
+                            {/* Confirm New Password */}
+                            <div className="relative">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Confirm New Password
+                                </label>
+                                <input
+                                    type={showConfirm ? "text" : "password"}
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 pr-10"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirm(!showConfirm)}
+                                    className="absolute right-3 top-9 text-gray-500 hover:text-gray-700"
+                                >
+                                    {showConfirm ? <Eye size={18} /> : <EyeOff size={18} />}
+                                </button>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex justify-end space-x-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowResetModal(false)}
+                                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                >
+                                    {loading ? "Updating..." : "Reset Password"}
+                                </button>
+                            </div>
                         </form>
+
                     </div>
                 </div>
             )}
+
+            {/* {showResetModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                        <h2 className="text-lg font-semibold mb-4">Reset Password</h2>
+
+                        <div className="space-y-3">
+                            <input
+                                type="password"
+                                placeholder="Old Password"
+                                value={oldPassword}
+                                onChange={(e) => setOldPassword(e.target.value)}
+                                className="w-full border rounded-lg p-2"
+                            />
+                            <input
+                                type="password"
+                                placeholder="New Password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                className="w-full border rounded-lg p-2"
+                            />
+                            <input
+                                type="password"
+                                placeholder="Confirm Password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                className="w-full border rounded-lg p-2"
+                            />
+                        </div>
+
+                        <div className="flex justify-end mt-4 space-x-2">
+                            <button
+                                onClick={() => setShowResetModal(false)}
+                                className="px-4 py-2 bg-gray-200 rounded-lg"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handlePasswordReset}
+                                disabled={loading}
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
+                            >
+                                {loading ? "Updating..." : "Update"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )} */}
+
 
             {/* Forgot Password Modal */}
             {showForgotModal && (

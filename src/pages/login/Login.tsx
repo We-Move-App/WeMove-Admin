@@ -2,19 +2,52 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "@/api/authApi";
 import loginBg from "@/assets/login-bg.png";
+import { Eye, EyeOff } from "lucide-react";
+import { toast } from '@/hooks/use-toast';
 
 const Login = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   if (!email || !password) {
+  //     alert("Please enter email and password");
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+  //     const result = await loginUser({ username: email, password });
+  //     console.log("Login Success:", result);
+  //     const { accessToken, refreshToken } = result.data;
+  //     localStorage.setItem("accessToken", accessToken);
+  //     localStorage.setItem("refreshToken", refreshToken);
+
+  //     // Navigate to dashboard
+  //     navigate("/dashboard");
+  //   } catch (error: any) {
+  //     console.error("Login failed:", error.response?.data || error.message);
+  //     alert(error.response?.data?.message || "Login failed");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Please enter email and password");
+      toast({
+        title: "Invalid credentials",
+        description: "Please enter email and password",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -22,15 +55,23 @@ const Login = () => {
       setLoading(true);
       const result = await loginUser({ username: email, password });
       console.log("Login Success:", result);
+
       const { accessToken, refreshToken } = result.data;
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
 
-      // Navigate to dashboard
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
       navigate("/dashboard");
     } catch (error: any) {
       console.error("Login failed:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Login failed");
+      toast({
+        title: "Login failed",
+        description: "Invalid credentials",
+        variant: "destructive", // red color
+      });
     } finally {
       setLoading(false);
     }
@@ -67,13 +108,6 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-700 outline-none"
             />
-            {/* <input
-              id="email"
-              type="email"
-              value="demo@example.com"
-              disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-gray-100"
-            /> */}
           </div>
 
           <div>
@@ -83,21 +117,23 @@ const Login = () => {
             >
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-700"
-            />
-            {/* <input
-              id="password"
-              type="password"
-              value="password123"
-              disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-gray-100"
-            /> */}
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-700"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+              </button>
+            </div>
           </div>
 
           <button
