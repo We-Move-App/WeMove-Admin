@@ -7,6 +7,7 @@ import { TaxiDriver } from "@/types/admin";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/api/axiosInstance";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const TaxiDrivers = () => {
   const navigate = useNavigate();
@@ -62,20 +63,22 @@ const TaxiDrivers = () => {
     },
   ];
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 500);
+
+
   useEffect(() => {
     const fetchDrivers = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get(
-          "/driver-management/drivers",
-          {
-            params: {
-              vehicleType: "taxi",
-              page: currentPage,
-              limit: pageSize,
-            },
-          }
-        );
+        const response = await axiosInstance.get("/driver-management/drivers", {
+          params: {
+            vehicleType: "taxi",
+            page: currentPage,
+            limit: pageSize,
+            mobile: debouncedSearch || undefined,
+          },
+        });
         setDrivers(response.data?.data || []);
         setTotalDrivers(response.data?.total || 0);
       } catch (err: any) {
@@ -86,7 +89,8 @@ const TaxiDrivers = () => {
     };
 
     fetchDrivers();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, debouncedSearch]);
+
 
   if (loading) return <p>Loading drivers...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -117,6 +121,11 @@ const TaxiDrivers = () => {
         currentPage={currentPage}
         totalItems={totalDrivers}
         onPageChange={(page) => setCurrentPage(page)}
+        searchTerm={searchTerm}
+        onSearchChange={(term) => {
+          setSearchTerm(term);
+          setCurrentPage(1);
+        }}
       />
     </>
   );

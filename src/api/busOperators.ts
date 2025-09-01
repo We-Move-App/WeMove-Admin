@@ -18,5 +18,6 @@ export const fetchBusOperators = async (): Promise<BusOperator[]> => {
     mobile: user.phoneNumber,
     status: user.verificationStatus,
     numberOfBuses: user.busCount || 0,
+    companyName: user.companyName || "",
   }));
 };

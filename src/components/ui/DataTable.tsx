@@ -44,6 +44,8 @@ type DataTableProps<T> = {
   keyExtractor: (item: T) => string | number;
   onRowClick?: (item: T) => void;
   searchable?: boolean;
+  searchTerm?: string;
+  onSearchChange?: (term: string) => void;
   exportable?: boolean;
   filterable?: boolean;
   filterOptions?: FilterOption[];
@@ -60,6 +62,9 @@ function DataTable<T>({
   data,
   keyExtractor,
   onRowClick,
+  searchable = true,
+  searchTerm = "",
+  onSearchChange,
   filterable = true,
   filterOptions = [],
   paginate = true,
@@ -68,7 +73,6 @@ function DataTable<T>({
   totalItems = data.length,
   onPageChange,
 }: DataTableProps<T>) {
-  const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{
     key: keyof T | null;
     direction: "asc" | "desc";
@@ -105,15 +109,6 @@ function DataTable<T>({
   }, [data, sortConfig]);
 
   // Sorting handler
-  // const requestSort = (key: keyof T | "actions") => {
-  //   if (key === "actions") return;
-  //   let direction: "asc" | "desc" = "asc";
-  //   if (sortConfig.key === key && sortConfig.direction === "asc") {
-  //     direction = "desc";
-  //   }
-  //   setSortConfig({ key, direction });
-  // };
-
   const requestSort = (key: keyof T) => {
     let direction: "asc" | "desc" = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -150,13 +145,6 @@ function DataTable<T>({
   }, [sortedData, searchTerm, filters, columns]);
 
   // Pagination
-  // const paginatedData = useMemo(() => {
-  //   if (!paginate) return filteredData;
-  //   const startIndex = (currentPage - 1) * pageSize;
-  //   return filteredData.slice(startIndex, startIndex + pageSize);
-  // }, [filteredData, currentPage, pageSize, paginate]);
-
-  // const totalPages = Math.ceil(filteredData.length / pageSize);
   const totalPages = totalItems && pageSize ? Math.ceil(totalItems / pageSize) : 1;
 
   // Filter change
@@ -195,9 +183,9 @@ function DataTable<T>({
             <Input
               placeholder="Search..."
               className="pl-10"
-              value={searchTerm}
+              value={searchTerm || ""}
               onChange={(e) => {
-                setSearchTerm(e.target.value);
+                onSearchChange?.(e.target.value);
                 onPageChange?.(1);
               }}
             />
