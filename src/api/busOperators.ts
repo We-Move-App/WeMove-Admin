@@ -5,7 +5,7 @@ export const fetchBusOperators = async (): Promise<BusOperator[]> => {
   const response = await axiosInstance.get("/bus-management/bus-operators");
   // console.log("Fetched Bus Operators:", response.data);
 
-  const operators = response.data?.data?.data;
+  const operators = response.data?.data;
 
   if (!Array.isArray(operators)) {
     throw new Error("Invalid API response: 'data.data' is not an array");

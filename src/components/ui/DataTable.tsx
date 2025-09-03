@@ -19,14 +19,8 @@ import {
 import { ChevronDown, ChevronUp, Search } from "lucide-react";
 
 // Define types
-// type Column<T> = {
-//   key: keyof T | "actions";
-//   header: string;
-//   render?: (item: T) => React.ReactNode;
-// };
-
 export type Column<T> = {
-  key: keyof T | "actions" | string; // allow any custom string too
+  key: keyof T | "actions" | string;
   header: string;
   render?: (item: T) => React.ReactNode;
 };
@@ -219,21 +213,11 @@ function DataTable<T>({
           <TableHeader>
             <TableRow>
               {columns.map((column) => (
-                // <TableHead
-                //   key={String(column.key)}
-                //   className={column.key !== "actions" ? "cursor-pointer" : ""}
-                //   onClick={() => {
-                //     if (column.key !== "actions") {
-                //       requestSort(column.key);
-                //     }
-                //   }}
-                // >
                 <TableHead
                   key={String(column.key)}
                   className={column.key !== "actions" ? "cursor-pointer" : ""}
                   onClick={() => {
                     if (column.key !== "actions" && typeof column.key !== "string") {
-                      // now TS knows it's definitely keyof T
                       requestSort(column.key);
                     }
                   }}
@@ -293,16 +277,6 @@ function DataTable<T>({
         <Pagination className="mt-4">
           <PaginationContent>
             <PaginationItem>
-              {/* <PaginationPrevious
-                onClick={() =>
-                  currentPage > 1 && setCurrentPage(currentPage - 1)
-                }
-                className={
-                  currentPage <= 1
-                    ? "pointer-events-none opacity-50"
-                    : "cursor-pointer"
-                }
-              /> */}
               <PaginationPrevious
                 onClick={() => currentPage > 1 && onPageChange?.(currentPage - 1)}
                 className={
@@ -326,16 +300,6 @@ function DataTable<T>({
             ))}
 
             <PaginationItem>
-              {/* <PaginationNext
-                onClick={() =>
-                  currentPage < totalPages && setCurrentPage(currentPage + 1)
-                }
-                className={
-                  currentPage >= totalPages
-                    ? "pointer-events-none opacity-50"
-                    : "cursor-pointer"
-                }
-              /> */}
               <PaginationNext
                 onClick={() => currentPage < totalPages && onPageChange?.(currentPage + 1)}
                 className={

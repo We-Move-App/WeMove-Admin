@@ -15,7 +15,7 @@ import { HotelManager } from "@/types/admin";
 export const fetchHotelManagers = async (): Promise<HotelManager[]> => {
   const response = await axiosInstance.get("/hotel-management/hotel-managers");
 
-  const users = response.data?.data?.data || []; // ← access correctly
+  const users = response.data?.data || []; // ← access correctly
 
   return users.map((user: any) => ({
     id: user._id,
