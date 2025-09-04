@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -9,18 +9,48 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { ChartData } from "@/types/admin";
+import axiosInstance from "@/api/axiosInstance";
 
-interface RevenueChartProps {
-  data: ChartData;
-}
+const pastelBlue = "#3b82f6";
 
-const RevenueChart = ({ data }: RevenueChartProps) => {
-  // Transform the data for Recharts
-  const chartData = data.labels.map((label, index) => ({
-    name: label,
-    revenue: data.datasets[0].data[index],
-  }));
+const RevenueChart = () => {
+  const [formattedData, setFormattedData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchRevenue = async () => {
+      try {
+        const response = await axiosInstance.get("/dashboard/top-analytics?filter=monthly");
+        const revenue = response.data.data.revenue.totalRevenue;
+
+        // All months
+        const allMonths = [
+          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+        ];
+
+        // Map API data to short month names
+        const monthMap: { [key: string]: number } = {};
+        revenue.forEach((item: any) => {
+          monthMap[item.filter.slice(0, 3)] = item.amount;
+        });
+
+        // Prepare chart data for all months up to the current month
+        const currentMonthIndex = new Date().getMonth();
+        const data = allMonths
+          .slice(0, currentMonthIndex + 1)
+          .map((month) => ({
+            name: month,
+            revenue: monthMap[month] ?? 0, // fill 0 if no data from API
+          }));
+
+        setFormattedData(data);
+      } catch (error) {
+        console.error("Error fetching revenue data:", error);
+      }
+    };
+
+    fetchRevenue();
+  }, []);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4">
@@ -36,7 +66,7 @@ const RevenueChart = ({ data }: RevenueChartProps) => {
 
       <div className="w-full h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
+          <LineChart data={formattedData}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="name" />
             <YAxis />
@@ -45,7 +75,7 @@ const RevenueChart = ({ data }: RevenueChartProps) => {
             <Line
               type="monotone"
               dataKey="revenue"
-              stroke="#3b82f6"
+              stroke={pastelBlue}
               strokeWidth={2}
               dot={{ r: 4 }}
               activeDot={{ r: 6 }}

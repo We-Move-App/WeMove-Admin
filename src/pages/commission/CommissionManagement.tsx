@@ -76,20 +76,67 @@ const CommissionManagement = () => {
   const [commissions, setCommissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // useEffect(() => {
+  //   const fetchCommissions = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const response = await axiosInstance.get('/commission-management/get-all');
+
+  //       const mapped = response.data.data.map((item: any) => ({
+  //         id: item._id,
+  //         serviceType: item.serviceType,
+  //         commissionType: item.commissionType,
+  //         percentage: item.commissionType === "percentage" ? item.commissionPercentage : null,
+  //         fixedRate: item.commissionType === "fixed" ? item.commissionRate : null,
+  //         effectiveFrom: item.startDate,
+  //         effectiveTo: item.endDate,
+  //         isActive: item.status === "active",
+  //       }));
+
+  //       setCommissions(mapped);
+  //     } catch (error) {
+  //       console.error("Error fetching commissions:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchCommissions();
+  // }, []);
+
   useEffect(() => {
     const fetchCommissions = async () => {
       setLoading(true);
       try {
-        const response = await axiosInstance.get('/commission-management/get-all');
+        const response = await axiosInstance.get(
+          "/commission-management/get-all"
+        );
+
+        const capitalizeFirstLetter = (str: string) =>
+          str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+
+        const formatStatus = (status: string) => {
+          switch (status) {
+            case "in_active":
+              return "Inactive";
+            case "active":
+              return "Active";
+            default:
+              return capitalizeFirstLetter(status);
+          }
+        };
 
         const mapped = response.data.data.map((item: any) => ({
           id: item._id,
-          serviceType: item.serviceType,
+          serviceType: capitalizeFirstLetter(item.serviceType),
           commissionType: item.commissionType,
-          percentage: item.commissionType === "percentage" ? item.commissionPercentage : null,
-          fixedRate: item.commissionType === "fixed" ? item.commissionRate : null,
+          percentage:
+            item.commissionType === "percentage" ? item.commissionPercentage : null,
+          fixedRate:
+            item.commissionType === "fixed" ? item.commissionRate : null,
           effectiveFrom: item.startDate,
           effectiveTo: item.endDate,
+          status: formatStatus(item.status),
           isActive: item.status === "active",
         }));
 
@@ -103,6 +150,7 @@ const CommissionManagement = () => {
 
     fetchCommissions();
   }, []);
+
 
   const handleAddNew = () => {
     setIsEditing(false);

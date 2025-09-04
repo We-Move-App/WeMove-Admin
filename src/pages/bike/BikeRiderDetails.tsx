@@ -14,6 +14,7 @@ import { TaxiDriver } from '@/types/admin';
 import UploadField from '@/components/ui/UploadField';
 import axiosInstance from '@/api/axiosInstance';
 import fileUploadInstance from '@/api/fileUploadInstance';
+import BranchSelect from '@/components/branch-select/BranchSelect';
 
 const BikeRiderDetails = () => {
   const { id } = useParams();
@@ -30,6 +31,8 @@ const BikeRiderDetails = () => {
     status: 'Approved',
     vehicleType: '',
   });
+
+  const [selectedBranch, setSelectedBranch] = useState<string | undefined>(undefined);
 
   // GET API
   useEffect(() => {
@@ -198,6 +201,7 @@ const BikeRiderDetails = () => {
         age: driver.age || null,
         experience: driver.experience || 0,
         address: driver.address || "",
+        branch: selectedBranch || "",
       },
       bankDetails: {
         accountNumber: driver.accountNumber || "",
@@ -493,6 +497,10 @@ const BikeRiderDetails = () => {
                     value={driver.address || ''}
                     onChange={(e) => handleChange('address', e.target.value)}
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Choose Branch</label>
+                  <BranchSelect value={selectedBranch} onChange={setSelectedBranch} />
                 </div>
               </div>
             </CardContent>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -9,52 +9,86 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import axiosInstance from "@/api/axiosInstance";
 import { ChartData } from "@/types/admin";
 
-interface BookingChartProps {
-  monthlyData: ChartData;
-  weeklyData: ChartData;
-  yearlyData: ChartData;
-}
+const pastelColors = ["#FCE9A0", "#A5C8FF", "#A8E6E1", "#B7E4C7"];
 
-const BookingChart = ({
-  monthlyData,
-  weeklyData,
-  yearlyData,
-}: BookingChartProps) => {
-  const [timeRange, setTimeRange] = useState<"weekly" | "monthly" | "yearly">(
-    "monthly"
-  );
-
-  const getCurrentData = () => {
-    switch (timeRange) {
-      case "weekly":
-        return weeklyData;
-      case "yearly":
-        return yearlyData;
-      case "monthly":
-      default:
-        return monthlyData;
-    }
-  };
-
-  const currentData = getCurrentData();
-
-  const chartData = currentData.labels.map((label, index) => {
-    const dataPoint: { [key: string]: any } = { name: label };
-    currentData.datasets.forEach((dataset) => {
-      dataPoint[dataset.label] = dataset.data[index];
-    });
-    return dataPoint;
+const BookingChart = () => {
+  const [timeRange, setTimeRange] = useState<"weekly" | "monthly" | "yearly">("monthly");
+  const [chartData, setChartData] = useState<ChartData>({
+    labels: [],
+    datasets: [],
   });
 
-  // const pastelColors = ["#A5D8FF", "#B2F2BB", "#D0BFFF", "#FFF3BF"];
-  const pastelColors = [
-    "#FCE9A0", // Soft Yellow
-    "#A5C8FF", // Gentle Blue
-    "#A8E6E1", // Calm Teal
-    "#B7E4C7", // Fresh Pastel Green
-  ];
+  // Whenever timeRange changes, fetch new data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.get(`/dashboard/top-analytics?filter=${timeRange}`);
+        const data = response.data.data;
+
+        let labels: string[] = [];
+        const monthMap: { [key: string]: string } = {
+          January: "Jan",
+          February: "Feb",
+          March: "Mar",
+          April: "Apr",
+          May: "May",
+          June: "Jun",
+          July: "Jul",
+          August: "Aug",
+          September: "Sep",
+          October: "Oct",
+          November: "Nov",
+          December: "Dec",
+        };
+
+        // Set chart labels based on timeRange
+        if (timeRange === "weekly") {
+          labels = ["week1", "week2", "week3", "week4"];
+        } else if (timeRange === "monthly") {
+          labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        } else if (timeRange === "yearly") {
+          labels = Array.from(new Set(data.totalBookings.map((item: any) => item.filter)));
+        }
+
+        // Map data for each type
+        const datasets = ["hotel", "bus", "taxi", "bike"].map((type, idx) => ({
+          label: type.charAt(0).toUpperCase() + type.slice(1),
+          data: labels.map(label => {
+            if (timeRange === "monthly") {
+              // map full month names to 3-letter abbreviations
+              const item = data[type].find((d: any) => monthMap[d.filter] === label);
+              return item ? item.bookings : 0;
+            } else {
+              // weekly and yearly: match directly
+              const item = data[type].find((d: any) => d.filter === label);
+              return item ? item.bookings : 0;
+            }
+          }),
+          backgroundColor: pastelColors[idx],
+          borderColor: pastelColors[idx],
+          borderWidth: 1,
+        }));
+
+        setChartData({ labels, datasets });
+      } catch (error) {
+        console.error("Error fetching chart data:", error);
+      }
+    };
+
+    fetchData();
+  }, [timeRange]);
+
+
+  const formattedData = chartData.labels.map((label, index) => {
+    const point: { [key: string]: any } = { name: label };
+    chartData.datasets.forEach((dataset) => {
+      point[dataset.label] = dataset.data[index];
+    });
+    return point;
+  });
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4">
@@ -64,14 +98,11 @@ const BookingChart = ({
           {["weekly", "monthly", "yearly"].map((range) => (
             <button
               key={range}
-              onClick={() =>
-                setTimeRange(range as "weekly" | "monthly" | "yearly")
-              }
-              className={`px-3 py-1 text-xs rounded-md ${
-                timeRange === range
-                  ? "bg-blue-100 text-blue-700"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
+              onClick={() => setTimeRange(range as "weekly" | "monthly" | "yearly")}
+              className={`px-3 py-1 text-xs rounded-md ${timeRange === range
+                ? "bg-blue-100 text-blue-700"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
             >
               {range.charAt(0).toUpperCase() + range.slice(1)}
             </button>
@@ -81,23 +112,19 @@ const BookingChart = ({
 
       <div className="w-full h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={chartData}
-            barCategoryGap="20%" // Adjust this for category spacing
-            barGap={4}
-          >
+          <BarChart data={formattedData} barCategoryGap="20%" barGap={4}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
             <Legend />
-            {currentData.datasets.map((dataset, index) => (
+            {chartData.datasets.map((dataset, index) => (
               <Bar
                 key={dataset.label}
                 dataKey={dataset.label}
-                fill={pastelColors[index % pastelColors.length]}
+                fill={dataset.backgroundColor}
                 radius={[4, 4, 0, 0]}
-                barSize={timeRange === "yearly" ? 20 : 20}
+                barSize={20}
               />
             ))}
           </BarChart>

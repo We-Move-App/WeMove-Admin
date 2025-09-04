@@ -6,7 +6,6 @@ import DataTable from '@/components/ui/DataTable';
 import { WalletTransaction } from '@/types/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import StatusBadge from '@/components/ui/StatusBadge';
-import axios from 'axios';
 import axiosInstance from '@/api/axiosInstance';
 
 // Mock data for wallet transactions
@@ -154,47 +153,6 @@ const Wallet = () => {
     }
   ];
 
-  // useEffect(() => {
-  //   const fetchTransactions = async () => {
-  //     try {
-  //       const res = await axiosInstance.get("/auth/getAlltransactions");
-
-  //       // API structure
-  //       const apiResponse = res.data?.message || {};
-  //       const apiTransactions = apiResponse.transactions || [];
-
-  //       // Set aggregates for your cards
-  //       setTotalTransactions(apiResponse.pagination?.totalCount || 0);
-  //       setTotalCredits(apiResponse.aggregates?.totalCredits || 0);
-  //       setTotalDebits(apiResponse.aggregates?.totalDebits || 0);
-  //       setPendingWithdrawals(apiResponse.aggregates?.pendingWithdrawals || 0);
-
-  //       // Convert API shape to table rows
-  //       const formattedTransactions: WalletTransaction[] = apiTransactions.map(
-  //         (txn: any) => ({
-  //           id: txn.transactionId,
-  //           userId: txn.user,
-  //           userName: txn.user || "N/A",
-  //           type: txn.type === "CREDIT" ? "Credit" : "Debit",
-  //           amount: txn.amount,
-  //           date: new Date(txn.date).toLocaleDateString(),
-  //           status: txn.status === "SUCCESS" ? "Completed" : txn.status,
-  //           description: txn.description,
-  //         })
-  //       );
-
-  //       setTransactions(formattedTransactions);
-  //       console.log("API Transactions:", apiTransactions);
-  //     } catch (err) {
-  //       console.error("Failed to fetch transactions:", err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchTransactions();
-  // }, []);
-
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
@@ -207,34 +165,45 @@ const Wallet = () => {
           },
         });
 
+        const apiTransactions = res.data?.data || [];
+
         // ✅ Currency parser
         const parseCurrency = (val: string | number | undefined | null) => {
           if (!val) return 0;
           if (typeof val === "number") return val;
-          return parseFloat(val.replace(/[^0-9.-]+/g, "")) || 0;
+          return parseFloat(val.toString().replace(/[^0-9.-]+/g, "")) || 0;
         };
 
-        const walletData = res.data?.walletManagement || {};
-        const transactionHistory = res.data?.transactionHistory || {};
-        const apiTransactions = transactionHistory.transactions || [];
-
         // ✅ Set aggregates
-        setTotalTransactions(walletData.totalTransactions || 0);
-        setTotalCredits(parseCurrency(walletData.totalCredits));
-        setTotalDebits(parseCurrency(walletData.totalDebits));
-        setPendingWithdrawals(parseCurrency(walletData.pendingWithdrawals));
+        const totalCredits = apiTransactions
+          .filter((t: any) => t.type.toUpperCase() === "CREDIT")
+          .reduce((sum: number, t: any) => sum + parseCurrency(t.amount), 0);
 
-        // ✅ Format transactions
+        const totalDebits = apiTransactions
+          .filter((t: any) => t.type.toUpperCase() === "DEBIT")
+          .reduce((sum: number, t: any) => sum + parseCurrency(t.amount), 0);
+
+        setTotalTransactions(apiTransactions.length);
+        setTotalCredits(totalCredits);
+        setTotalDebits(totalDebits);
+
+        // You might not have pending withdrawals info in this API
+        setPendingWithdrawals(0);
+
+        // ✅ Format transactions for DataTable
         const formattedTransactions: WalletTransaction[] = apiTransactions.map(
           (txn: any) => ({
             id: txn.transactionId,
-            userId: txn.user,
-            userName: txn.user || "N/A",
-            type: txn.type === "Credit" ? "Credit" : "Debit",
+            userId: txn.name,
+            userName: txn.name || "N/A",
+            type: txn.type.toUpperCase() === "CREDIT" ? "Credit" : "Debit",
             amount: parseCurrency(txn.amount),
             date: new Date(txn.date).toLocaleDateString(),
-            status: txn.status === "Completed" ? "Completed" : txn.status,
-            description: txn.description,
+            status: txn.status === "SUCCESS" ? "Completed" : txn.status,
+            description:
+              txn.description.length > 20
+                ? txn.description.substring(0, 20) + "..."
+                : txn.description,
           })
         );
 
@@ -248,8 +217,7 @@ const Wallet = () => {
     };
 
     fetchTransactions();
-  }, [currentPage, pageSize]); // 👈 dependency array
-
+  }, [currentPage, pageSize]);
 
 
 

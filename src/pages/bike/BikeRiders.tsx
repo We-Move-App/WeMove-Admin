@@ -151,31 +151,6 @@ const BikeRiders = () => {
     },
   ];
 
-  // return (
-  //   <>
-  //     <div className="flex justify-between items-center mb-6">
-  //       <div>
-  //         <h1 className="text-2xl font-bold">Bike Riders</h1>
-  //         <p className="text-gray-600">Manage all bike riders</p>
-  //       </div>
-  //       <Button
-  //         onClick={() => navigate('/bike-management/riders/new')}
-  //         className="flex items-center gap-2"
-  //       >
-  //         <Plus size={16} /> Add Bike Rider
-  //       </Button>
-  //     </div>
-
-  //     <DataTable
-  //       columns={columns}
-  //       data={riders}
-  //       onRowClick={handleRowClick}
-  //       keyExtractor={(item) => item.id}
-  //       filterable={true}
-  //       filterOptions={filterOptions}
-  //     />
-  //   </>
-  // );
   return (
     <>
       <div className="flex justify-between items-center mb-6">

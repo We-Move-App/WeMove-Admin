@@ -15,6 +15,7 @@ import dummyLicense from "@/assets/dummy-data/bus-license.png";
 import dummyBankDetails from "@/assets/dummy-data/hdfc.jpg";
 import Loader from "@/components/ui/loader";
 import axios from "axios";
+import BranchSelect from "@/components/branch-select/BranchSelect";
 
 const BusOperatorDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,6 +35,7 @@ const BusOperatorDetails = () => {
 
 
   const statusOptions = ["approved", "processing", "submitted"];
+  const [selectedBranch, setSelectedBranch] = useState<string | undefined>(undefined);
   useEffect(() => {
     const fetchOperator = async () => {
       if (isNewOperator) {
@@ -183,6 +185,7 @@ const BusOperatorDetails = () => {
             email: operator?.email,
             phoneNumber: operator?.mobile,
             avatar: avatarFile || {},
+            branch: selectedBranch || "",
           },
           bankDetails: {
             accountHolderName: operator?.accountHolderName,
@@ -218,6 +221,7 @@ const BusOperatorDetails = () => {
           companyName: operator?.companyName,
           companyAddress: operator?.address,
           email: operator?.email,
+          branch: operator?.branch || "",
           phoneNumber: operator?.mobile?.replace(/^\+91/, ""),
           avatar: avatarFile || {},
           accountHolderName: operator?.accountHolderName,
@@ -429,6 +433,15 @@ const BusOperatorDetails = () => {
                           </option>
                         ))}
                       </select>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Choose Branch</label>
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">{operator.branch}</p>
+                    ) : (
+                      <BranchSelect value={selectedBranch} onChange={setSelectedBranch} />
                     )}
                   </div>
                 </div>
