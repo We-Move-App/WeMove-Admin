@@ -1,13 +1,12 @@
-
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 // import Layout from '@/components/layout/Layout';
-import DataTable from '@/components/ui/DataTable';
-import StatusBadge from '@/components/ui/StatusBadge';
-import { busBookings } from '@/data/mockData';
-import { BusBooking } from '@/types/admin';
-import { Eye } from 'lucide-react';
-import axiosInstance from '@/api/axiosInstance';
+import DataTable from "@/components/ui/DataTable";
+import StatusBadge from "@/components/ui/StatusBadge";
+import { busBookings } from "@/data/mockData";
+import { BusBooking } from "@/types/admin";
+import { Eye } from "lucide-react";
+import axiosInstance from "@/api/axiosInstance";
 
 const BusBookings = () => {
   const navigate = useNavigate();
@@ -15,27 +14,32 @@ const BusBookings = () => {
   const [loading, setLoading] = useState(true);
 
   const columns = [
-    { key: 'id' as keyof BusBooking, header: 'ID' },
-    { key: 'busRegistrationNumber' as keyof BusBooking, header: 'Bus Reg. No.' },
-    { key: 'customerName' as keyof BusBooking, header: 'Customer Name' },
-    { key: 'customerPhone' as keyof BusBooking, header: 'Phone' },
-    { key: 'customerEmail' as keyof BusBooking, header: 'Email' },
-    { key: 'from' as keyof BusBooking, header: 'From' },
-    { key: 'to' as keyof BusBooking, header: 'To' },
-    { key: 'journeyDate' as keyof BusBooking, header: 'Journey Date' },
+    { key: "id" as keyof BusBooking, header: "ID" },
     {
-      key: 'amount' as keyof BusBooking,
-      header: 'Amount',
-      render: (booking: BusBooking) => <span>₹{booking.amount}</span>
+      key: "busRegistrationNumber" as keyof BusBooking,
+      header: "Bus Reg. No.",
+    },
+    { key: "customerName" as keyof BusBooking, header: "Customer Name" },
+    { key: "customerPhone" as keyof BusBooking, header: "Phone" },
+    { key: "customerEmail" as keyof BusBooking, header: "Email" },
+    { key: "from" as keyof BusBooking, header: "From" },
+    { key: "to" as keyof BusBooking, header: "To" },
+    { key: "journeyDate" as keyof BusBooking, header: "Journey Date" },
+    {
+      key: "amount" as keyof BusBooking,
+      header: "Amount",
+      render: (booking: BusBooking) => <span>₹{booking.amount}</span>,
     },
     {
-      key: 'status' as keyof BusBooking,
-      header: 'Status',
-      render: (booking: BusBooking) => <StatusBadge status={booking.paymentStatus} />
+      key: "status" as keyof BusBooking,
+      header: "Status",
+      render: (booking: BusBooking) => (
+        <StatusBadge status={booking.paymentStatus} />
+      ),
     },
     {
-      key: 'actions' as 'actions',
-      header: 'Actions',
+      key: "actions" as "actions",
+      header: "Actions",
       render: (booking: BusBooking) => (
         <button
           onClick={(e) => {
@@ -47,41 +51,41 @@ const BusBookings = () => {
           <Eye size={16} className="mr-1" />
           View Details
         </button>
-      )
-    }
+      ),
+    },
   ];
 
   const filterOptions = [
     {
-      key: 'status' as keyof BusBooking,
-      label: 'Status',
+      key: "status" as keyof BusBooking,
+      label: "Status",
       options: [
-        { label: 'Completed', value: 'Completed' },
-        { label: 'Upcoming', value: 'Upcoming' },
-        { label: 'Cancelled', value: 'Cancelled' }
-      ]
+        { label: "Completed", value: "Completed" },
+        { label: "Upcoming", value: "Upcoming" },
+        { label: "Cancelled", value: "Cancelled" },
+      ],
     },
     {
-      key: 'from' as keyof BusBooking,
-      label: 'From',
+      key: "from" as keyof BusBooking,
+      label: "From",
       options: [
-        { label: 'Mumbai', value: 'Mumbai' },
-        { label: 'Delhi', value: 'Delhi' },
-        { label: 'Bangalore', value: 'Bangalore' },
-        { label: 'Chennai', value: 'Chennai' }
-      ]
+        { label: "Mumbai", value: "Mumbai" },
+        { label: "Delhi", value: "Delhi" },
+        { label: "Bangalore", value: "Bangalore" },
+        { label: "Chennai", value: "Chennai" },
+      ],
     },
     {
-      key: 'to' as keyof BusBooking,
-      label: 'To',
+      key: "to" as keyof BusBooking,
+      label: "To",
       options: [
-        { label: 'Pune', value: 'Pune' },
-        { label: 'Jaipur', value: 'Jaipur' },
-        { label: 'Chennai', value: 'Chennai' },
-        { label: 'Hyderabad', value: 'Hyderabad' },
-        { label: 'Chandigarh', value: 'Chandigarh' }
-      ]
-    }
+        { label: "Pune", value: "Pune" },
+        { label: "Jaipur", value: "Jaipur" },
+        { label: "Chennai", value: "Chennai" },
+        { label: "Hyderabad", value: "Hyderabad" },
+        { label: "Chandigarh", value: "Chandigarh" },
+      ],
+    },
   ];
 
   const handleRowClick = (booking: BusBooking) => {
@@ -151,15 +155,17 @@ const BusBookings = () => {
         const formattedBookings = bookingsData.map((booking: any) => ({
           id: booking.bookingId || "N/A",
           busRegistrationNumber: booking.busRegNumber || "N/A",
-          customerName: booking.customerName || "N/A",
+          customerName: booking?.bookedBy?.fullName || "N/A",
+          customerPhone: booking?.bookedBy?.phoneNumber || "N/A",
+          customerEmail: booking?.bookedBy?.email || "N/A",
           from: booking.from || "N/A",
           to: booking.to || "N/A",
           journeyDate: booking.journeyDate
             ? new Date(booking.journeyDate).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
             : "N/A",
           amount: booking.amount || 0,
           status: booking.status || "N/A",
@@ -179,8 +185,6 @@ const BusBookings = () => {
 
     fetchBookings();
   }, []);
-
-
 
   return (
     <>

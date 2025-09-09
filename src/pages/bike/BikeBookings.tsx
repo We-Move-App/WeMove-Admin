@@ -61,7 +61,6 @@ import axiosInstance from "@/api/axiosInstance";
 // ];
 
 const BikeBookings = () => {
-  // const [bookings] = useState<BikeBooking[]>(mockBikeBookings);
   const [bookings, setBookings] = useState<TaxiBooking[]>([]);
   const [selectedBooking, setSelectedBooking] = useState<TaxiBooking | null>(
     null
@@ -78,12 +77,25 @@ const BikeBookings = () => {
   };
 
   const columns = [
-    { key: "id" as keyof TaxiBooking, header: "Booking ID" },
+    { key: "bookingId" as keyof TaxiBooking, header: "Booking ID" },
     { key: "customerName" as keyof TaxiBooking, header: "Customer Name" },
     { key: "riderName" as keyof TaxiBooking, header: "Rider Name" },
     { key: "from" as keyof TaxiBooking, header: "From" },
     { key: "to" as keyof TaxiBooking, header: "To" },
-    { key: "rideDate" as keyof TaxiBooking, header: "Ride Date" },
+    // { key: "rideDate" as keyof TaxiBooking, header: "Ride Date" },
+    {
+      key: "rideDate" as keyof TaxiBooking,
+      header: "Ride Date",
+      render: (booking: TaxiBooking) => (
+        <span>
+          {new Date(booking.rideDate).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
+        </span>
+      ),
+    },
     { key: "vehicleType" as keyof TaxiBooking, header: "Vehicle Type" },
     {
       key: "amount" as keyof TaxiBooking,
@@ -203,7 +215,7 @@ const BikeBookings = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="text-sm text-gray-500">Booking ID</h4>
-                  <p className="font-medium">{selectedBooking.id}</p>
+                  <p className="font-medium">{selectedBooking.bookingId}</p>
                 </div>
                 <div>
                   <h4 className="text-sm text-gray-500">Status</h4>
@@ -234,7 +246,7 @@ const BikeBookings = () => {
                   </div>
                   <div>
                     <h4 className="text-sm text-gray-500">Ride Date</h4>
-                    <p className="font-medium">{selectedBooking.rideDate}</p>
+                    <p className="font-medium">{selectedBooking.rideDate.slice(0, 10)}</p>
                   </div>
                 </div>
               </div>
@@ -244,10 +256,10 @@ const BikeBookings = () => {
                 <p className="font-medium">{selectedBooking.customerName}</p>
               </div>
 
-              <div className="pt-4 border-t">
+              {/* <div className="pt-4 border-t">
                 <h3 className="font-semibold mb-2">Rider Information</h3>
                 <p className="font-medium">{selectedBooking.driverName}</p>
-              </div>
+              </div> */}
             </div>
           )}
         </SheetContent>

@@ -1,18 +1,29 @@
-
-import { useEffect, useState } from 'react';
-import { Plus, Percent, DollarSign } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Plus, Percent, DollarSign } from "lucide-react";
 // import Layout from '@/components/layout/Layout';
-import DataTable from '@/components/ui/DataTable';
-import { Commission } from '@/types/admin';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from '@/hooks/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import axiosInstance from '@/api/axiosInstance';
+import DataTable from "@/components/ui/DataTable";
+import { Commission } from "@/types/admin";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import axiosInstance from "@/api/axiosInstance";
 
 // Modified mock data to include commission type
 const mockCommissions: Commission[] = [
@@ -24,7 +35,7 @@ const mockCommissions: Commission[] = [
     commissionType: "percentage",
     effectiveFrom: "2023-01-01T00:00",
     effectiveTo: "2023-12-31T23:59",
-    isActive: true
+    isActive: true,
   },
   {
     id: "2",
@@ -34,7 +45,7 @@ const mockCommissions: Commission[] = [
     commissionType: "percentage",
     effectiveFrom: "2023-01-01T00:00",
     effectiveTo: "2023-12-31T23:59",
-    isActive: true
+    isActive: true,
   },
   {
     id: "3",
@@ -44,7 +55,7 @@ const mockCommissions: Commission[] = [
     commissionType: "fixed",
     effectiveFrom: "2023-01-01T00:00",
     effectiveTo: "2023-12-31T23:59",
-    isActive: true
+    isActive: true,
   },
   {
     id: "4",
@@ -54,8 +65,8 @@ const mockCommissions: Commission[] = [
     commissionType: "percentage",
     effectiveFrom: "2023-01-01T00:00",
     effectiveTo: "2023-12-31T23:59",
-    isActive: true
-  }
+    isActive: true,
+  },
 ];
 
 const CommissionManagement = () => {
@@ -63,46 +74,21 @@ const CommissionManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentCommission, setCurrentCommission] = useState<Commission>({
-    id: '',
-    serviceType: 'Bus',
+    id: "",
+    serviceType: "Bus",
     percentage: 0,
     fixedRate: null,
-    commissionType: 'percentage',
-    effectiveFrom: new Date().toISOString().split('.')[0].slice(0, 16),
-    effectiveTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('.')[0].slice(0, 16),
-    isActive: true
+    commissionType: "percentage",
+    effectiveFrom: new Date().toISOString().split(".")[0].slice(0, 16),
+    effectiveTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+      .toISOString()
+      .split(".")[0]
+      .slice(0, 16),
+    isActive: true,
   });
 
   const [commissions, setCommissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-
-  // useEffect(() => {
-  //   const fetchCommissions = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const response = await axiosInstance.get('/commission-management/get-all');
-
-  //       const mapped = response.data.data.map((item: any) => ({
-  //         id: item._id,
-  //         serviceType: item.serviceType,
-  //         commissionType: item.commissionType,
-  //         percentage: item.commissionType === "percentage" ? item.commissionPercentage : null,
-  //         fixedRate: item.commissionType === "fixed" ? item.commissionRate : null,
-  //         effectiveFrom: item.startDate,
-  //         effectiveTo: item.endDate,
-  //         isActive: item.status === "active",
-  //       }));
-
-  //       setCommissions(mapped);
-  //     } catch (error) {
-  //       console.error("Error fetching commissions:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchCommissions();
-  // }, []);
 
   useEffect(() => {
     const fetchCommissions = async () => {
@@ -131,7 +117,9 @@ const CommissionManagement = () => {
           serviceType: capitalizeFirstLetter(item.serviceType),
           commissionType: item.commissionType,
           percentage:
-            item.commissionType === "percentage" ? item.commissionPercentage : null,
+            item.commissionType === "percentage"
+              ? item.commissionPercentage
+              : null,
           fixedRate:
             item.commissionType === "fixed" ? item.commissionRate : null,
           effectiveFrom: item.startDate,
@@ -151,18 +139,22 @@ const CommissionManagement = () => {
     fetchCommissions();
   }, []);
 
-
   const handleAddNew = () => {
     setIsEditing(false);
     setCurrentCommission({
       id: undefined,
-      serviceType: 'Bus',
+      serviceType: "Bus",
       percentage: 0,
       fixedRate: null,
-      commissionType: 'percentage',
-      effectiveFrom: new Date().toISOString().split('.')[0].slice(0, 16),
-      effectiveTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('.')[0].slice(0, 16),
-      isActive: true
+      commissionType: "percentage",
+      effectiveFrom: new Date().toISOString().split(".")[0].slice(0, 16),
+      effectiveTo: new Date(
+        new Date().setFullYear(new Date().getFullYear() + 1)
+      )
+        .toISOString()
+        .split(".")[0]
+        .slice(0, 16),
+      isActive: true,
     });
     setIsDialogOpen(true);
   };
@@ -171,20 +163,28 @@ const CommissionManagement = () => {
     setIsEditing(true);
 
     try {
-      const res = await axiosInstance.get(`/commission-management/get/${commission.id}`);
+      const res = await axiosInstance.get(
+        `/commission-management/get/${commission.id}`
+      );
 
       if (res.status === 200) {
         const data = res.data.data;
 
         const mappedCommission: Commission = {
           id: data._id,
-          serviceType: data.serviceType.charAt(0).toUpperCase() + data.serviceType.slice(1), // e.g. "bus" -> "Bus"
+          serviceType:
+            data.serviceType.charAt(0).toUpperCase() +
+            data.serviceType.slice(1), // e.g. "bus" -> "Bus"
           commissionType: data.commissionType,
-          percentage: data.commissionType === "percentage" ? data.commissionPercentage : null,
-          fixedRate: data.commissionType === "fixed" ? data.commissionRate : null,
+          percentage:
+            data.commissionType === "percentage"
+              ? data.commissionPercentage
+              : null,
+          fixedRate:
+            data.commissionType === "fixed" ? data.commissionRate : null,
           effectiveFrom: new Date(data.startDate).toISOString().slice(0, 16), // format for datetime-local
           effectiveTo: new Date(data.endDate).toISOString().slice(0, 16),
-          isActive: data.status === "active"
+          isActive: data.status === "active",
         };
 
         setCurrentCommission(mappedCommission);
@@ -196,15 +196,15 @@ const CommissionManagement = () => {
   };
 
   const handleInputChange = (field: keyof Commission, value: any) => {
-    setCurrentCommission(prev => ({ ...prev, [field]: value }));
+    setCurrentCommission((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleCommissionTypeChange = (type: 'percentage' | 'fixed') => {
-    setCurrentCommission(prev => ({
+  const handleCommissionTypeChange = (type: "percentage" | "fixed") => {
+    setCurrentCommission((prev) => ({
       ...prev,
       commissionType: type,
-      percentage: type === 'percentage' ? (prev.percentage || 0) : null,
-      fixedRate: type === 'fixed' ? (prev.fixedRate || 0) : null
+      percentage: type === "percentage" ? prev.percentage || 0 : null,
+      fixedRate: type === "fixed" ? prev.fixedRate || 0 : null,
     }));
   };
 
@@ -265,7 +265,7 @@ const CommissionManagement = () => {
   const toggleCommissionStatus = async (id: string) => {
     try {
       // find the commission
-      const commission = commissions.find(c => c.id === id);
+      const commission = commissions.find((c) => c.id === id);
       if (!commission) return;
 
       // prepare payload with only status
@@ -276,16 +276,21 @@ const CommissionManagement = () => {
       await axiosInstance.put(`/commission-management/update/${id}`, payload);
 
       // update local state
-      setCommissions(prev =>
-        prev.map(item =>
+      setCommissions((prev) =>
+        prev.map((item) =>
           item.id === id ? { ...item, isActive: newStatus === "active" } : item
         )
       );
 
       // toast message
       toast({
-        title: newStatus === "active" ? "Commission Activated" : "Commission Deactivated",
-        description: `${commission.serviceType} commission has been ${newStatus === "active" ? "activated" : "deactivated"}.`,
+        title:
+          newStatus === "active"
+            ? "Commission Activated"
+            : "Commission Deactivated",
+        description: `${commission.serviceType} commission has been ${
+          newStatus === "active" ? "activated" : "deactivated"
+        }.`,
       });
     } catch (error: any) {
       console.error("Error toggling commission status:", error);
@@ -297,40 +302,41 @@ const CommissionManagement = () => {
     }
   };
 
-
   const formatDateTime = (dateTimeString: string) => {
     const date = new Date(dateTimeString);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const columns = [
-    { key: 'serviceType' as keyof Commission, header: 'Service Type' },
+    { key: "serviceType" as keyof Commission, header: "Service Type" },
     {
-      key: 'commissionValue' as string,
-      header: 'Commission',
+      key: "commissionValue" as string,
+      header: "Commission",
       render: (commission: Commission) => (
         <div className="flex items-center">
-          {commission.commissionType === 'percentage' ? (
+          {commission.commissionType === "percentage" ? (
             <span className="flex items-center">
-              {commission.percentage}% <Percent size={14} className="ml-1 text-gray-500" />
+              {commission.percentage}
+              <Percent size={14} className="ml-1 text-gray-500" />
             </span>
           ) : (
             <span className="flex items-center">
-              ₹{commission.fixedRate} <DollarSign size={14} className="ml-1 text-gray-500" />
+              {commission.fixedRate}
+              <DollarSign size={14} className="ml-1 text-gray-500" />
             </span>
           )}
         </div>
-      )
+      ),
     },
     {
-      key: 'effectiveFrom',
-      header: 'Effective From',
+      key: "effectiveFrom",
+      header: "Effective From",
       render: (commission: Commission) => (
         <span>
           {new Date(commission.effectiveFrom).toLocaleDateString("en-GB", {
@@ -339,35 +345,41 @@ const CommissionManagement = () => {
             year: "numeric",
           })}
         </span>
-      )
+      ),
     },
     {
-      key: 'effectiveTo',
-      header: 'Effective To',
+      key: "effectiveTo",
+      header: "Effective To",
       render: (commission: Commission) => (
         <span>
           {commission.effectiveTo
             ? new Date(commission.effectiveTo).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
             : "No End Date"}
         </span>
-      )
+      ),
     },
     {
-      key: 'isActive' as keyof Commission,
-      header: 'Status',
+      key: "isActive" as keyof Commission,
+      header: "Status",
       render: (commission: Commission) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${commission.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-          {commission.isActive ? 'Active' : 'Inactive'}
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            commission.isActive
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {commission.isActive ? "Active" : "Inactive"}
         </span>
-      )
+      ),
     },
     {
-      key: 'actions' as string,
-      header: 'Actions',
+      key: "actions" as string,
+      header: "Actions",
       render: (commission: Commission) => (
         <div className="flex items-center space-x-2">
           <button
@@ -377,26 +389,37 @@ const CommissionManagement = () => {
             Edit
           </button>
           <button
-            className={`action-button ${commission.isActive ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}
+            className={`action-button ${
+              commission.isActive
+                ? "bg-red-50 text-red-600"
+                : "bg-green-50 text-green-600"
+            }`}
             onClick={() => toggleCommissionStatus(commission.id)}
           >
-            {commission.isActive ? 'Deactivate' : 'Activate'}
+            {commission.isActive ? "Deactivate" : "Activate"}
           </button>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   return (
     <>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Commission Management</h1>
-        <Button
-          onClick={handleAddNew}
-          className="flex items-center gap-2"
-        >
-          <Plus size={16} />Add New Commission
-        </Button>
+        {(() => {
+          const existingServices = commissions.map((c) => c.serviceType);
+          const allServicesAdded = ["Bus", "Hotel", "Taxi", "Bike"].every(
+            (service) => existingServices.includes(service)
+          );
+
+          return !allServicesAdded ? (
+            <Button onClick={handleAddNew} className="flex items-center gap-2">
+              <Plus size={16} />
+              Add New Commission
+            </Button>
+          ) : null;
+        })()}
       </div>
 
       <DataTable
@@ -404,13 +427,14 @@ const CommissionManagement = () => {
         data={commissions}
         keyExtractor={(item) => item.id}
         searchable={false}
+        paginate={false}
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? 'Edit Commission' : 'Add New Commission'}
+              {isEditing ? "Edit Commission" : "Add New Commission"}
             </DialogTitle>
           </DialogHeader>
 
@@ -419,7 +443,9 @@ const CommissionManagement = () => {
               <label className="text-sm font-medium">Service Type</label>
               <Select
                 value={currentCommission.serviceType}
-                onValueChange={(value: any) => handleInputChange('serviceType', value)}
+                onValueChange={(value: any) =>
+                  handleInputChange("serviceType", value)
+                }
                 disabled={isEditing}
               >
                 <SelectTrigger>
@@ -438,7 +464,9 @@ const CommissionManagement = () => {
               <label className="text-sm font-medium">Commission Type</label>
               <RadioGroup
                 value={currentCommission.commissionType}
-                onValueChange={(value) => handleCommissionTypeChange(value as 'percentage' | 'fixed')}
+                onValueChange={(value) =>
+                  handleCommissionTypeChange(value as "percentage" | "fixed")
+                }
                 className="flex space-x-4"
               >
                 <div className="flex items-center space-x-2">
@@ -456,35 +484,61 @@ const CommissionManagement = () => {
               </RadioGroup>
             </div>
 
-            {currentCommission.commissionType === 'percentage' && (
+            {currentCommission.commissionType === "percentage" && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Commission Percentage</label>
+                <label className="text-sm font-medium">
+                  Commission Percentage
+                </label>
                 <div className="relative">
                   <Input
                     type="number"
-                    value={currentCommission.percentage !== null ? currentCommission.percentage : 0}
-                    onChange={(e) => handleInputChange('percentage', parseFloat(e.target.value) || 0)}
+                    value={
+                      currentCommission.percentage !== null
+                        ? currentCommission.percentage
+                        : 0
+                    }
+                    onChange={(e) =>
+                      handleInputChange(
+                        "percentage",
+                        parseFloat(e.target.value) || 0
+                      )
+                    }
                     className="pr-8"
                     min={0}
                     max={100}
                   />
-                  <Percent className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500" size={16} />
+                  <Percent
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+                    size={16}
+                  />
                 </div>
               </div>
             )}
 
-            {currentCommission.commissionType === 'fixed' && (
+            {currentCommission.commissionType === "fixed" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">Fixed Rate (₹)</label>
                 <div className="relative">
                   <Input
                     type="number"
-                    value={currentCommission.fixedRate !== null ? currentCommission.fixedRate : 0}
-                    onChange={(e) => handleInputChange('fixedRate', parseFloat(e.target.value) || 0)}
+                    value={
+                      currentCommission.fixedRate !== null
+                        ? currentCommission.fixedRate
+                        : 0
+                    }
+                    onChange={(e) =>
+                      handleInputChange(
+                        "fixedRate",
+                        parseFloat(e.target.value) || 0
+                      )
+                    }
                     className="pl-8"
                     min={0}
                   />
-                  <DollarSign className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" size={16} />
+                  <DollarSign
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+                    size={16}
+                  />
                 </div>
               </div>
             )}
@@ -494,7 +548,9 @@ const CommissionManagement = () => {
               <Input
                 type="datetime-local"
                 value={currentCommission.effectiveFrom}
-                onChange={(e) => handleInputChange('effectiveFrom', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("effectiveFrom", e.target.value)
+                }
               />
             </div>
 
@@ -503,7 +559,9 @@ const CommissionManagement = () => {
               <Input
                 type="datetime-local"
                 value={currentCommission.effectiveTo}
-                onChange={(e) => handleInputChange('effectiveTo', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("effectiveTo", e.target.value)
+                }
               />
             </div>
 
@@ -511,7 +569,9 @@ const CommissionManagement = () => {
               <label className="text-sm font-medium">Status</label>
               <Select
                 value={currentCommission.isActive ? "active" : "inactive"}
-                onValueChange={(value) => handleInputChange('isActive', value === "active")}
+                onValueChange={(value) =>
+                  handleInputChange("isActive", value === "active")
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -525,7 +585,9 @@ const CommissionManagement = () => {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
             <Button onClick={handleSaveCommission}>Save</Button>
           </DialogFooter>
         </DialogContent>

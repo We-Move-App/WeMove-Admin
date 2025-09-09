@@ -101,7 +101,7 @@ const Wallet = () => {
 
   const columns = [
     { key: 'id' as keyof WalletTransaction, header: 'Transaction ID' },
-    // { key: 'userName' as keyof WalletTransaction, header: 'User' },
+    { key: 'userName' as keyof WalletTransaction, header: 'User' },
     {
       key: 'type' as keyof WalletTransaction,
       header: 'Type',

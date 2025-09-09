@@ -231,53 +231,111 @@ const Coupons = () => {
     });
   };
 
+  // const handleSaveCoupon = async () => {
+  //   try {
+  //     if (isEditing) {
+  //       // Call PUT update API (you can implement later)
+  //       return;
+  //     }
+
+  //     const payload = {
+  //       couponName: currentCoupon.name,
+  //       couponCode: currentCoupon.code,
+  //       // minOrderAmount: currentCoupon.minOrderAmount || 0,
+  //       serviceType: currentCoupon.serviceType,
+  //       discountType: currentCoupon.discountType === "percentage" ? "Percentage" : "Fixed Amount",
+  //       discountPercentage: currentCoupon.discountType === "percentage" ? currentCoupon.discountPercentage : undefined,
+  //       discountAmount: currentCoupon.discountType === "fixed" ? currentCoupon.discountAmount : undefined,
+  //       startDate: new Date(currentCoupon.startDate).toISOString(),
+  //       expiryDate: new Date(currentCoupon.expiryDate).toISOString(),
+  //       status: currentCoupon.isActive ? "Active" : "Inactive",
+  //       // maxUsage: currentCoupon.maxUsage || 1,
+  //     };
+
+  //     const res = await axiosInstance.post("/auth/create-coupon", payload);
+
+  //     if (res.status === 200 || res.status === 201) {
+  //       toast({
+  //         title: "Coupon Created",
+  //         description: `${res.data.data.couponName} has been added successfully.`,
+  //       });
+
+  //       setIsDialogOpen(false);
+  //       // fetchCoupons();
+  //     }
+  //   } catch (error: any) {
+  //     const message =
+  //       error.response?.data?.message ||
+  //       error.message ||
+  //       "Failed to create coupon.";
+
+  //     toast({
+  //       title: "Error",
+  //       description: message,
+  //       variant: "destructive",
+  //     });
+
+  //     console.error("Coupon creation failed:", error.response || error);
+  //   }
+  // };
+
+
   const handleSaveCoupon = async () => {
-    try {
-      if (isEditing) {
-        // Call PUT update API (you can implement later)
-        return;
+  try {
+    const payload = {
+      couponName: currentCoupon.name,
+      couponCode: currentCoupon.code,
+      serviceType: currentCoupon.serviceType,
+      discountType: currentCoupon.discountType === "percentage" ? "Percentage" : "Fixed Amount",
+      discountPercentage: currentCoupon.discountType === "percentage" ? currentCoupon.discountPercentage : undefined,
+      discountAmount: currentCoupon.discountType === "fixed" ? currentCoupon.discountAmount : undefined,
+      startDate: new Date(currentCoupon.startDate).toISOString(),
+      expiryDate: new Date(currentCoupon.expiryDate).toISOString(),
+      status: currentCoupon.isActive ? "Active" : "Inactive",
+      // minOrderAmount: currentCoupon.minOrderAmount || 0,
+      // maxUsage: currentCoupon.maxUsage || 1,
+    };
+
+    let res;
+
+    if (isEditing) {
+      // Assuming you have currentCoupon.id
+      res = await axiosInstance.put(`/auth/update-coupon/${currentCoupon.id}`, payload);
+
+      if (res.status === 200) {
+        toast({
+          title: "Coupon Updated",
+          description: `${res.data.data.couponName} has been updated successfully.`,
+        });
       }
-
-      const payload = {
-        couponName: currentCoupon.name,
-        couponCode: currentCoupon.code,
-        // minOrderAmount: currentCoupon.minOrderAmount || 0,
-        serviceType: currentCoupon.serviceType,
-        discountType: currentCoupon.discountType === "percentage" ? "Percentage" : "Fixed Amount",
-        discountPercentage: currentCoupon.discountType === "percentage" ? currentCoupon.discountPercentage : undefined,
-        discountAmount: currentCoupon.discountType === "fixed" ? currentCoupon.discountAmount : undefined,
-        startDate: new Date(currentCoupon.startDate).toISOString(),
-        expiryDate: new Date(currentCoupon.expiryDate).toISOString(),
-        status: currentCoupon.isActive ? "Active" : "Inactive",
-        // maxUsage: currentCoupon.maxUsage || 1,
-      };
-
-      const res = await axiosInstance.post("/auth/create-coupon", payload);
+    } else {
+      res = await axiosInstance.post("/auth/create-coupon", payload);
 
       if (res.status === 200 || res.status === 201) {
         toast({
           title: "Coupon Created",
           description: `${res.data.data.couponName} has been added successfully.`,
         });
-
-        setIsDialogOpen(false);
-        // fetchCoupons();
       }
-    } catch (error: any) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to create coupon.";
-
-      toast({
-        title: "Error",
-        description: message,
-        variant: "destructive",
-      });
-
-      console.error("Coupon creation failed:", error.response || error);
     }
-  };
+
+    setIsDialogOpen(false);
+    // fetchCoupons(); // Refresh after update or create
+  } catch (error: any) {
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to save coupon.";
+
+    toast({
+      title: "Error",
+      description: message,
+      variant: "destructive",
+    });
+
+    console.error("Coupon save failed:", error.response || error);
+  }
+};
 
 
   const toggleCouponStatus = async (id: string) => {
