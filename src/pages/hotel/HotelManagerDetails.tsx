@@ -23,24 +23,24 @@ import Loader from "@/components/ui/loader";
 import NotFoundImage from "@/assets/not-found-illustration.svg";
 import AmenitiesMultiSelect from "@/components/ui/amenitiesMultiSelect";
 import { FileText } from "lucide-react";
-
+import BranchSelect from "@/components/branch-select/BranchSelect";
 
 const HotelManagerDetails = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
 
   const modeParam = searchParams.get("mode");
-  const mode = modeParam === "post"
-    ? "post"
-    : modeParam === "edit"
-      ? "edit"
-      : "view";
+  const mode =
+    modeParam === "post" ? "post" : modeParam === "edit" ? "edit" : "view";
 
   const isReadOnly = mode === "view";
   const navigate = useNavigate();
   const isNewManager = id === "new";
 
   const [manager, setManager] = useState<Partial<HotelManager> | null>(null);
+  const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
+    undefined
+  );
 
   const [loading, setLoading] = useState(true);
 
@@ -57,7 +57,6 @@ const HotelManagerDetails = () => {
     return map[status.toLowerCase()] ?? "Pending";
   };
 
-
   useEffect(() => {
     const fetchOperator = async () => {
       if (isNewManager) {
@@ -65,6 +64,7 @@ const HotelManagerDetails = () => {
           id: "new",
           profilePhoto: "",
           name: "",
+          branch: "",
           mobile: "",
           email: "",
           status: "Pending",
@@ -76,7 +76,9 @@ const HotelManagerDetails = () => {
       }
 
       try {
-        const response = await axiosInstance.get(`/hotel-management/hotel-managers/hotel/${id}`);
+        const response = await axiosInstance.get(
+          `/hotel-management/hotel-managers/hotel/${id}`
+        );
         console.log("API Response:", response.data);
 
         const hotelData = response.data?.data?.hotel || null;
@@ -92,7 +94,6 @@ const HotelManagerDetails = () => {
         const luxuryRoom = response.data?.data?.luxuryRoom || null;
         const hotelPolicy = response.data?.data?.policy || null;
 
-
         if (managerData) {
           setManager({
             id: managerData._id || "",
@@ -100,13 +101,14 @@ const HotelManagerDetails = () => {
             name: managerData.fullName || "",
             mobile: managerData.phoneNumber || "",
             email: managerData.email || "",
+            branch: managerData?.branch?.name || "",
             companyName: managerData.companyName || "",
             companyAddress: managerData.companyAddress || "",
             status: toTitleCaseStatus(apiStatus),
             // Hotel Details
             hotelName: hotelData?.hotelName || "",
             businessLicense: hotelData?.businessLicense || "",
-            hotelPhotos: hotelData?.images?.map(img => img.url) || [],
+            hotelPhotos: hotelData?.images?.map((img) => img.url) || [],
             // Hotel Address
             city: hotelAddress?.townCity || "",
             locality: hotelAddress?.locality || "",
@@ -117,26 +119,26 @@ const HotelManagerDetails = () => {
             // Room Type
             standardRooms: standardRoom
               ? {
-                numberOfRooms: parseInt(standardRoom.numberOfRoom, 10) || 0,
-                price: standardRoom.roomPrice,
-                amenities: standardRoom.amenities?.map(a => a.name) || [],
-                photos: standardRoom.images?.map(img => img.url) || []
-              }
+                  numberOfRooms: parseInt(standardRoom.numberOfRoom, 10) || 0,
+                  price: standardRoom.roomPrice,
+                  amenities: standardRoom.amenities?.map((a) => a.name) || [],
+                  photos: standardRoom.images?.map((img) => img.url) || [],
+                }
               : { numberOfRooms: 0, price: 0, amenities: [], photos: [] },
 
             luxuryRooms: luxuryRoom
               ? {
-                numberOfRooms: parseInt(luxuryRoom.numberOfRoom, 10) || 0,
-                price: luxuryRoom.roomPrice,
-                amenities: luxuryRoom.amenities?.map(a => a.name) || [],
-                photos: luxuryRoom.images?.map(img => img.url) || []
-              }
+                  numberOfRooms: parseInt(luxuryRoom.numberOfRoom, 10) || 0,
+                  price: luxuryRoom.roomPrice,
+                  amenities: luxuryRoom.amenities?.map((a) => a.name) || [],
+                  photos: luxuryRoom.images?.map((img) => img.url) || [],
+                }
               : { numberOfRooms: 0, price: 0, amenities: [], photos: [] },
 
             // Policy Info
             checkInTime: hotelPolicy?.checkInTime,
             checkOutTime: hotelPolicy?.checkOutTime,
-            amenities: hotelPolicy?.amenities?.map(a => a.name) || [],
+            amenities: hotelPolicy?.amenities?.map((a) => a.name) || [],
             policyDocuments: hotelPolicy?.uploadDocuments || [],
 
             // Bank Details
@@ -164,19 +166,22 @@ const HotelManagerDetails = () => {
     fetchOperator();
   }, [id, isNewManager]);
 
-  useEffect(() => {
-    console.log("Policy docs after state update:", manager?.policyDocuments);
-  }, [manager]);
-
-
+  // useEffect(() => {
+  //   console.log("Policy docs after state update:", manager?.policyDocuments);
+  // }, [manager]);
 
   const handleChange = (field: keyof HotelManager, value: any) => {
     setManager((prev) => ({ ...prev, [field]: value }));
   };
 
-
-
-  const uploadImage = async (file: File): Promise<{ public_id: string; url: string; fileName: string; fileType: string }> => {
+  const uploadImage = async (
+    file: File
+  ): Promise<{
+    public_id: string;
+    url: string;
+    fileName: string;
+    fileType: string;
+  }> => {
     const formData = new FormData();
     formData.append("image", file);
 
@@ -203,7 +208,7 @@ const HotelManagerDetails = () => {
   };
 
   const handleMultipleFileUpload = async (files: File[]) => {
-    return await Promise.all(files.map(file => uploadImage(file)));
+    return await Promise.all(files.map((file) => uploadImage(file)));
   };
 
   // When handling upload
@@ -214,7 +219,6 @@ const HotelManagerDetails = () => {
     handleChange("policyDocuments", updatedDocs);
   };
 
-
   const handleSubmit = async () => {
     try {
       const payload = {
@@ -222,6 +226,7 @@ const HotelManagerDetails = () => {
           fullName: manager.name,
           email: manager.email,
           phoneNumber: manager.mobile,
+          branch: selectedBranch,
           companyName: manager.companyName,
           companyAddress: manager.companyAddress,
           avatar: manager.profilePhoto ? { url: manager.profilePhoto } : null,
@@ -249,14 +254,16 @@ const HotelManagerDetails = () => {
         roomInfo: {
           standardRoomCount: manager.standardRooms?.numberOfRooms || 0,
           standardRoomPrice: manager.standardRooms?.price || 0,
-          standardAmenities: (manager.standardRooms?.amenities || []).map(a => ({
-            name: a,
-            status: true,
-          })),
+          standardAmenities: (manager.standardRooms?.amenities || []).map(
+            (a) => ({
+              name: a,
+              status: true,
+            })
+          ),
           standardImages: manager.standardRooms?.photos || [],
           luxuryRoomCount: manager.luxuryRooms?.numberOfRooms || 0,
           luxuryRoomPrice: manager.luxuryRooms?.price || 0,
-          luxuryAmenities: (manager.luxuryRooms?.amenities || []).map(a => ({
+          luxuryAmenities: (manager.luxuryRooms?.amenities || []).map((a) => ({
             name: a,
             status: true,
           })),
@@ -265,7 +272,10 @@ const HotelManagerDetails = () => {
         policyInfo: {
           checkInTime: manager.checkInTime,
           checkOutTime: manager.checkOutTime,
-          amenities: (manager.amenities || []).map(a => ({ name: a, status: true })),
+          amenities: (manager.amenities || []).map((a) => ({
+            name: a,
+            status: true,
+          })),
           uploadDocuments: manager.policyDocuments || [],
         },
       };
@@ -273,9 +283,15 @@ const HotelManagerDetails = () => {
       console.log("Payload being sent:", JSON.stringify(payload, null, 2));
 
       if (mode === "post") {
-        await axiosInstance.post("/hotel-management/hotel-managers/register", payload);
+        await axiosInstance.post(
+          "/hotel-management/hotel-managers/register",
+          payload
+        );
       } else if (mode === "edit") {
-        await axiosInstance.put(`/hotel-management/hotel-manager/update/${id}`, payload);
+        await axiosInstance.put(
+          `/hotel-management/hotel-manager/update/${id}`,
+          payload
+        );
       }
 
       toast({
@@ -294,18 +310,13 @@ const HotelManagerDetails = () => {
     }
   };
 
-
-
   const handleStatusChange = async (value: HotelManager["status"]) => {
     try {
       setManager((prev) => ({ ...prev!, status: value }));
 
-      await axiosInstance.put(
-        `/hotel-management/hotel-managers/verify/${id}`,
-        {
-          status: value.toLowerCase(),
-        }
-      );
+      await axiosInstance.put(`/hotel-management/hotel-managers/verify/${id}`, {
+        status: value.toLowerCase(),
+      });
 
       toast({
         title: "Status Updated",
@@ -363,29 +374,30 @@ const HotelManagerDetails = () => {
         </h1>
         <div className="flex gap-2">
           {!isNewManager && (
-
             <Select
               value={manager.status}
-              onValueChange={(value: HotelManager["status"]) => handleStatusChange(value)}
+              onValueChange={(value: HotelManager["status"]) =>
+                handleStatusChange(value)
+              }
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Approved">Approved</SelectItem>
-                <SelectItem value="Processing">Processing</SelectItem>
                 <SelectItem value="Submitted">Submitted</SelectItem>
-                <SelectItem value="Rejected">Rejected</SelectItem>
-                <SelectItem value="Blocked">Blocked</SelectItem>
                 <SelectItem value="Pending">Pending</SelectItem>
               </SelectContent>
             </Select>
-
           )}
           {/* <Button onClick={handleSubmit}>Save Changes</Button> */}
           <div className="flex gap-2">
             {mode === "view" && id !== "new" && (
-              <Button onClick={() => navigate(`/hotel-management/managers/${id}?mode=edit`)}>
+              <Button
+                onClick={() =>
+                  navigate(`/hotel-management/managers/${id}?mode=edit`)
+                }
+              >
                 Edit
               </Button>
             )}
@@ -425,8 +437,6 @@ const HotelManagerDetails = () => {
                     }}
                     multiple={false}
                   />
-
-
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Name</label>
@@ -457,6 +467,21 @@ const HotelManagerDetails = () => {
                     onChange={(e) => handleChange("email", e.target.value)}
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Choose Branch
+                  </label>
+                  {mode === "view" ? (
+                    <p className="filter-input w-full bg-gray-100">
+                      {manager.branch}
+                    </p>
+                  ) : (
+                    <BranchSelect
+                      value={selectedBranch}
+                      onChange={setSelectedBranch}
+                    />
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -465,11 +490,15 @@ const HotelManagerDetails = () => {
               <h3 className="text-lg font-semibold mb-4">Company Info</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Company Name</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Company Name
+                  </label>
                   <Input
                     disabled={isReadOnly}
                     value={manager.companyName}
-                    onChange={(e) => handleChange("companyName", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("companyName", e.target.value)
+                    }
                   />
                 </div>
                 <div>
@@ -479,7 +508,9 @@ const HotelManagerDetails = () => {
                   <Textarea
                     disabled={isReadOnly}
                     value={manager.companyAddress || ""}
-                    onChange={(e) => handleChange("companyAddress", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("companyAddress", e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -508,10 +539,11 @@ const HotelManagerDetails = () => {
                   <Input
                     disabled={isReadOnly}
                     value={manager.businessLicense || ""}
-                    onChange={(e) => handleChange("businessLicense", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("businessLicense", e.target.value)
+                    }
                   />
                 </div>
-
 
                 <div className="md:col-span-2">
                   <UploadField
@@ -523,15 +555,19 @@ const HotelManagerDetails = () => {
                         : manager.hotelPhotos
                     }
                     onChange={async (files) => {
-                      if (Array.isArray(files) && files.every(f => f instanceof File)) {
-                        const uploadedUrls = await handleMultipleFileUpload(files);
+                      if (
+                        Array.isArray(files) &&
+                        files.every((f) => f instanceof File)
+                      ) {
+                        const uploadedUrls = await handleMultipleFileUpload(
+                          files
+                        );
                         handleChange("hotelPhotos", uploadedUrls);
                       }
                     }}
                     multiple={true}
                   />
                 </div>
-
 
                 <div>
                   <label className="block text-sm font-medium mb-1">City</label>
@@ -628,7 +664,9 @@ const HotelManagerDetails = () => {
                 </div>
 
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium mb-1">Amenities</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Amenities
+                  </label>
                   <AmenitiesMultiSelect
                     value={manager.standardRooms?.amenities || []}
                     onChange={(selected) =>
@@ -645,10 +683,19 @@ const HotelManagerDetails = () => {
                   <UploadField
                     disabled={isReadOnly}
                     label="Room Photos"
-                    value={isNewManager || !manager.standardRooms?.photos ? null : manager.standardRooms?.photos}
+                    value={
+                      isNewManager || !manager.standardRooms?.photos
+                        ? null
+                        : manager.standardRooms?.photos
+                    }
                     onChange={async (files) => {
-                      if (Array.isArray(files) && files.every(f => f instanceof File)) {
-                        const uploadedUrls = await handleMultipleFileUpload(files);
+                      if (
+                        Array.isArray(files) &&
+                        files.every((f) => f instanceof File)
+                      ) {
+                        const uploadedUrls = await handleMultipleFileUpload(
+                          files
+                        );
                         handleChange("standardRooms", {
                           ...manager.standardRooms,
                           photos: uploadedUrls,
@@ -657,7 +704,6 @@ const HotelManagerDetails = () => {
                     }}
                     multiple={true}
                   />
-
                 </div>
               </div>
 
@@ -696,7 +742,9 @@ const HotelManagerDetails = () => {
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium mb-1">Amenities</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Amenities
+                  </label>
                   <AmenitiesMultiSelect
                     value={manager.luxuryRooms?.amenities || []}
                     onChange={(selected) =>
@@ -712,10 +760,19 @@ const HotelManagerDetails = () => {
                   <UploadField
                     disabled={isReadOnly}
                     label="Room Photos"
-                    value={isNewManager || !manager.luxuryRooms?.photos ? null : manager.luxuryRooms?.photos}
+                    value={
+                      isNewManager || !manager.luxuryRooms?.photos
+                        ? null
+                        : manager.luxuryRooms?.photos
+                    }
                     onChange={async (files) => {
-                      if (Array.isArray(files) && files.every(f => f instanceof File)) {
-                        const uploadedUrls = await handleMultipleFileUpload(files);
+                      if (
+                        Array.isArray(files) &&
+                        files.every((f) => f instanceof File)
+                      ) {
+                        const uploadedUrls = await handleMultipleFileUpload(
+                          files
+                        );
                         handleChange("luxuryRooms", {
                           ...manager.luxuryRooms,
                           photos: uploadedUrls,
@@ -755,8 +812,10 @@ const HotelManagerDetails = () => {
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium mb-1">Hotel Amenities</label>
-                  <AmenitiesMultiSelect
+                  <label className="block text-sm font-medium mb-1">
+                    Hotel Amenities
+                  </label>
+                  {/* <AmenitiesMultiSelect
                     value={manager.amenities || []}
                     onChange={(selected) =>
                       handleChange("amenities", {
@@ -765,34 +824,49 @@ const HotelManagerDetails = () => {
                       })
                     }
                     isReadOnly={isReadOnly}
+                  /> */}
+                  <AmenitiesMultiSelect
+                    value={manager.amenities || []}
+                    onChange={
+                      (selected) => handleChange("amenities", selected) // ✅ just pass the array
+                    }
+                    isReadOnly={isReadOnly}
                   />
                 </div>
                 <div className="col-span-2 space-y-2">
-                  {mode === "view" && manager.policyDocuments && manager.policyDocuments.length > 0 && (
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Policy Document</label>
-                      <div className="flex flex-col gap-2">
-                        {manager.policyDocuments.map((doc) => (
-                          <a
-                            key={doc._id}
-                            href={doc.fileUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-blue-600 hover:underline"
-                          >
-                            <FileText className="w-5 h-5" />
-                            <span>{doc.fileName}</span>
-                          </a>
-                        ))}
+                  {mode === "view" &&
+                    manager.policyDocuments &&
+                    manager.policyDocuments.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Policy Document
+                        </label>
+                        <div className="flex flex-col gap-2">
+                          {manager.policyDocuments.map((doc) => (
+                            <a
+                              key={doc._id}
+                              href={doc.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 text-blue-600 hover:underline"
+                            >
+                              <FileText className="w-5 h-5" />
+                              <span>{doc.fileName}</span>
+                            </a>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {mode !== "view" && (
                     <UploadField
                       disabled={isReadOnly}
                       label="Policy Documents"
-                      value={isNewManager || !manager.policyDocuments ? null : manager.policyDocuments}
+                      value={
+                        isNewManager || !manager.policyDocuments
+                          ? null
+                          : manager.policyDocuments
+                      }
                       onChange={async (file) => {
                         if (!file) return;
 
@@ -811,7 +885,6 @@ const HotelManagerDetails = () => {
                     />
                   )}
                 </div>
-
               </div>
             </CardContent>
           </Card>
@@ -828,9 +901,7 @@ const HotelManagerDetails = () => {
                   <Input
                     disabled={isReadOnly}
                     value={manager.bankName || ""}
-                    onChange={(e) =>
-                      handleChange("bankName", e.target.value)
-                    }
+                    onChange={(e) => handleChange("bankName", e.target.value)}
                   />
                 </div>
                 <div>
@@ -842,7 +913,6 @@ const HotelManagerDetails = () => {
                     value={manager.bankAccountNumber || ""}
                     onChange={(e) =>
                       handleChange("bankAccountNumber", e.target.value)
-
                     }
                   />
                 </div>
@@ -863,12 +933,15 @@ const HotelManagerDetails = () => {
                   {/* View Mode */}
                   {mode === "view" && manager.bankAccountDetails && (
                     <div>
-                      <label className="block text-sm font-medium mb-2">Bank Account Document</label>
+                      <label className="block text-sm font-medium mb-2">
+                        Bank Account Document
+                      </label>
                       <a
                         href={
                           typeof manager.bankAccountDetails === "string"
                             ? manager.bankAccountDetails
-                            : manager.bankAccountDetails.url || manager.bankAccountDetails.fileUrl
+                            : manager.bankAccountDetails.url ||
+                              manager.bankAccountDetails.fileUrl
                         }
                         target="_blank"
                         rel="noopener noreferrer"
@@ -878,7 +951,8 @@ const HotelManagerDetails = () => {
                         <span>
                           {typeof manager.bankAccountDetails === "string"
                             ? "Bank Document"
-                            : manager.bankAccountDetails.fileName || "Bank Document"}
+                            : manager.bankAccountDetails.fileName ||
+                              "Bank Document"}
                         </span>
                       </a>
                     </div>
@@ -907,15 +981,11 @@ const HotelManagerDetails = () => {
                     />
                   )}
                 </div>
-
-
-
-
               </div>
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs >
+      </Tabs>
     </>
   );
 };

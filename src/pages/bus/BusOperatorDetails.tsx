@@ -16,6 +16,7 @@ import dummyBankDetails from "@/assets/dummy-data/hdfc.jpg";
 import Loader from "@/components/ui/loader";
 import axios from "axios";
 import BranchSelect from "@/components/branch-select/BranchSelect";
+import fileUploadInstance from "@/api/fileUploadInstance";
 
 const BusOperatorDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,15 +28,16 @@ const BusOperatorDetails = () => {
   const isNewOperator = id === "new";
   const pageTitle = isNewOperator ? "Add Bus Operator" : "Edit Bus Operator";
   const [isEditMode, setIsEditMode] = useState(isNewOperator);
-  const mode: 'add' | 'view' | 'edit' = isNewOperator
-    ? 'add'
+  const mode: "add" | "view" | "edit" = isNewOperator
+    ? "add"
     : isEditMode
-      ? 'edit'
-      : 'view';
-
+    ? "edit"
+    : "view";
 
   const statusOptions = ["approved", "processing", "submitted"];
-  const [selectedBranch, setSelectedBranch] = useState<string | undefined>(undefined);
+  const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
+    undefined
+  );
   useEffect(() => {
     const fetchOperator = async () => {
       if (isNewOperator) {
@@ -45,6 +47,7 @@ const BusOperatorDetails = () => {
           companyName: "",
           mobile: "",
           email: "",
+          branch: "",
           status: "Pending",
           numberOfBuses: 0,
           profilePhoto: null,
@@ -69,7 +72,9 @@ const BusOperatorDetails = () => {
         const user = data?.user;
         const docs = data?.docs?.documentIds || [];
         const getDocUrl = (name: string) => {
-          return docs.find(doc => doc.documentName === name)?.file.url || null;
+          return (
+            docs.find((doc) => doc.documentName === name)?.file.url || null
+          );
         };
 
         if (user) {
@@ -80,6 +85,7 @@ const BusOperatorDetails = () => {
             companyName: user.companyName || "",
             mobile: user.phoneNumber || "",
             email: user.email || "",
+            branch: user.branch?.name || "",
             status: user.verificationStatus || "Pending",
             numberOfBuses: 0,
             profilePhoto: user.avatar?.url || dummyProfile,
@@ -92,9 +98,7 @@ const BusOperatorDetails = () => {
             accountHolderName: bank?.accountHolderName || "",
             bankAccountDetails: bank?.bankDocs?.url || null,
           });
-        }
-
-        else {
+        } else {
           setOperator(null);
         }
       } catch (error) {
@@ -127,8 +131,6 @@ const BusOperatorDetails = () => {
     }
   };
 
-
-
   const handleFileChange = (field: string, file: File) => {
     setOperator((prev: any) => ({
       ...prev,
@@ -140,15 +142,12 @@ const BusOperatorDetails = () => {
     const formData = new FormData();
     formData.append("image", file);
 
-    const response = await axios.post(
-      "http://139.59.20.155:8000/api/v1/file/upload",
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
+    const response = await fileUploadInstance.post("/file/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
     return response.data?.data;
   };
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,7 +190,7 @@ const BusOperatorDetails = () => {
             accountHolderName: operator?.accountHolderName,
             accountNumber: operator?.bankAccountNumber,
             bankName: operator?.bankName,
-            bankDocs: bankDocFile || {},
+            bankDocs: bankDocFile,
           },
           national_identity_card_front: {
             documentName: "National ID Front",
@@ -221,7 +220,7 @@ const BusOperatorDetails = () => {
           companyName: operator?.companyName,
           companyAddress: operator?.address,
           email: operator?.email,
-          branch: operator?.branch || "",
+          branch: selectedBranch || "",
           phoneNumber: operator?.mobile?.replace(/^\+91/, ""),
           avatar: avatarFile || {},
           accountHolderName: operator?.accountHolderName,
@@ -241,7 +240,7 @@ const BusOperatorDetails = () => {
         };
 
         await axiosInstance.put(
-          `/bus-management/bus-operators/updateBusOperator/${id}`, // replace operatorId with actual ID
+          `/bus-management/bus-operators/updateBusOperator/${id}`,
           putPayload
         );
 
@@ -266,20 +265,20 @@ const BusOperatorDetails = () => {
       console.error("Form submission failed:", error);
       toast({
         title: "Error",
-        description:
-          error?.response?.data?.message || "Failed to submit form.",
+        description: error?.response?.data?.message || "Failed to submit form.",
         variant: "destructive",
       });
     }
   };
-
 
   const handleEdit = () => {
     if (isEditMode) {
       // Trigger form submission
       const form = document.querySelector("form");
       if (form) {
-        form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+        form.dispatchEvent(
+          new Event("submit", { cancelable: true, bubbles: true })
+        );
       }
     } else {
       setIsEditMode(true);
@@ -288,9 +287,8 @@ const BusOperatorDetails = () => {
 
   // console.log("profilePhoto", operator?.profilePhoto);
 
-
   if (loading) {
-    return <Loader />
+    return <Loader />;
   }
 
   if (!operator) {
@@ -308,7 +306,6 @@ const BusOperatorDetails = () => {
       </>
     );
   }
-
 
   return (
     <>
@@ -333,7 +330,7 @@ const BusOperatorDetails = () => {
                   label="Profile Photo"
                   value={operator?.profilePhoto ?? null}
                   onChange={(file) => handleFileChange("profilePhoto", file)}
-                  showCloseButton={mode === 'edit' || mode === 'add'}
+                  showCloseButton={mode === "edit" || mode === "add"}
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -342,7 +339,9 @@ const BusOperatorDetails = () => {
                       Full Name
                     </label>
                     {mode === "view" ? (
-                      <p className="filter-input w-full bg-gray-100">{operator.name}</p>
+                      <p className="filter-input w-full bg-gray-100">
+                        {operator.name}
+                      </p>
                     ) : (
                       <input
                         type="text"
@@ -374,14 +373,14 @@ const BusOperatorDetails = () => {
                     )}
                   </div> */}
 
-
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Mobile
                     </label>
                     {mode === "view" ? (
-                      <p className="filter-input w-full bg-gray-100">{operator.mobile}</p>
+                      <p className="filter-input w-full bg-gray-100">
+                        {operator.mobile}
+                      </p>
                     ) : (
                       <input
                         type="text"
@@ -400,7 +399,9 @@ const BusOperatorDetails = () => {
                       Email ID
                     </label>
                     {mode === "view" ? (
-                      <p className="filter-input w-full bg-gray-100">{operator.email}</p>
+                      <p className="filter-input w-full bg-gray-100">
+                        {operator.email}
+                      </p>
                     ) : (
                       <input
                         type="email"
@@ -419,7 +420,9 @@ const BusOperatorDetails = () => {
                       Status
                     </label>
                     {mode === "view" ? (
-                      <p className="filter-input w-full bg-gray-100">{operator.status}</p>
+                      <p className="filter-input w-full bg-gray-100">
+                        {operator.status}
+                      </p>
                     ) : (
                       <select
                         name="status"
@@ -437,11 +440,18 @@ const BusOperatorDetails = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Choose Branch</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Choose Branch
+                    </label>
                     {mode === "view" ? (
-                      <p className="filter-input w-full bg-gray-100">{operator.branch}</p>
+                      <p className="filter-input w-full bg-gray-100">
+                        {operator.branch}
+                      </p>
                     ) : (
-                      <BranchSelect value={selectedBranch} onChange={setSelectedBranch} />
+                      <BranchSelect
+                        value={selectedBranch}
+                        onChange={setSelectedBranch}
+                      />
                     )}
                   </div>
                 </div>
@@ -452,38 +462,15 @@ const BusOperatorDetails = () => {
             <div className="form-section col-span-full">
               <h2 className="form-section-title">Company Information</h2>
               <div className="grid grid-cols-1 gap-4">
-                {/* <UploadField
-                  label="Profile Photo"
-                  value={operator?.profilePhoto ?? null}
-                  onChange={(file) => handleFileChange("profilePhoto", file)}
-                  showCloseButton={mode === 'edit' || mode === 'add'}
-                /> */}
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Name
-                    </label>
-                    {mode === "view" ? (
-                      <p className="filter-input w-full bg-gray-100">{operator.name}</p>
-                    ) : (
-                      <input
-                        type="text"
-                        name="name"
-                        value={operator.name}
-                        onChange={handleInputChange}
-                        className="filter-input w-full"
-                        style={{ outline: "none" }}
-                        required
-                      />
-                    )}
-                  </div> */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Company Name
                     </label>
                     {mode === "view" ? (
-                      <p className="filter-input w-full bg-gray-100">{operator.companyName}</p>
+                      <p className="filter-input w-full bg-gray-100">
+                        {operator.companyName}
+                      </p>
                     ) : (
                       <input
                         type="text"
@@ -511,73 +498,17 @@ const BusOperatorDetails = () => {
                         <textarea
                           name="address"
                           value={operator.address || ""}
-                          onChange={(e) => setOperator({ ...operator, address: e.target.value })}
+                          onChange={(e) =>
+                            setOperator({
+                              ...operator,
+                              address: e.target.value,
+                            })
+                          }
                           className="filter-input w-full h-24"
                         />
                       )}
                     </div>
                   </div>
-
-
-                  {/* <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Mobile
-                    </label>
-                    {mode === "view" ? (
-                      <p className="filter-input w-full bg-gray-100">{operator.mobile}</p>
-                    ) : (
-                      <input
-                        type="text"
-                        name="mobile"
-                        value={operator.mobile}
-                        onChange={handleInputChange}
-                        className="filter-input w-full"
-                        style={{ outline: "none" }}
-                        required
-                      />
-                    )}
-                  </div> */}
-
-                  {/* <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email ID
-                    </label>
-                    {mode === "view" ? (
-                      <p className="filter-input w-full bg-gray-100">{operator.email}</p>
-                    ) : (
-                      <input
-                        type="email"
-                        name="email"
-                        value={operator.email}
-                        onChange={handleInputChange}
-                        className="filter-input w-full"
-                        style={{ outline: "none" }}
-                        required
-                      />
-                    )}
-                  </div> */}
-
-                  {/* <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Status
-                    </label>
-                    {mode === "view" ? (
-                      <p className="filter-input w-full bg-gray-100">{operator.status}</p>
-                    ) : (
-                      <select
-                        name="status"
-                        value={operator.status}
-                        onChange={handleInputChange}
-                        className="filter-select w-full"
-                      >
-                        {statusOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  </div> */}
                 </div>
               </div>
             </div>
@@ -612,14 +543,14 @@ const BusOperatorDetails = () => {
                   label="ID Card Front"
                   value={operator.idCardFront}
                   onChange={(file) => handleFileChange("idCardFront", file)}
-                  showCloseButton={mode === 'edit' || mode === 'add'}
+                  showCloseButton={mode === "edit" || mode === "add"}
                 />
 
                 <UploadField
                   label="ID Card Back"
                   value={operator.idCardBack}
                   onChange={(file) => handleFileChange("idCardBack", file)}
-                  showCloseButton={mode === 'edit' || mode === 'add'}
+                  showCloseButton={mode === "edit" || mode === "add"}
                 />
               </div>
             </div>
@@ -680,7 +611,9 @@ const BusOperatorDetails = () => {
                   <UploadField
                     label="Bank Account Details"
                     value={operator.bankAccountDetails}
-                    onChange={(file) => handleFileChange("bankAccountDetails", file)}
+                    onChange={(file) =>
+                      handleFileChange("bankAccountDetails", file)
+                    }
                     showCloseButton
                     disabled={false}
                   />
@@ -689,34 +622,19 @@ const BusOperatorDetails = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Bank Account Details
                     </label>
-                    {/* <a
-                      href={operator.bankAccountDetails}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      View Uploaded Document
-                    </a> */}
-                    {/* {typeof operator.bankAccountDetails === "string" && (
-                      <a
-                        href={operator.bankAccountDetails}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline"
-                      >
-                        View Uploaded Document
-                      </a>
-                    )} */}
                     <UploadField
                       label="ID Card Back"
                       value={operator.bankAccountDetails}
-                      onChange={(file) => handleFileChange("bankAccountDetails", file)}
-                      showCloseButton={mode === 'edit' || mode === 'add'}
+                      onChange={(file) =>
+                        handleFileChange("bankAccountDetails", file)
+                      }
+                      showCloseButton={mode === "edit" || mode === "add"}
                     />
-
                   </div>
                 ) : (
-                  <div className="text-sm text-gray-500 italic">No bank document uploaded.</div>
+                  <div className="text-sm text-gray-500 italic">
+                    No bank document uploaded.
+                  </div>
                 )}
               </div>
             </div>
@@ -752,11 +670,9 @@ const BusOperatorDetails = () => {
                 </button>
               )}
             </div>
-
           </div>
         </form>
       </div>
-
     </>
   );
 };

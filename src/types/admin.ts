@@ -41,6 +41,7 @@ export interface BusOperator {
   name: string;
   companyName: string;
   email: string;
+  branch?: string;
   mobile?: string;
   phone?: string;
   address?: string;
@@ -121,6 +122,7 @@ export interface HotelManager {
   companyName: string;
   companyAddress: string;
   email: string;
+  branch?: string;
   mobile?: string;
   phone?: string;
   address?: string;
@@ -189,6 +191,7 @@ export interface TaxiDriver {
   driverId?: string;
   name: string;
   email: string;
+  branch?: string;
   mobile?: string;
   phone?: string;
   licenseNumber?: string;

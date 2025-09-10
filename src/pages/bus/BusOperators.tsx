@@ -15,22 +15,27 @@ const BusOperators = () => {
   const navigate = useNavigate();
   const [operators, setOperators] = useState<BusOperator[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalBusOperators, setTotalBusOperators] = useState(0);
 
   useEffect(() => {
     const loadBusOperators = async () => {
       try {
-        const data = await fetchBusOperators();
+        const { data, total } = await fetchBusOperators(currentPage, pageSize);
         setOperators(data);
+        setTotalBusOperators(total);
       } catch (error) {
         console.error("Failed to fetch bus operators", error);
         setOperators(busOperators);
+        setTotalBusOperators(busOperators.length);
       } finally {
         setLoading(false);
       }
     };
 
     loadBusOperators();
-  }, []);
+  }, [currentPage, pageSize]);
 
   const columns = [
     { key: "name" as keyof BusOperator, header: "Name" },
@@ -118,6 +123,11 @@ const BusOperators = () => {
         columns={columns}
         data={operators}
         loading={loading}
+        paginate={true}
+        pageSize={pageSize}
+        currentPage={currentPage}
+        totalItems={totalBusOperators}
+        onPageChange={(page) => setCurrentPage(page)}
         keyExtractor={(item) => item.id}
         onRowClick={handleRowClick}
         filterOptions={filterOptions}

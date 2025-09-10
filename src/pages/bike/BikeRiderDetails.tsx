@@ -1,38 +1,45 @@
-
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
 // import Layout from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from '@/hooks/use-toast';
-import { TaxiDriver } from '@/types/admin';
-import UploadField from '@/components/ui/UploadField';
-import axiosInstance from '@/api/axiosInstance';
-import fileUploadInstance from '@/api/fileUploadInstance';
-import BranchSelect from '@/components/branch-select/BranchSelect';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "@/hooks/use-toast";
+import { TaxiDriver } from "@/types/admin";
+import UploadField from "@/components/ui/UploadField";
+import axiosInstance from "@/api/axiosInstance";
+import fileUploadInstance from "@/api/fileUploadInstance";
+import BranchSelect from "@/components/branch-select/BranchSelect";
 
 const BikeRiderDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const initialMode = id === 'new' ? 'post' : 'view';
-  const [mode, setMode] = useState<'post' | 'view' | 'edit'>(initialMode);
+  const initialMode = id === "new" ? "post" : "view";
+  const [mode, setMode] = useState<"post" | "view" | "edit">(initialMode);
 
   const [driver, setDriver] = useState<TaxiDriver>({
-    id: '',
-    name: '',
-    mobile: '',
-    email: '',
-    status: 'Approved',
-    vehicleType: '',
+    id: "",
+    name: "",
+    mobile: "",
+    email: "",
+    status: "Approved",
+    vehicleType: "",
   });
 
-  const [selectedBranch, setSelectedBranch] = useState<string | undefined>(undefined);
+  const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
+    undefined
+  );
 
   // GET API
   useEffect(() => {
@@ -44,31 +51,44 @@ const BikeRiderDetails = () => {
 
           // map API response into your BikeDriver shape
           const mappedDriver: TaxiDriver = {
-            id: apiData.BikeDriverDetails?.driverId || '',
-            driverId: apiData.BikeDriverDetails?.driverId || '',
-            name: apiData.BikeDriverDetails?.name || '',
-            email: apiData.BikeDriverDetails?.email || '',
-            mobile: apiData.BikeDriverDetails?.mobile || '',
-            status: apiData.BikeDriverDetails?.status || '',
+            id: apiData.BikeDriverDetails?.driverId || "",
+            driverId: apiData.BikeDriverDetails?.driverId || "",
+            name: apiData.BikeDriverDetails?.name || "",
+            email: apiData.BikeDriverDetails?.email || "",
+            mobile: apiData.BikeDriverDetails?.mobile || "",
+            branch: apiData.BikeDriverDetails?.branch?.name || "",
+            status: apiData.BikeDriverDetails?.status || "",
             age: apiData.BikeDriverDetails?.age || null,
             profilePhoto: apiData.documents?.avatarPhotos || null,
-            address: apiData.BikeDriverDetails?.address || '',
+            address: apiData.BikeDriverDetails?.address || "",
             experience: apiData.BikeDriverDetails?.experience || 0,
-            vehicleNumber: apiData.bikeDetails?.registrationNo || '',
-            vehicleType: apiData.bikeDetails?.vehicleType || '',
-            vehicleRegistrationNumber: apiData.bikeDetails?.registrationNo || '',
-            vehicleModel: apiData.bikeDetails?.model || '',
+            vehicleNumber: apiData.bikeDetails?.registrationNo || "",
+            vehicleType: apiData.bikeDetails?.vehicleType || "",
+            vehicleRegistrationNumber:
+              apiData.bikeDetails?.registrationNo || "",
+            vehicleModel: apiData.bikeDetails?.model || "",
             vehicleInsurance: apiData.documents?.insurance || null,
-            vehicleRegistrationCertificate: apiData.documents?.registrationCertificate || null,
-            vehiclePhotos: apiData.documents?.vehicleBikePhotos ? [apiData.documents.vehicleBikePhotos] : [],
-            idProofs: apiData.documents?.idCard?.fileUrl || apiData.documents?.idCard?.fileName || "No ID Proof uploaded",
+            vehicleRegistrationCertificate:
+              apiData.documents?.registrationCertificate || null,
+            vehiclePhotos: apiData.documents?.vehicleBikePhotos
+              ? [apiData.documents.vehicleBikePhotos]
+              : [],
+            idProofs:
+              apiData.documents?.idCard?.fileUrl ||
+              apiData.documents?.idCard?.fileName ||
+              "No ID Proof uploaded",
             // driverLicense: apiData.documents?.driverLicense?.fileUrl || apiData.documents?.driverLicense?.fileName || "No Driver License uploaded",
-            driverLicense: apiData.documents?.license?.fileUrl || "No Driver License uploaded",
-            accountNumber: apiData.bankDetails?.accountNumber || '',
-            accountHolderName: apiData.bankDetails?.holderName || '',
-            bankAccountDetails: apiData?.bankDetails?.document?.fileUrl || "No Bank Account Details uploaded",
+            driverLicense:
+              apiData.documents?.license?.fileUrl ||
+              "No Driver License uploaded",
+            accountNumber: apiData.bankDetails?.accountNumber || "",
+            accountHolderName: apiData.bankDetails?.holderName || "",
+            bankAccountDetails:
+              apiData?.bankDetails?.document?.fileUrl ||
+              "No Bank Account Details uploaded",
           };
           setDriver(mappedDriver);
+          console.log("Branch name:", apiData.BikeDriverDetails?.branch?.name);
         })
         .catch((err) => {
           console.error("Error fetching driver:", err);
@@ -77,7 +97,7 @@ const BikeRiderDetails = () => {
   }, [id]);
 
   const handleChange = (field: keyof TaxiDriver, value: any) => {
-    setDriver(prev => ({ ...prev, [field]: value }));
+    setDriver((prev) => ({ ...prev, [field]: value }));
   };
 
   // Upload Files to Server
@@ -142,13 +162,12 @@ const BikeRiderDetails = () => {
         const uploaded = await uploadFiles(file);
         return uploaded
           ? {
-            documentType,
-            fileUrl: uploaded.url,
-            fileName: uploaded.fileName
-          }
+              documentType,
+              fileUrl: uploaded.url,
+              fileName: uploaded.fileName,
+            }
           : null;
       }
-
 
       if (typeof file === "string") {
         return { documentType, fileUrl: file, fileName: file.split("/").pop() };
@@ -160,7 +179,6 @@ const BikeRiderDetails = () => {
 
       return null;
     };
-
 
     // Uploads
     const profilePhoto = await uploadOrReturn(driver.profilePhoto, "avatar");
@@ -183,9 +201,9 @@ const BikeRiderDetails = () => {
 
     const vehicleRegistrationCertificate = driver.vehicleRegistrationCertificate
       ? await uploadOrReturn(
-        driver.vehicleRegistrationCertificate,
-        "registration"
-      )
+          driver.vehicleRegistrationCertificate,
+          "registration"
+        )
       : null;
 
     const bankAccountDetails = driver.bankAccountDetails
@@ -241,10 +259,10 @@ const BikeRiderDetails = () => {
         const uploaded = await uploadFiles(file);
         return uploaded
           ? {
-            fileUrl: uploaded.fileUrl,
-            fileName: uploaded.fileName || file.name,
-            documentType,
-          }
+              fileUrl: uploaded.fileUrl,
+              fileName: uploaded.fileName || file.name,
+              documentType,
+            }
           : null;
       }
 
@@ -262,7 +280,10 @@ const BikeRiderDetails = () => {
         return {
           fileUrl: file.fileUrl || file.url, // ✅ supports both keys
           fileName:
-            file.fileName || file.fileUrl?.split("/").pop() || file.url?.split("/").pop() || "unknown",
+            file.fileName ||
+            file.fileUrl?.split("/").pop() ||
+            file.url?.split("/").pop() ||
+            "unknown",
           documentType,
         };
       }
@@ -289,9 +310,9 @@ const BikeRiderDetails = () => {
 
     const vehicleRegistrationCertificate = driver.vehicleRegistrationCertificate
       ? await uploadOrReturn(
-        driver.vehicleRegistrationCertificate,
-        "registration"
-      )
+          driver.vehicleRegistrationCertificate,
+          "registration"
+        )
       : null;
 
     const bankAccountDetails = driver.bankAccountDetails
@@ -306,6 +327,7 @@ const BikeRiderDetails = () => {
         age: driver.age || null,
         experience: driver.experience || 0,
         address: driver.address || "",
+        branch: selectedBranch || "",
       },
       bankDetails: {
         accountNumber: driver.accountNumber || "",
@@ -332,9 +354,11 @@ const BikeRiderDetails = () => {
     try {
       if (mode === "post") {
         const payload = await buildDriverPayload(driver);
-        await axiosInstance.post("/driver-management/bike-drivers/register", payload);
-      }
-      else if (mode === "edit") {
+        await axiosInstance.post(
+          "/driver-management/bike-drivers/register",
+          payload
+        );
+      } else if (mode === "edit") {
         try {
           // 1. Build payload for driver update
           const payload = await buildPutDriverPayload(driver);
@@ -368,21 +392,23 @@ const BikeRiderDetails = () => {
     }
   };
 
-  const isReadOnly = mode === 'view';
+  const isReadOnly = mode === "view";
 
   return (
     <>
       <Button
         variant="ghost"
         className="mb-4"
-        onClick={() => navigate('/bike-management/riders')}
+        onClick={() => navigate("/bike-management/riders")}
       >
         <ChevronLeft className="mr-2 h-4 w-4" /> Back to Bike Drivers
       </Button>
 
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">
-          {mode === 'post' ? 'Add New Bike Driver' : `Bike Driver: ${driver.name}`}
+          {mode === "post"
+            ? "Add New Bike Driver"
+            : `Bike Driver: ${driver.name}`}
         </h1>
         <div className="flex gap-2">
           {/* status handling */}
@@ -405,7 +431,6 @@ const BikeRiderDetails = () => {
                 <SelectItem value="inactive">Inactive</SelectItem>
               </SelectContent>
             </Select>
-
           )}
 
           {/* action buttons */}
@@ -418,8 +443,7 @@ const BikeRiderDetails = () => {
             </Button>
           )}
         </div>
-
-      </div >
+      </div>
 
       <Tabs defaultValue="personal" className="w-full">
         <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-4 mb-4">
@@ -451,7 +475,7 @@ const BikeRiderDetails = () => {
 
                       // Store as FileObject
                       handleChange("profilePhoto", {
-                        fileUrl: uploaded.url,       // backend expects this
+                        fileUrl: uploaded.url, // backend expects this
                         fileName: uploaded.fileName, // backend expects this
                       });
                     }}
@@ -462,7 +486,7 @@ const BikeRiderDetails = () => {
                   <Input
                     value={driver.name}
                     disabled={isReadOnly}
-                    onChange={(e) => handleChange('name', e.target.value)}
+                    onChange={(e) => handleChange("name", e.target.value)}
                   />
                 </div>
                 <div>
@@ -470,37 +494,56 @@ const BikeRiderDetails = () => {
                   <Input
                     type="number"
                     disabled={isReadOnly}
-                    value={driver.age || ''}
-                    onChange={(e) => handleChange('age', parseInt(e.target.value) || '')}
+                    value={driver.age || ""}
+                    onChange={(e) =>
+                      handleChange("age", parseInt(e.target.value) || "")
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Mobile</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Mobile
+                  </label>
                   <Input
                     value={driver.mobile}
                     disabled={isReadOnly}
-                    onChange={(e) => handleChange('mobile', e.target.value)}
+                    onChange={(e) => handleChange("mobile", e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Email</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Email
+                  </label>
                   <Input
                     value={driver.email}
                     disabled={isReadOnly}
-                    onChange={(e) => handleChange('email', e.target.value)}
+                    onChange={(e) => handleChange("email", e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Address</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Address
+                  </label>
                   <Textarea
                     disabled={isReadOnly}
-                    value={driver.address || ''}
-                    onChange={(e) => handleChange('address', e.target.value)}
+                    value={driver.address || ""}
+                    onChange={(e) => handleChange("address", e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Choose Branch</label>
-                  <BranchSelect value={selectedBranch} onChange={setSelectedBranch} />
+                  <label className="block text-sm font-medium mb-1">
+                    Choose Branch
+                  </label>
+                  {mode === "view" ? (
+                    <p className="filter-input w-full bg-gray-100">
+                      {driver.branch}
+                    </p>
+                  ) : (
+                    <BranchSelect
+                      value={selectedBranch}
+                      onChange={setSelectedBranch}
+                    />
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -513,15 +556,19 @@ const BikeRiderDetails = () => {
             <CardContent className="pt-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Years of Experience</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Years of Experience
+                  </label>
                   <Input
                     type="number"
                     disabled={isReadOnly}
                     value={driver.experience || 0}
-                    onChange={(e) => handleChange('experience', parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleChange("experience", parseInt(e.target.value) || 0)
+                    }
                   />
                 </div>
-                <div className='col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <UploadField
                       label="ID Proofs"
@@ -536,7 +583,9 @@ const BikeRiderDetails = () => {
                         value={driver.driverLicense || null}
                         disabled={isReadOnly}
                         multiple={false}
-                        onChange={(file) => handleSingleUpload(file, "driverLicense")}
+                        onChange={(file) =>
+                          handleSingleUpload(file, "driverLicense")
+                        }
                       />
                     </div>
                   </div>
@@ -552,19 +601,27 @@ const BikeRiderDetails = () => {
             <CardContent className="pt-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Vehicle Model</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Vehicle Model
+                  </label>
                   <Input
-                    value={driver.vehicleModel || ''}
+                    value={driver.vehicleModel || ""}
                     disabled={isReadOnly}
-                    onChange={(e) => handleChange('vehicleModel', e.target.value)}
+                    onChange={(e) =>
+                      handleChange("vehicleModel", e.target.value)
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Registration Number</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Registration Number
+                  </label>
                   <Input
-                    value={driver.vehicleRegistrationNumber || ''}
+                    value={driver.vehicleRegistrationNumber || ""}
                     disabled={isReadOnly}
-                    onChange={(e) => handleChange('vehicleRegistrationNumber', e.target.value)}
+                    onChange={(e) =>
+                      handleChange("vehicleRegistrationNumber", e.target.value)
+                    }
                   />
                 </div>
                 <div>
@@ -573,7 +630,9 @@ const BikeRiderDetails = () => {
                     value={driver.vehicleInsurance || null}
                     disabled={isReadOnly}
                     multiple={false}
-                    onChange={(file) => handleSingleUpload(file, "vehicleInsurance")}
+                    onChange={(file) =>
+                      handleSingleUpload(file, "vehicleInsurance")
+                    }
                   />
                 </div>
                 <div>
@@ -582,7 +641,9 @@ const BikeRiderDetails = () => {
                     value={driver.vehicleRegistrationCertificate || null}
                     disabled={isReadOnly}
                     multiple={false}
-                    onChange={(file) => handleSingleUpload(file, "vehicleRegistrationCertificate")}
+                    onChange={(file) =>
+                      handleSingleUpload(file, "vehicleRegistrationCertificate")
+                    }
                   />
                 </div>
                 <div className="col-span-2">
@@ -591,7 +652,9 @@ const BikeRiderDetails = () => {
                     value={driver.vehiclePhotos || null}
                     disabled={isReadOnly}
                     multiple={false}
-                    onChange={(file) => handleSingleUpload(file, "vehiclePhotos")}
+                    onChange={(file) =>
+                      handleSingleUpload(file, "vehiclePhotos")
+                    }
                   />
                 </div>
               </div>
@@ -605,28 +668,38 @@ const BikeRiderDetails = () => {
             <CardContent className="pt-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Account Number</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Account Number
+                  </label>
                   <Input
-                    value={driver.accountNumber || ''}
+                    value={driver.accountNumber || ""}
                     disabled={isReadOnly}
-                    onChange={(e) => handleChange('accountNumber', e.target.value)}
+                    onChange={(e) =>
+                      handleChange("accountNumber", e.target.value)
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Account Holder Name</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Account Holder Name
+                  </label>
                   <Input
-                    value={driver.accountHolderName || ''}
+                    value={driver.accountHolderName || ""}
                     disabled={isReadOnly}
-                    onChange={(e) => handleChange('accountHolderName', e.target.value)}
+                    onChange={(e) =>
+                      handleChange("accountHolderName", e.target.value)
+                    }
                   />
                 </div>
-                <div className='col-span-2'>
+                <div className="col-span-2">
                   <UploadField
                     label="Bank Account Details"
                     value={driver.bankAccountDetails || null}
                     disabled={isReadOnly}
                     multiple={false}
-                    onChange={(file) => handleSingleUpload(file, "bankAccountDetails")}
+                    onChange={(file) =>
+                      handleSingleUpload(file, "bankAccountDetails")
+                    }
                   />
                 </div>
               </div>
@@ -636,7 +709,6 @@ const BikeRiderDetails = () => {
       </Tabs>
     </>
   );
-
 };
 
 export default BikeRiderDetails;

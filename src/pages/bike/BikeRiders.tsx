@@ -67,16 +67,13 @@ const BikeRiders = () => {
   useEffect(() => {
     const fetchRiders = async () => {
       try {
-        const res = await axiosInstance.get(
-          "/driver-management/drivers",
-          {
-            params: {
-              vehicleType: "bike",
-              page: currentPage,
-              limit: pageSize,
-            },
-          }
-        );
+        const res = await axiosInstance.get("/driver-management/drivers", {
+          params: {
+            vehicleType: "bike",
+            page: currentPage,
+            limit: pageSize,
+          },
+        });
 
         const apiData = res.data.data || [];
         // setTotal(res.data.total || 0);
@@ -104,7 +101,7 @@ const BikeRiders = () => {
   }, [currentPage, pageSize]);
 
   const handleRowClick = (rider: BikeRider) => {
-    navigate(`/ bike - management / riders / ${rider.driverId}`);
+    navigate(`/bike-management/riders/${rider.driverId}`);
   };
 
   const columns = [
@@ -184,7 +181,6 @@ const BikeRiders = () => {
       )}
     </>
   );
-
 };
 
 export default BikeRiders;

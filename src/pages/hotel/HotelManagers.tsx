@@ -63,12 +63,17 @@ const HotelManagers = () => {
   const [managers, setManagers] = useState<HotelManager[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalHotelManagers, setTotalHotelManagers] = useState(0);
 
   useEffect(() => {
     const getManagers = async () => {
       try {
-        const data = await fetchHotelManagers();
+        setLoading(true);
+        const { data, total } = await fetchHotelManagers(currentPage, pageSize);
         setManagers(data);
+        setTotalHotelManagers(total);
       } catch (err) {
         console.error(err);
         setError("Failed to load hotel managers.");
@@ -78,7 +83,7 @@ const HotelManagers = () => {
     };
 
     getManagers();
-  }, []);
+  }, [currentPage, pageSize]);
 
   const handleRowClick = (manager: HotelManager) => {
     navigate(`/hotel-management/managers/${manager.id}?mode=view`);
@@ -149,6 +154,11 @@ const HotelManagers = () => {
         <DataTable
           columns={columns}
           data={managers}
+          paginate={true}
+          pageSize={pageSize}
+          currentPage={currentPage}
+          totalItems={totalHotelManagers}
+          onPageChange={(page) => setCurrentPage(page)}
           onRowClick={handleRowClick}
           keyExtractor={(item) => item.id}
           filterable={true}

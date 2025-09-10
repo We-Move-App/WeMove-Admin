@@ -18,6 +18,7 @@ import { TaxiDriver } from "@/types/admin";
 import UploadField from "@/components/ui/UploadField";
 import axiosInstance from "@/api/axiosInstance";
 import fileUploadInstance from "@/api/fileUploadInstance";
+import BranchSelect from "@/components/branch-select/BranchSelect";
 
 const TaxiDriverDetails = () => {
   const { id } = useParams();
@@ -36,6 +37,10 @@ const TaxiDriverDetails = () => {
     vehicleType: "",
   });
 
+  const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
+    undefined
+  );
+
   useEffect(() => {
     if (id && id !== "new") {
       axiosInstance
@@ -50,6 +55,7 @@ const TaxiDriverDetails = () => {
             name: apiData.TaxiDriverDetails?.name || "",
             email: apiData.TaxiDriverDetails?.email || "",
             mobile: apiData.TaxiDriverDetails?.mobile || "",
+            branch: apiData.TaxiDriverDetails?.branch?.name || "",
             status: apiData.TaxiDriverDetails?.status || "",
             age: apiData.TaxiDriverDetails?.age || null,
             profilePhoto: apiData.documents?.avatarPhotos || null,
@@ -216,6 +222,7 @@ const TaxiDriverDetails = () => {
         age: driver.age || null,
         experience: driver.experience || 0,
         address: driver.address || "",
+        branch: selectedBranch || "",
       },
       bankDetails: {
         accountNumber: driver.accountNumber || "",
@@ -368,6 +375,7 @@ const TaxiDriverDetails = () => {
         age: driver.age || null,
         experience: driver.experience || 0,
         address: driver.address || "",
+        branch: selectedBranch || "",
       },
       bankDetails: {
         accountNumber: driver.accountNumber || "",
@@ -581,6 +589,21 @@ const TaxiDriverDetails = () => {
                     value={driver.address || ""}
                     onChange={(e) => handleChange("address", e.target.value)}
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Choose Branch
+                  </label>
+                  {mode === "view" ? (
+                    <p className="filter-input w-full bg-gray-100">
+                      {driver.branch}
+                    </p>
+                  ) : (
+                    <BranchSelect
+                      value={selectedBranch}
+                      onChange={setSelectedBranch}
+                    />
+                  )}
                 </div>
               </div>
             </CardContent>
