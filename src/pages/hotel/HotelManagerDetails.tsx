@@ -233,7 +233,7 @@ const HotelManagerDetails = () => {
         },
         bankInfo: {
           accountNumber: manager.bankAccountNumber,
-          bankDocs: manager.bankAccountDetails || null,
+          bankDocs: manager.bankAccountDetails,
           bankName: manager.bankName,
           accountHolderName: manager.accountHolderName,
         },
@@ -295,8 +295,11 @@ const HotelManagerDetails = () => {
       }
 
       toast({
-        title: mode === "post" ? "Created" : "Updated",
-        description: `${manager.name}`,
+        title: mode === "post" ? "Manager Created" : "Manager Updated",
+        description:
+          mode === "post"
+            ? `The manager ${manager.name} has been successfully added.`
+            : `The details for ${manager.name} have been successfully updated.`,
       });
 
       navigate("/hotel-management/managers");

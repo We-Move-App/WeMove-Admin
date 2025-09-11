@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "@/api/authApi";
 import loginBg from "@/assets/login-bg.png";
 import { Eye, EyeOff } from "lucide-react";
-import { toast } from '@/hooks/use-toast';
+import { toast } from "@/hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,39 +13,13 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //   if (!email || !password) {
-  //     alert("Please enter email and password");
-  //     return;
-  //   }
-
-  //   try {
-  //     setLoading(true);
-  //     const result = await loginUser({ username: email, password });
-  //     console.log("Login Success:", result);
-  //     const { accessToken, refreshToken } = result.data;
-  //     localStorage.setItem("accessToken", accessToken);
-  //     localStorage.setItem("refreshToken", refreshToken);
-
-  //     // Navigate to dashboard
-  //     navigate("/dashboard");
-  //   } catch (error: any) {
-  //     console.error("Login failed:", error.response?.data || error.message);
-  //     alert(error.response?.data?.message || "Login failed");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !password) {
       toast({
         title: "Invalid credentials",
-        description: "Please enter email and password",
+        description: "Please enter both email and password.",
         variant: "destructive",
       });
       return;
@@ -54,23 +28,39 @@ const Login = () => {
     try {
       setLoading(true);
       const result = await loginUser({ username: email, password });
-      console.log("Login Success:", result);
 
-      const { accessToken, refreshToken } = result.data;
+      const { accessToken, refreshToken, UserActivity } = result.data;
+
+      // Save tokens & user info
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
 
+      // decode accessToken if needed for role/permissions
+      const payload = JSON.parse(atob(accessToken.split(".")[1]));
+      localStorage.setItem("role", payload.role);
+      localStorage.setItem("permissions", JSON.stringify(payload.permissions));
+
       toast({
         title: "Login successful",
-        description: "Welcome back!",
+        description: `${UserActivity?.recentActivity?.activity} at ${UserActivity?.recentActivity?.time}`,
       });
-      navigate("/dashboard");
+
+      // Redirect based on role
+      if (payload.role === "SuperAdmin") {
+        navigate("/dashboard");
+      } else if (payload.role === "Admin") {
+        navigate("/dashboard");
+      } else if (payload.role === "SubAdmin") {
+        navigate("/dashboard");
+      } else {
+        navigate("/user-dashboard");
+      }
     } catch (error: any) {
       console.error("Login failed:", error.response?.data || error.message);
       toast({
         title: "Login failed",
-        description: "Invalid credentials",
-        variant: "destructive", // red color
+        description: error.response?.data?.message || "Invalid credentials.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -139,8 +129,9 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-2 rounded-xl text-white transition ${loading ? "bg-green-700" : "bg-green-700 hover:bg-green-900"
-              }`}
+            className={`w-full py-2 rounded-xl text-white transition ${
+              loading ? "bg-green-700" : "bg-green-700 hover:bg-green-900"
+            }`}
           >
             {loading ? "Logging in..." : "Log In"}
             {/* Log In */}

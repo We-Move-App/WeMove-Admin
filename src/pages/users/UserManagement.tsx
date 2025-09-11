@@ -1,20 +1,37 @@
-
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 // import Layout from '@/components/layout/Layout';
-import DataTable from '@/components/ui/DataTable';
-import { Eye, Plus, Check, X, ChevronLeft } from 'lucide-react';
-import { Commission, User } from '@/types/admin';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from '@/hooks/use-toast';
-import { Command, CommandGroup, CommandItem, CommandList, CommandInput } from "@/components/ui/command";
-import fileUploadInstance from '@/api/fileUploadInstance';
-import axiosInstance from '@/api/axiosInstance';
-import { permission } from 'process';
+import DataTable from "@/components/ui/DataTable";
+import { Eye, Plus, Check, X, ChevronLeft } from "lucide-react";
+import { Commission, User } from "@/types/admin";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "@/hooks/use-toast";
+import {
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  CommandInput,
+} from "@/components/ui/command";
+import fileUploadInstance from "@/api/fileUploadInstance";
+import axiosInstance from "@/api/axiosInstance";
+import { permission } from "process";
 
 // Mock user data
 // const mockUsers: User[] = [
@@ -46,17 +63,17 @@ import { permission } from 'process';
 
 // Available permissions
 const availablePermissions = [
-  { id: 'reportsAnalytics', label: 'Dashboard' },
-  { id: 'busManagement', label: 'Manage Bus Operators' },
-  { id: 'hotelManagement', label: 'Manage Hotels' },
-  { id: 'taxiManagement', label: 'Manage Taxis' },
-  { id: 'bikeManagement', label: 'Manage Bikes' },
-  { id: 'userManagement', label: 'Manage Users' },
+  { id: "reportsAnalytics", label: "Dashboard" },
+  { id: "busManagement", label: "Manage Bus Operators" },
+  { id: "hotelManagement", label: "Manage Hotels" },
+  { id: "taxiManagement", label: "Manage Taxis" },
+  { id: "bikeManagement", label: "Manage Bikes" },
+  { id: "userManagement", label: "Manage Users" },
   // { id: 'subadminManagement', label: 'Manage Sub-admins' },
-  { id: 'commissionManagement', label: 'Manage Commissions' },
-  { id: 'couponManagement', label: 'Manage Coupons' },
-  { id: 'notifications', label: 'Manage Notifications' },
-  { id: 'walletManagement', label: 'Wallet Management' } // <-- missing
+  { id: "commissionManagement", label: "Manage Commissions" },
+  { id: "couponManagement", label: "Manage Coupons" },
+  { id: "notifications", label: "Manage Notifications" },
+  { id: "walletManagement", label: "Wallet Management" }, // <-- missing
 ];
 
 const UserManagement = () => {
@@ -68,17 +85,17 @@ const UserManagement = () => {
     email: string;
     phoneNumber: string;
     // password: string;
-    role: 'Admin' | 'SubAdmin';
+    role: "Admin" | "SubAdmin";
     permissions: string[];
     branchId: string;
     branchName: string;
     adminId: string;
   }>({
-    name: '',
-    email: '',
-    phoneNumber: '',
+    name: "",
+    email: "",
+    phoneNumber: "",
     // password: '',
-    role: 'Admin',
+    role: "Admin",
     permissions: [],
     branchId: "",
     branchName: "",
@@ -88,14 +105,17 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [currentCommission, setCurrentCommission] = useState<Commission>({
-    id: '',
-    serviceType: 'Bus',
+    id: "",
+    serviceType: "Bus",
     percentage: 0,
     fixedRate: null,
-    commissionType: 'percentage',
-    effectiveFrom: new Date().toISOString().split('.')[0].slice(0, 16),
-    effectiveTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('.')[0].slice(0, 16),
-    isActive: true
+    commissionType: "percentage",
+    effectiveFrom: new Date().toISOString().split(".")[0].slice(0, 16),
+    effectiveTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+      .toISOString()
+      .split(".")[0]
+      .slice(0, 16),
+    isActive: true,
   });
   const [isEditing, setIsEditing] = useState(false);
   // const [admins, setAdmins] = useState<{ id: string; name: string }[]>([]);
@@ -115,32 +135,34 @@ const UserManagement = () => {
 
   useEffect(() => {
     const fetchAdmins = async () => {
-      setLoading(true)
+      setLoading(true);
       setError(null);
 
       try {
-        const res = await axiosInstance.get('/auth/all-admins');
-        console.log('Fetched admins:', res.data);
+        const res = await axiosInstance.get("/auth/all-admins");
+        console.log("Fetched admins:", res.data);
         const usersData = res.data?.data?.data || [];
-        setUsers(usersData.map((user: any) => ({
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          permissionsCount: user.permissionsCount,
-          createdAt: user.createdAt,
-          branch: user.branch,
-        })));
+        setUsers(
+          usersData.map((user: any) => ({
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            permissionsCount: user.permissionsCount,
+            createdAt: user.createdAt,
+            branch: user.branch,
+          }))
+        );
       } catch (err: any) {
-        console.error('Failed to fetch users:', err);
-        setError(err?.response?.data?.message || 'Failed to fetch users');
+        console.error("Failed to fetch users:", err);
+        setError(err?.response?.data?.message || "Failed to fetch users");
       } finally {
         setLoading(false);
       }
     };
 
     fetchAdmins();
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (newUser.role === "SubAdmin") {
@@ -162,13 +184,16 @@ const UserManagement = () => {
   }, [newUser.role]);
 
   const handleInputChange = (field: keyof Commission, value: any) => {
-    setCurrentCommission(prev => ({ ...prev, [field]: value }));
+    setCurrentCommission((prev) => ({ ...prev, [field]: value }));
   };
 
   const togglePermission = (permission: string) => {
-    setNewUser(prev => {
+    setNewUser((prev) => {
       if (prev.permissions.includes(permission)) {
-        return { ...prev, permissions: prev.permissions.filter(p => p !== permission) };
+        return {
+          ...prev,
+          permissions: prev.permissions.filter((p) => p !== permission),
+        };
       } else {
         return { ...prev, permissions: [...prev.permissions, permission] };
       }
@@ -176,31 +201,31 @@ const UserManagement = () => {
   };
 
   const columns = [
-    { key: 'name' as keyof User, header: 'Name' },
-    { key: 'email' as keyof User, header: 'Email' },
-    { key: 'role' as keyof User, header: 'Role' },
+    { key: "name" as keyof User, header: "Name" },
+    { key: "email" as keyof User, header: "Email" },
+    { key: "role" as keyof User, header: "Role" },
     {
-      key: 'permissions' as keyof User,
-      header: 'Permissions',
+      key: "permissions" as keyof User,
+      header: "Permissions",
       render: (user: any) => (
         <span className="text-sm">
-          {user.role === 'SuperAdmin' ? 'Full Access' : `${user.permissionsCount} permissions`}
+          {user.role === "SuperAdmin"
+            ? "Full Access"
+            : `${user.permissionsCount} permissions`}
         </span>
-      )
+      ),
     },
     // { key: 'createdAt' as keyof User, header: 'Created At' },
     {
-      key: 'branch' as keyof User,
-      header: 'Branch',
+      key: "branch" as keyof User,
+      header: "Branch",
       render: (user: any) => (
-        <span className="text-sm">
-          {user.branch?.location || 'N/A'}
-        </span>
-      )
+        <span className="text-sm">{user.branch?.location || "N/A"}</span>
+      ),
     },
     {
-      key: 'actions' as 'actions',
-      header: 'Actions',
+      key: "actions" as "actions",
+      header: "Actions",
       render: (user: User) => (
         <button
           onClick={(e) => {
@@ -212,13 +237,15 @@ const UserManagement = () => {
           <Eye size={16} className="mr-1" />
           View Details
         </button>
-      )
-    }
+      ),
+    },
   ];
   const fetchBranches = async (address: string) => {
     setLoading(true);
     try {
-      const res = await fileUploadInstance.get(`/google-search?address=${address}`);
+      const res = await fileUploadInstance.get(
+        `/google-search?address=${address}`
+      );
       if (res.data?.data) {
         // Convert string[] → {id, name}[]
         const formatted = res.data.data.map((item: string) => ({
@@ -233,7 +260,6 @@ const UserManagement = () => {
       setLoading(false);
     }
   };
-
 
   const handleAddUser = async () => {
     if (!newUser.name || !newUser.email || !newUser.phoneNumber) {
@@ -293,7 +319,7 @@ const UserManagement = () => {
       };
 
       if (newUser.role === "SubAdmin") {
-        userPayload.reportingManger = newUser.adminId; // ✅ admin id
+        userPayload.reportingManger = newUser.adminId;
       }
 
       console.log("Creating user with payload:", userPayload);
@@ -333,8 +359,6 @@ const UserManagement = () => {
     }
   };
 
-
-
   const handleRowClick = (user: User) => {
     navigate(`/user-management/${user.id}`);
   };
@@ -344,7 +368,9 @@ const UserManagement = () => {
       <div className="mb-6 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">Role Management</h1>
-          <p className="text-gray-600">Manage admin, sub-admin roles and their permissions</p>
+          <p className="text-gray-600">
+            Manage admin, sub-admin roles and their permissions
+          </p>
         </div>
 
         <Button
@@ -361,7 +387,7 @@ const UserManagement = () => {
         data={users}
         keyExtractor={(item) => item.id}
         onRowClick={handleRowClick}
-      // searchable={true}
+        // searchable={true}
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -374,7 +400,9 @@ const UserManagement = () => {
               <label className="text-sm font-medium">Name</label>
               <Input
                 value={newUser.name}
-                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, name: e.target.value })
+                }
                 placeholder="Enter full name"
               />
             </div>
@@ -383,7 +411,9 @@ const UserManagement = () => {
               <label className="text-sm font-medium">Mobile Number</label>
               <Input
                 value={newUser.phoneNumber}
-                onChange={(e) => setNewUser({ ...newUser, phoneNumber: e.target.value })}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, phoneNumber: e.target.value })
+                }
                 placeholder="Enter mobile number"
               />
             </div>
@@ -393,7 +423,9 @@ const UserManagement = () => {
               <Input
                 type="email"
                 value={newUser.email}
-                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, email: e.target.value })
+                }
                 placeholder="Enter email address"
               />
             </div>
@@ -402,7 +434,9 @@ const UserManagement = () => {
               <label className="text-sm font-medium">Role</label>
               <Select
                 value={newUser.role}
-                onValueChange={(value: 'Admin' | 'SubAdmin') => setNewUser({ ...newUser, role: value })}
+                onValueChange={(value: "Admin" | "SubAdmin") =>
+                  setNewUser({ ...newUser, role: value })
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -420,7 +454,9 @@ const UserManagement = () => {
                 <Select
                   value={newUser.adminId || ""}
                   onValueChange={(value) => {
-                    const selectedAdmin = admins.find((admin) => admin._id === value);
+                    const selectedAdmin = admins.find(
+                      (admin) => admin._id === value
+                    );
                     if (selectedAdmin) {
                       console.log("Admin ID:", selectedAdmin._id);
                       console.log("Branch ID:", selectedAdmin.branch.branchId);
@@ -452,7 +488,6 @@ const UserManagement = () => {
                 </Select>
               </div>
             )}
-
 
             {newUser.role === "Admin" && (
               <div className="space-y-2">
@@ -487,23 +522,30 @@ const UserManagement = () => {
                   </CommandList>
                 </Command>
                 {newUser.branchName && (
-                  <p className="text-xs text-gray-400">Selected: {newUser.branchName}</p>
+                  <p className="text-xs text-gray-400">
+                    Selected: {newUser.branchName}
+                  </p>
                 )}
               </div>
             )}
-
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Permissions</label>
               <div className="border rounded-md p-4 max-h-48 overflow-y-auto">
                 <div className="space-y-2">
                   {availablePermissions.map((permission) => {
-                    const isDashboard = permission.id === 'reportsAnalytics';
+                    const isDashboard = permission.id === "reportsAnalytics";
                     return (
-                      <div key={permission.id} className="flex items-center space-x-2">
+                      <div
+                        key={permission.id}
+                        className="flex items-center space-x-2"
+                      >
                         <Checkbox
                           id={`permission-${permission.id}`}
-                          checked={isDashboard || newUser.permissions.includes(permission.id)}
+                          checked={
+                            isDashboard ||
+                            newUser.permissions.includes(permission.id)
+                          }
                           disabled={isDashboard}
                           onCheckedChange={() => {
                             if (!isDashboard) togglePermission(permission.id);
@@ -518,13 +560,14 @@ const UserManagement = () => {
                       </div>
                     );
                   })}
-
                 </div>
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
             <Button onClick={handleAddUser}>Add Admin / Sub-admin</Button>
           </DialogFooter>
         </DialogContent>

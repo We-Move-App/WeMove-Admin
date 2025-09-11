@@ -5,7 +5,7 @@ const axiosInstance = axios.create({
   baseURL: "http://139.59.20.155:8000/api/v1/admin",
   // Local URL
   // baseURL:
-  //   "https://appliance-described-valve-obviously.trycloudflare.com/api/v1/admin",
+  //   "https://butler-controversial-feature-uniform.trycloudflare.com/api/v1/admin",
 
   headers: {
     "Content-Type": "application/json",
