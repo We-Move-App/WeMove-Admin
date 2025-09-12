@@ -247,7 +247,10 @@ const BikeRiderDetails = () => {
 
   // PUT API Payload Builder
 
-  const buildPutDriverPayload = async (driver: TaxiDriver) => {
+  const buildPutDriverPayload = async (
+    driver: TaxiDriver,
+    selectedBranch?: string
+  ) => {
     const isFile = (file: any): file is File =>
       file && typeof file === "object" && "name" in file;
 
@@ -327,7 +330,7 @@ const BikeRiderDetails = () => {
         age: driver.age || null,
         experience: driver.experience || 0,
         address: driver.address || "",
-        branch: selectedBranch || "",
+        branch: selectedBranch || driver.branch || "",
       },
       bankDetails: {
         accountNumber: driver.accountNumber || "",
@@ -361,7 +364,7 @@ const BikeRiderDetails = () => {
       } else if (mode === "edit") {
         try {
           // 1. Build payload for driver update
-          const payload = await buildPutDriverPayload(driver);
+          const payload = await buildPutDriverPayload(driver, selectedBranch);
           console.log("PUT payload:", JSON.stringify(payload, null, 2));
 
           // 2. First API call -> Update driver details

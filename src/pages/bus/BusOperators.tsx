@@ -18,11 +18,16 @@ const BusOperators = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalBusOperators, setTotalBusOperators] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const loadBusOperators = async () => {
       try {
-        const { data, total } = await fetchBusOperators(currentPage, pageSize);
+        const { data, total } = await fetchBusOperators(
+          currentPage,
+          pageSize,
+          searchTerm
+        );
         setOperators(data);
         setTotalBusOperators(total);
       } catch (error) {
@@ -35,7 +40,7 @@ const BusOperators = () => {
     };
 
     loadBusOperators();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, searchTerm]);
 
   const columns = [
     { key: "name" as keyof BusOperator, header: "Name" },
@@ -131,6 +136,8 @@ const BusOperators = () => {
         keyExtractor={(item) => item.id}
         onRowClick={handleRowClick}
         filterOptions={filterOptions}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
       />
     </>
   );

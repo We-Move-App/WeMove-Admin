@@ -37,8 +37,8 @@ const TaxiDriverDetails = () => {
     vehicleType: "",
   });
 
-  const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
-    undefined
+  const [selectedBranch, setSelectedBranch] = useState<string>(
+    driver?.branch || ""
   );
 
   useEffect(() => {
@@ -249,62 +249,12 @@ const TaxiDriverDetails = () => {
     return payload;
   };
 
-  const buildPutDriverPayload = async (driver: TaxiDriver) => {
+  const buildPutDriverPayload = async (
+    driver: TaxiDriver,
+    selectedBranch?: string
+  ) => {
     const isFile = (file: any): file is File =>
       file && typeof file === "object" && "name" in file;
-
-    // const uploadOrReturn = async (file: any, documentType: string) => {
-    //   if (!file) return null;
-
-    //   // Case 0: FileList or Array<File>
-    //   if (file instanceof FileList || Array.isArray(file)) {
-    //     const files = Array.from(file); // normalize to array
-    //     const uploaded = await uploadFiles(files[0]); // assuming single file for now
-    //     return uploaded
-    //       ? {
-    //           fileUrl: uploaded.fileUrl,
-    //           fileName: uploaded.fileName || files[0].name,
-    //           documentType,
-    //         }
-    //       : null;
-    //   }
-
-    //   // Case 1: Single File
-    //   if (isFile(file)) {
-    //     const uploaded = await uploadFiles(file);
-    //     return uploaded
-    //       ? {
-    //           fileUrl: uploaded.fileUrl,
-    //           fileName: uploaded.fileName || file.name,
-    //           documentType,
-    //         }
-    //       : null;
-    //   }
-
-    //   // Case 2: Already uploaded string URL
-    //   if (typeof file === "string") {
-    //     return {
-    //       fileUrl: file,
-    //       fileName: file.split("/").pop() || "unknown",
-    //       documentType,
-    //     };
-    //   }
-
-    //   // Case 3: Object from backend (fileUrl or url)
-    //   if (typeof file === "object") {
-    //     return {
-    //       fileUrl: file.fileUrl || file.url,
-    //       fileName:
-    //         file.fileName ||
-    //         file.fileUrl?.split("/").pop() ||
-    //         file.url?.split("/").pop() ||
-    //         "unknown",
-    //       documentType,
-    //     };
-    //   }
-
-    //   return null;
-    // };
 
     const uploadOrReturn = async (file: any, documentType: string) => {
       if (!file) return null;
@@ -375,7 +325,7 @@ const TaxiDriverDetails = () => {
         age: driver.age || null,
         experience: driver.experience || 0,
         address: driver.address || "",
-        branch: selectedBranch || "",
+        branch: selectedBranch || driver.branch || "",
       },
       bankDetails: {
         accountNumber: driver.accountNumber || "",
@@ -409,7 +359,7 @@ const TaxiDriverDetails = () => {
       } else if (mode === "edit") {
         try {
           // 1. Build payload for driver update
-          const payload = await buildPutDriverPayload(driver);
+          const payload = await buildPutDriverPayload(driver, selectedBranch);
           console.log("PUT payload:", JSON.stringify(payload, null, 2));
 
           // 2. First API call -> Update driver details
