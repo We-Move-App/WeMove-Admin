@@ -2,9 +2,10 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   // Deployed URL
-  // baseURL: "http://139.59.20.155:8000/api/v1/admin",
+  baseURL: "http://139.59.20.155:8000/api/v1/admin",
   // Local URL
-  baseURL: "https://theft-pure-jail-proposed.trycloudflare.com/api/v1/admin",
+  // baseURL:
+  //   "https://marathon-ports-webcams-turns.trycloudflare.com/api/v1/admin",
 
   headers: {
     "Content-Type": "application/json",

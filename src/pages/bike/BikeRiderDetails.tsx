@@ -361,29 +361,68 @@ const BikeRiderDetails = () => {
           "/driver-management/bike-drivers/register",
           payload
         );
+        // } else if (mode === "edit") {
+        //   try {
+        //     // 1. Build payload for driver update
+        //     const payload = await buildPutDriverPayload(driver, selectedBranch);
+        //     console.log("PUT payload:", JSON.stringify(payload, null, 2));
+
+        //     // 2. First API call -> Update driver details
+        //     await axiosInstance.put(
+        //       `/driver-management/bike-drivers/${id}?vehicleType=bike`,
+        //       payload
+        //     );
+
+        //     // 3. Second API call -> Verify driver status
+        //     await axiosInstance.put(
+        //       `/driver-management/drivers/verify/${driver.driverId}`,
+        //       { status: driver.status }
+        //     );
+
+        //     // ✅ Success message / toast
+        //     console.log("Driver updated & verified successfully");
+        //   } catch (error) {
+        //     console.error("Error updating driver:", error);
+        //   }
+        // }
       } else if (mode === "edit") {
+        let payload;
+        // 1. Try updating driver details
         try {
-          // 1. Build payload for driver update
-          const payload = await buildPutDriverPayload(driver, selectedBranch);
+          payload = await buildPutDriverPayload(driver, selectedBranch);
           console.log("PUT payload:", JSON.stringify(payload, null, 2));
 
-          // 2. First API call -> Update driver details
           await axiosInstance.put(
             `/driver-management/bike-drivers/${id}?vehicleType=bike`,
             payload
           );
 
-          // 3. Second API call -> Verify driver status
-          await axiosInstance.put(
-            `/driver-management/drivers/verify/${driver.driverId}`,
-            { status: driver.status }
-          );
-
-          // ✅ Success message / toast
-          console.log("Driver updated & verified successfully");
+          console.log("✅ Driver details updated");
         } catch (error) {
-          console.error("Error updating driver:", error);
+          console.error("❌ Error updating driver:", error);
         }
+
+        // 2. Independently try updating driver status
+        try {
+          if (driver.driverId) {
+            await axiosInstance.put(
+              `/driver-management/drivers/verify/${driver.driverId}`,
+              { status: driver.status }
+            );
+            console.log("✅ Driver status updated");
+          } else {
+            console.warn("⚠️ Skipping verify API: missing driverId");
+          }
+        } catch (error) {
+          console.error("❌ Error verifying driver status:", error);
+        }
+
+        console.log("Editing driver", {
+          id,
+          driverId: driver.driverId,
+          status: driver.status,
+          payload,
+        });
       }
       toast({
         title: mode === "post" ? "Driver Created" : "Driver Updated",
