@@ -66,12 +66,17 @@ const HotelManagers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalHotelManagers, setTotalHotelManagers] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const getManagers = async () => {
       try {
         setLoading(true);
-        const { data, total } = await fetchHotelManagers(currentPage, pageSize);
+        const { data, total } = await fetchHotelManagers(
+          currentPage,
+          pageSize,
+          searchTerm
+        );
         setManagers(data);
         setTotalHotelManagers(total);
       } catch (err) {
@@ -83,7 +88,7 @@ const HotelManagers = () => {
     };
 
     getManagers();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, searchTerm]);
 
   const handleRowClick = (manager: HotelManager) => {
     navigate(`/hotel-management/managers/${manager.id}?mode=view`);
@@ -117,19 +122,19 @@ const HotelManagers = () => {
     },
   ];
 
-  const filterOptions = [
-    {
-      key: "status" as keyof HotelManager,
-      label: "Status",
-      options: [
-        { label: "Approved", value: "Approved" },
-        { label: "Pending", value: "Pending" },
-        { label: "Submitted", value: "Submitted" },
-        { label: "Rejected", value: "Rejected" },
-        { label: "Blocked", value: "Blocked" },
-      ],
-    },
-  ];
+  // const filterOptions = [
+  //   {
+  //     key: "status" as keyof HotelManager,
+  //     label: "Status",
+  //     options: [
+  //       { label: "Approved", value: "Approved" },
+  //       { label: "Pending", value: "Pending" },
+  //       { label: "Submitted", value: "Submitted" },
+  //       { label: "Rejected", value: "Rejected" },
+  //       { label: "Blocked", value: "Blocked" },
+  //     ],
+  //   },
+  // ];
 
   return (
     <>
@@ -154,6 +159,7 @@ const HotelManagers = () => {
         <DataTable
           columns={columns}
           data={managers}
+          loading={loading}
           paginate={true}
           pageSize={pageSize}
           currentPage={currentPage}
@@ -161,8 +167,10 @@ const HotelManagers = () => {
           onPageChange={(page) => setCurrentPage(page)}
           onRowClick={handleRowClick}
           keyExtractor={(item) => item.id}
-          filterable={true}
-          filterOptions={filterOptions}
+          // filterable={true}
+          // filterOptions={filterOptions}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
         />
       )}
     </>

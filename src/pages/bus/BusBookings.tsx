@@ -12,6 +12,110 @@ const BusBookings = () => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalBusOperators, setTotalBusOperators] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  // const [fromOptions, setFromOptions] = useState<
+  //   { label: string; value: string }[]
+  // >([]);
+  // const [toOptions, setToOptions] = useState<
+  //   { label: string; value: string }[]
+  // >([]);
+  // const [selectedFrom, setSelectedFrom] = useState("");
+  // const [selectedTo, setSelectedTo] = useState("");
+
+  // const filteredBookings = bookings.filter(
+  //   (b) =>
+  //     (!selectedFrom || b.from === selectedFrom) &&
+  //     (!selectedTo || b.to === selectedTo)
+  // );
+
+  const handleRowClick = (booking: BusBooking) => {
+    navigate(`/bus-management/bookings/${booking.bookingId}`);
+  };
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const accessToken = localStorage.getItem("accessToken");
+
+        const response = await axiosInstance.get(
+          "/bus-management/AllBusBookings",
+          {
+            params: {
+              page: currentPage,
+              limit: pageSize,
+              search: searchTerm,
+            },
+          }
+        );
+
+        const bookingsData = response.data?.data || [];
+
+        setTotalBusOperators(response.data?.total || 0);
+
+        const formattedBookings = bookingsData.map((booking: any) => {
+          const primaryName =
+            booking?.bookedBy?.fullName ||
+            booking?.passengers?.[0]?.name ||
+            "N/A";
+
+          const primaryPhone =
+            booking?.bookedBy?.phoneNumber ||
+            booking?.passengers?.[0]?.contactNumber ||
+            "N/A";
+
+          const primaryEmail =
+            booking?.bookedBy?.email ||
+            booking?.passengers?.[0]?.email ||
+            "N/A";
+
+          return {
+            id: booking.bookId,
+            bookingId: booking.bookingId,
+            busRegistrationNumber: booking.busRegNumber || "N/A",
+            customerName: primaryName,
+            customerPhone: primaryPhone,
+            customerEmail: primaryEmail,
+            from: booking.from || "N/A",
+            to: booking.to || "N/A",
+            journeyDate: booking.journeyDate
+              ? new Date(booking.journeyDate).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })
+              : "N/A",
+            amount: booking.amount || 0,
+            // status: booking.status || "N/A",
+            paymentStatus: booking.paymentStatus || "N/A",
+            createdAt: booking.createdAt
+              ? new Date(booking.createdAt).toLocaleString("en-GB")
+              : "N/A",
+          };
+        });
+        // const uniqueFrom = Array.from(
+        //   new Set(bookingsData.map((b: any) => String(b.from)))
+        // ).map((f) => ({ label: f, value: f }));
+
+        // const uniqueTo = Array.from(
+        //   new Set(bookingsData.map((b: any) => String(b.to)))
+        // ).map((t) => ({ label: t, value: t }));
+
+        // setFromOptions(uniqueFrom);
+        // setToOptions(uniqueTo);
+
+        setBookings(formattedBookings);
+      } catch (error) {
+        console.error("❌ Failed to fetch bookings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, [currentPage, pageSize, searchTerm]);
 
   const columns = [
     { key: "id" as keyof BusBooking, header: "ID" },
@@ -30,13 +134,21 @@ const BusBookings = () => {
       header: "Amount",
       render: (booking: BusBooking) => <span>₹{booking.amount}</span>,
     },
+    // {
+    //   key: "status" as keyof BusBooking,
+    //   header: "Status",
+    //   render: (booking: BusBooking) => (
+    //     <StatusBadge status={booking.paymentStatus} />
+    //   ),
+    // },
     {
-      key: "status" as keyof BusBooking,
-      header: "Status",
+      key: "paymentStatus" as keyof BusBooking,
+      header: "Payment",
       render: (booking: BusBooking) => (
         <StatusBadge status={booking.paymentStatus} />
       ),
     },
+
     {
       key: "actions" as "actions",
       header: "Actions",
@@ -55,136 +167,38 @@ const BusBookings = () => {
     },
   ];
 
-  const filterOptions = [
-    {
-      key: "status" as keyof BusBooking,
-      label: "Status",
-      options: [
-        { label: "Completed", value: "Completed" },
-        { label: "Upcoming", value: "Upcoming" },
-        { label: "Cancelled", value: "Cancelled" },
-      ],
-    },
-    {
-      key: "from" as keyof BusBooking,
-      label: "From",
-      options: [
-        { label: "Mumbai", value: "Mumbai" },
-        { label: "Delhi", value: "Delhi" },
-        { label: "Bangalore", value: "Bangalore" },
-        { label: "Chennai", value: "Chennai" },
-      ],
-    },
-    {
-      key: "to" as keyof BusBooking,
-      label: "To",
-      options: [
-        { label: "Pune", value: "Pune" },
-        { label: "Jaipur", value: "Jaipur" },
-        { label: "Chennai", value: "Chennai" },
-        { label: "Hyderabad", value: "Hyderabad" },
-        { label: "Chandigarh", value: "Chandigarh" },
-      ],
-    },
-  ];
-
-  const handleRowClick = (booking: BusBooking) => {
-    navigate(`/bus-management/bookings/${booking.id}`);
-  };
-
-  // useEffect(() => {
-  //   const fetchBookings = async () => {
-  //     try {
-  //       const accessToken = localStorage.getItem("accessToken");
-
-  //       const response = await axiosInstance.get("/bus-management/AllBusBookings", {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //         },
-  //       });
-
-  //       const bookingsData = response.data?.data?.bookings || [];
-
-  //       const formattedBookings = bookingsData.map((booking: any) => ({
-  //         id: booking._id || "N/A",
-  //         busRegistrationNumber: booking?.busId?.busRegNumber || "N/A",
-  //         customerName: booking.passengers[0]?.name || "N/A",
-  //         customerPhone: booking.passengers[0]?.contactNumber || "N/A",
-  //         customerEmail: booking.passengers[0]?.email || "N/A",
-  //         from: booking.from || "N/A",
-  //         to: booking.to || "N/A",
-  //         journeyDate: booking.journeyDate
-  //           ? new Date(booking.journeyDate).toLocaleDateString("en-GB", {
-  //             day: "2-digit",
-  //             month: "short",
-  //             year: "numeric",
-  //           })
-  //           : "N/A",
-  //         amount: booking.price || 0,
-  //         status: "Confirmed", // or map this if backend provides status
-  //         paymentStatus: booking.paymentStatus || "N/A",
-  //       }));
-
-  //       setBookings(formattedBookings);
-  //     } catch (error) {
-  //       console.error("❌ Failed to fetch bookings:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchBookings();
-  // }, []);
-
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const accessToken = localStorage.getItem("accessToken");
-
-        const response = await axiosInstance.get(
-          "/bus-management/AllBusBookings",
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        const bookingsData = response.data?.data || [];
-
-        const formattedBookings = bookingsData.map((booking: any) => ({
-          id: booking.bookingId || "N/A",
-          busRegistrationNumber: booking.busRegNumber || "N/A",
-          customerName: booking?.bookedBy?.fullName || "N/A",
-          customerPhone: booking?.bookedBy?.phoneNumber || "N/A",
-          customerEmail: booking?.bookedBy?.email || "N/A",
-          from: booking.from || "N/A",
-          to: booking.to || "N/A",
-          journeyDate: booking.journeyDate
-            ? new Date(booking.journeyDate).toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })
-            : "N/A",
-          amount: booking.amount || 0,
-          status: booking.status || "N/A",
-          paymentStatus: booking.paymentStatus || "N/A",
-          createdAt: booking.createdAt
-            ? new Date(booking.createdAt).toLocaleString("en-GB")
-            : "N/A",
-        }));
-
-        setBookings(formattedBookings);
-      } catch (error) {
-        console.error("❌ Failed to fetch bookings:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBookings();
-  }, []);
+  // const filterOptions = [
+  //   {
+  //     key: "status" as keyof BusBooking,
+  //     label: "Status",
+  //     options: [
+  //       { label: "Completed", value: "Completed" },
+  //       { label: "Upcoming", value: "Upcoming" },
+  //       { label: "Cancelled", value: "Cancelled" },
+  //     ],
+  //   },
+  //   {
+  //     key: "from" as keyof BusBooking,
+  //     label: "From",
+  //     options: [
+  //       { label: "Mumbai", value: "Mumbai" },
+  //       { label: "Delhi", value: "Delhi" },
+  //       { label: "Bangalore", value: "Bangalore" },
+  //       { label: "Chennai", value: "Chennai" },
+  //     ],
+  //   },
+  //   {
+  //     key: "to" as keyof BusBooking,
+  //     label: "To",
+  //     options: [
+  //       { label: "Pune", value: "Pune" },
+  //       { label: "Jaipur", value: "Jaipur" },
+  //       { label: "Chennai", value: "Chennai" },
+  //       { label: "Hyderabad", value: "Hyderabad" },
+  //       { label: "Chandigarh", value: "Chandigarh" },
+  //     ],
+  //   },
+  // ];
 
   return (
     <>
@@ -196,9 +210,20 @@ const BusBookings = () => {
       <DataTable
         columns={columns}
         data={bookings}
+        paginate={true}
+        pageSize={pageSize}
+        currentPage={currentPage}
+        totalItems={totalBusOperators}
+        onPageChange={(page) => setCurrentPage(page)}
         keyExtractor={(item) => item.id}
         onRowClick={handleRowClick}
-        filterOptions={filterOptions}
+        // filterOptions={filterOptions}
+        // onFilterChange={(key, value) => {
+        //   if (key === "from") setSelectedFrom(value);
+        //   if (key === "to") setSelectedTo(value);
+        // }}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
       />
     </>
   );

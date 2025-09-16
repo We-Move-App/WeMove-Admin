@@ -1,50 +1,97 @@
-
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 // import Layout from '@/components/layout/Layout';
-import { busBookings } from '@/data/mockData';
-import { BusBooking } from '@/types/admin';
-import { ArrowLeft } from 'lucide-react';
-import StatusBadge from '@/components/ui/StatusBadge';
-import axiosInstance from '@/api/axiosInstance';
+import { busBookings } from "@/data/mockData";
+import { BusBooking } from "@/types/admin";
+import { ArrowLeft } from "lucide-react";
+import StatusBadge from "@/components/ui/StatusBadge";
+import axiosInstance from "@/api/axiosInstance";
 
 const BusBookingDetails = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<BusBooking | null>(null);
 
+  useEffect(() => {
+    const foundBooking = busBookings.find((b) => b.id === bookingId);
+    if (foundBooking) {
+      setBooking(foundBooking);
+    }
+  }, [bookingId]);
+
   // useEffect(() => {
-  //   const foundBooking = busBookings.find(b => b.id === bookingId);
-  //   if (foundBooking) {
-  //     setBooking(foundBooking);
+  //   const fetchBookingDetails = async () => {
+  //     try {
+  //       const response = await axiosInstance.get(
+  //         `/bus-management/bus-booking-details/${bookingId}`
+  //       );
+
+  //       const booking = response.data?.data;
+  //       console.log(booking);
+
+  //       if (!booking) return;
+
+  //       const passenger = booking.passengers?.[0] || {};
+
+  //       const formattedBooking = {
+  //         // id: booking._id,
+  //         id: booking._id,
+  //         bookingId: booking.bookingId, // add this
+  //         busRegistrationNumber: booking.busId?.busRegNumber || "N/A",
+  //         from: booking.from,
+  //         to: booking.to,
+  //         journeyDate: booking.journeyDate
+  //           ? new Date(booking.journeyDate).toLocaleDateString("en-GB", {
+  //               day: "2-digit",
+  //               month: "short",
+  //               year: "numeric",
+  //             })
+  //           : "N/A",
+  //         status: booking.status,
+  //         amount: booking.price,
+  //         customerName: passenger.name || "N/A",
+  //         customerPhone: passenger.contactNumber || "N/A",
+  //         customerEmail: passenger.email || "N/A",
+  //         paymentStatus: booking.paymentStatus,
+  //       };
+
+  //       setBooking(formattedBooking);
+  //     } catch (error) {
+  //       console.error("Error fetching booking details:", error);
+  //     }
+  //   };
+
+  //   if (bookingId) {
+  //     fetchBookingDetails();
   //   }
   // }, [bookingId]);
 
   useEffect(() => {
     const fetchBookingDetails = async () => {
+      if (!bookingId) return;
+
       try {
         const response = await axiosInstance.get(
           `/bus-management/bus-booking-details/${bookingId}`
         );
 
         const booking = response.data?.data;
-        console.log(booking);
-
         if (!booking) return;
 
         const passenger = booking.passengers?.[0] || {};
 
-        const formattedBooking = {
+        setBooking({
           id: booking._id,
+          bookingId: booking.bookingId,
           busRegistrationNumber: booking.busId?.busRegNumber || "N/A",
           from: booking.from,
           to: booking.to,
           journeyDate: booking.journeyDate
             ? new Date(booking.journeyDate).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
             : "N/A",
           status: booking.status,
           amount: booking.price,
@@ -52,20 +99,14 @@ const BusBookingDetails = () => {
           customerPhone: passenger.contactNumber || "N/A",
           customerEmail: passenger.email || "N/A",
           paymentStatus: booking.paymentStatus,
-        };
-
-        setBooking(formattedBooking);
+        });
       } catch (error) {
         console.error("Error fetching booking details:", error);
       }
     };
 
-    if (bookingId) {
-      fetchBookingDetails();
-    }
+    fetchBookingDetails();
   }, [bookingId]);
-
-
 
   if (!booking) {
     return (
@@ -80,7 +121,7 @@ const BusBookingDetails = () => {
     <>
       <div className="mb-6">
         <button
-          onClick={() => navigate('/bus-management/bookings')}
+          onClick={() => navigate("/bus-management/bookings")}
           className="mb-4 flex items-center text-blue-600 hover:underline"
         >
           <ArrowLeft size={16} className="mr-1" />
@@ -90,7 +131,7 @@ const BusBookingDetails = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold">Booking Details</h1>
-            <p className="text-gray-600">Booking ID: {booking.id}</p>
+            <p className="text-gray-600">Booking ID: {booking.bookingId}</p>
           </div>
           <StatusBadge status={booking.status} />
         </div>
@@ -103,7 +144,9 @@ const BusBookingDetails = () => {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">Bus Registration:</span>
-                <span className="font-medium">{booking.busRegistrationNumber}</span>
+                <span className="font-medium">
+                  {booking.busRegistrationNumber}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">From:</span>

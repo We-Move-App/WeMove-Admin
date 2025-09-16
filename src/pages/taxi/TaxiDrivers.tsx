@@ -52,20 +52,19 @@ const TaxiDrivers = () => {
     },
   ];
 
-  const filterOptions = [
-    {
-      key: "status" as keyof TaxiDriver,
-      label: "Status",
-      options: [
-        { label: "Approved", value: "Approved" },
-        { label: "Rejected", value: "Rejected" },
-      ],
-    },
-  ];
+  // const filterOptions = [
+  //   {
+  //     key: "status" as keyof TaxiDriver,
+  //     label: "Status",
+  //     options: [
+  //       { label: "Approved", value: "Approved" },
+  //       { label: "Rejected", value: "Rejected" },
+  //     ],
+  //   },
+  // ];
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 500);
-
 
   useEffect(() => {
     const fetchDrivers = async () => {
@@ -76,7 +75,7 @@ const TaxiDrivers = () => {
             vehicleType: "taxi",
             page: currentPage,
             limit: pageSize,
-            mobile: debouncedSearch || undefined,
+            search: searchTerm,
           },
         });
         setDrivers(response.data?.data || []);
@@ -89,8 +88,7 @@ const TaxiDrivers = () => {
     };
 
     fetchDrivers();
-  }, [currentPage, pageSize, debouncedSearch]);
-
+  }, [currentPage, pageSize, searchTerm]);
 
   if (loading) return <p>Loading drivers...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -103,7 +101,7 @@ const TaxiDrivers = () => {
           <p className="text-gray-600">Manage all taxi drivers</p>
         </div>
         <Button
-          onClick={() => navigate('/taxi-management/drivers/new')}
+          onClick={() => navigate("/taxi-management/drivers/new")}
           className="flex items-center gap-2"
         >
           <Plus size={16} /> Add Taxi Driver
@@ -114,18 +112,15 @@ const TaxiDrivers = () => {
         columns={columns}
         data={drivers}
         keyExtractor={(item) => item.driverId}
-        filterable={true}
-        filterOptions={filterOptions}
+        // filterable={true}
+        // filterOptions={filterOptions}
         paginate={true}
         pageSize={10}
         currentPage={currentPage}
         totalItems={totalDrivers}
         onPageChange={(page) => setCurrentPage(page)}
         searchTerm={searchTerm}
-        onSearchChange={(term) => {
-          setSearchTerm(term);
-          setCurrentPage(1);
-        }}
+        onSearchChange={setSearchTerm}
       />
     </>
   );

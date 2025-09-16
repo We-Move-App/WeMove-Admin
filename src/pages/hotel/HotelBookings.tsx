@@ -13,73 +13,86 @@ import {
 } from "@/components/ui/sheet";
 
 // Mock data for hotel bookings
-const mockHotelBookings: HotelBooking[] = [
-  {
-    id: "1",
-    hotelId: "hotel-001",
-    customerName: "John Doe",
-    customerPhone: "9876543210",
-    customerEmail: "john.doe@example.com",
-    checkInDate: "2023-10-15",
-    checkOutDate: "2023-10-18",
-    amount: 450,
-    status: "Confirmed",
-  },
-  {
-    id: "2",
-    hotelId: "hotel-002",
-    customerName: "Jane Smith",
-    customerPhone: "8765432109",
-    customerEmail: "jane.smith@example.com",
-    checkInDate: "2023-10-20",
-    checkOutDate: "2023-10-25",
-    amount: 750,
-    status: "Completed",
-  },
-  {
-    id: "3",
-    hotelId: "hotel-003",
-    customerName: "Michael Johnson",
-    customerPhone: "7654321098",
-    customerEmail: "michael.j@example.com",
-    checkInDate: "2023-11-01",
-    checkOutDate: "2023-11-05",
-    amount: 600,
-    status: "Cancelled",
-  },
-  {
-    id: "4",
-    hotelId: "hotel-001",
-    customerName: "Sarah Williams",
-    customerPhone: "6543210987",
-    customerEmail: "sarah.w@example.com",
-    checkInDate: "2023-11-10",
-    checkOutDate: "2023-11-12",
-    amount: 350,
-    status: "Pending",
-  },
-];
-
-
+// const mockHotelBookings: HotelBooking[] = [
+//   {
+//     id: "1",
+//     hotelId: "hotel-001",
+//     customerName: "John Doe",
+//     customerPhone: "9876543210",
+//     customerEmail: "john.doe@example.com",
+//     checkInDate: "2023-10-15",
+//     checkOutDate: "2023-10-18",
+//     amount: 450,
+//     status: "Confirmed",
+//   },
+//   {
+//     id: "2",
+//     hotelId: "hotel-002",
+//     customerName: "Jane Smith",
+//     customerPhone: "8765432109",
+//     customerEmail: "jane.smith@example.com",
+//     checkInDate: "2023-10-20",
+//     checkOutDate: "2023-10-25",
+//     amount: 750,
+//     status: "Completed",
+//   },
+//   {
+//     id: "3",
+//     hotelId: "hotel-003",
+//     customerName: "Michael Johnson",
+//     customerPhone: "7654321098",
+//     customerEmail: "michael.j@example.com",
+//     checkInDate: "2023-11-01",
+//     checkOutDate: "2023-11-05",
+//     amount: 600,
+//     status: "Cancelled",
+//   },
+//   {
+//     id: "4",
+//     hotelId: "hotel-001",
+//     customerName: "Sarah Williams",
+//     customerPhone: "6543210987",
+//     customerEmail: "sarah.w@example.com",
+//     checkInDate: "2023-11-10",
+//     checkOutDate: "2023-11-12",
+//     amount: 350,
+//     status: "Pending",
+//   },
+// ];
 
 const HotelBookings = () => {
-  // const [bookings] = useState<HotelBooking[]>(mockHotelBookings);
   const [bookings, setBookings] = useState<HotelBooking[]>([]);
   const [selectedBooking, setSelectedBooking] = useState<HotelBooking | null>(
     null
   );
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [totalHotelBookings, setTotalHotelBookings] = useState(0);
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const res = await axiosInstance.get("/hotel-management/hotel-booking-details");
-        const apiBookings = res.data?.data?.bookings || [];
+        const res = await axiosInstance.get(
+          "/hotel-management/hotel-booking-details",
+          {
+            params: {
+              page: currentPage,
+              limit: pageSize,
+              search: searchTerm,
+            },
+          }
+        );
+        const apiBookings = res.data?.data || [];
+        setTotalHotelBookings(res.data?.total || 0);
 
         // Map API fields into our table format
         const mapped = apiBookings.map((b: any) => ({
-          id: b.bookingId?.slice(0, 6),
-          hotelId: b.hotelId?.slice(0, 6),
+          id: b.bookId,
+          bookingId: b.bookingId,
+          // id: b.bookingId,
+          hotelId: b.hotelId,
           customerName: b.customerName,
           customerPhone: b.phone,
           customerEmail: b.email,
@@ -96,7 +109,7 @@ const HotelBookings = () => {
     };
 
     fetchBookings();
-  }, []);
+  }, [currentPage, pageSize, searchTerm]);
 
   const viewBookingDetails = (booking: HotelBooking) => {
     setSelectedBooking(booking);
@@ -142,18 +155,18 @@ const HotelBookings = () => {
     },
   ];
 
-  const filterOptions = [
-    {
-      key: "status" as keyof HotelBooking,
-      label: "Status",
-      options: [
-        { label: "Confirmed", value: "Confirmed" },
-        { label: "Completed", value: "Completed" },
-        { label: "Cancelled", value: "Cancelled" },
-        { label: "Pending", value: "Pending" },
-      ],
-    },
-  ];
+  // const filterOptions = [
+  //   {
+  //     key: "status" as keyof HotelBooking,
+  //     label: "Status",
+  //     options: [
+  //       { label: "Confirmed", value: "Confirmed" },
+  //       { label: "Completed", value: "Completed" },
+  //       { label: "Cancelled", value: "Cancelled" },
+  //       { label: "Pending", value: "Pending" },
+  //     ],
+  //   },
+  // ];
 
   return (
     <>
@@ -168,10 +181,17 @@ const HotelBookings = () => {
         columns={columns}
         data={bookings}
         keyExtractor={(item) => item.id}
-        filterable={true}
+        // filterable={true}
         // searchable={true}
         // exportable={true}
-        filterOptions={filterOptions}
+        paginate={true}
+        pageSize={pageSize}
+        currentPage={currentPage}
+        totalItems={totalHotelBookings}
+        onPageChange={(page) => setCurrentPage(page)}
+        // filterOptions={filterOptions}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
       />
 
       {/* Booking Details Sheet */}

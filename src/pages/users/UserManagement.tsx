@@ -118,10 +118,13 @@ const UserManagement = () => {
     isActive: true,
   });
   const [isEditing, setIsEditing] = useState(false);
-  // const [admins, setAdmins] = useState<{ id: string; name: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [admins, setAdmins] = useState<any[]>([]);
   const [loadingAdmins, setLoadingAdmins] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [totalBookings, setTotalBookings] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -139,7 +142,10 @@ const UserManagement = () => {
       setError(null);
 
       try {
-        const res = await axiosInstance.get("/auth/all-admins");
+        const res = await axiosInstance.get("/auth/all-admins", {
+          params: { page: currentPage, limit: pageSize, search: searchTerm },
+        });
+
         console.log("Fetched admins:", res.data);
         const usersData = res.data?.data?.data || [];
         setUsers(
@@ -162,7 +168,7 @@ const UserManagement = () => {
     };
 
     fetchAdmins();
-  }, []);
+  }, [currentPage, pageSize, searchTerm]);
 
   useEffect(() => {
     if (newUser.role === "SubAdmin") {
@@ -387,6 +393,13 @@ const UserManagement = () => {
         data={users}
         keyExtractor={(item) => item.id}
         onRowClick={handleRowClick}
+        paginate
+        pageSize={pageSize}
+        currentPage={currentPage}
+        totalItems={totalBookings}
+        onPageChange={setCurrentPage}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
         // searchable={true}
       />
 
@@ -464,7 +477,7 @@ const UserManagement = () => {
                       setNewUser({
                         ...newUser,
                         adminId: selectedAdmin._id,
-                        branchId: selectedAdmin.branch.branchId, // store branch id as well
+                        branchId: selectedAdmin.branch.branchId,
                       });
                     }
                   }}

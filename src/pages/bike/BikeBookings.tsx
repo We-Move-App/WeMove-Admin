@@ -70,6 +70,7 @@ const BikeBookings = () => {
   const [pageSize] = useState(10);
   const [totalBookings, setTotalBookings] = useState(0);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const viewBookingDetails = (booking: TaxiBooking) => {
     setSelectedBooking(booking);
@@ -126,25 +127,25 @@ const BikeBookings = () => {
     },
   ];
 
-  const filterOptions = [
-    {
-      key: "status" as keyof TaxiBooking,
-      label: "Status",
-      options: [
-        { label: "Completed", value: "Completed" },
-        { label: "Cancelled", value: "Cancelled" },
-        { label: "Pending", value: "Pending" },
-      ],
-    },
-    {
-      key: "vehicleType" as keyof TaxiBooking,
-      label: "Vehicle Type",
-      options: [
-        { label: "Scooter", value: "Scooter" },
-        { label: "MotorBike", value: "MotorBike" },
-      ],
-    },
-  ];
+  // const filterOptions = [
+  //   {
+  //     key: "status" as keyof TaxiBooking,
+  //     label: "Status",
+  //     options: [
+  //       { label: "Completed", value: "Completed" },
+  //       { label: "Cancelled", value: "Cancelled" },
+  //       { label: "Pending", value: "Pending" },
+  //     ],
+  //   },
+  //   {
+  //     key: "vehicleType" as keyof TaxiBooking,
+  //     label: "Vehicle Type",
+  //     options: [
+  //       { label: "Scooter", value: "Scooter" },
+  //       { label: "MotorBike", value: "MotorBike" },
+  //     ],
+  //   },
+  // ];
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -157,6 +158,7 @@ const BikeBookings = () => {
               vehicleType: "bike",
               page: currentPage,
               limit: pageSize,
+              search: searchTerm,
             },
           }
         );
@@ -176,7 +178,7 @@ const BikeBookings = () => {
     };
 
     fetchBookings();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, searchTerm]);
 
   return (
     <>
@@ -194,13 +196,15 @@ const BikeBookings = () => {
           columns={columns}
           data={bookings}
           keyExtractor={(item) => item.bookingId}
-          filterable
-          filterOptions={filterOptions}
+          // filterable
+          // filterOptions={filterOptions}
           paginate
           pageSize={pageSize}
           currentPage={currentPage}
           totalItems={totalBookings}
           onPageChange={setCurrentPage}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
         />
       )}
 
@@ -246,7 +250,9 @@ const BikeBookings = () => {
                   </div>
                   <div>
                     <h4 className="text-sm text-gray-500">Ride Date</h4>
-                    <p className="font-medium">{selectedBooking.rideDate.slice(0, 10)}</p>
+                    <p className="font-medium">
+                      {selectedBooking.rideDate.slice(0, 10)}
+                    </p>
                   </div>
                 </div>
               </div>

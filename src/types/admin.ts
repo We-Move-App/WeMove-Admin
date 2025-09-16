@@ -86,6 +86,7 @@ export interface Bus {
 
 export interface BusBooking {
   id: string;
+  bookingId: string;
   busRegistrationNumber: string;
   customerName: string;
   customerPhone: string;
@@ -95,7 +96,7 @@ export interface BusBooking {
   journeyDate: string;
   amount: number;
   status: "Completed" | "Upcoming" | "Cancelled" | "Confirmed" | "Pending";
-  paymentStatus: string;
+  paymentStatus: "PAID";
 }
 
 interface PolicyDocument {
@@ -182,7 +183,13 @@ export interface HotelBooking {
   checkInDate: string;
   checkOutDate: string;
   amount: number;
-  status: "Completed" | "Upcoming" | "Cancelled" | "Confirmed" | "Pending";
+  status:
+    | "Completed"
+    | "Upcoming"
+    | "Cancelled"
+    | "Confirmed"
+    | "Pending"
+    | "Booked";
 }
 
 // Taxi related types

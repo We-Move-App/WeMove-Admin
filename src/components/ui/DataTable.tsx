@@ -25,7 +25,6 @@ export type Column<T> = {
   render?: (item: T) => React.ReactNode;
 };
 
-
 type FilterOption = {
   key: string;
   label: string;
@@ -43,6 +42,8 @@ type DataTableProps<T> = {
   exportable?: boolean;
   filterable?: boolean;
   filterOptions?: FilterOption[];
+  onFilterChange?: (filters: Record<string, string | null>) => void; // ✅ new
+  filters?: Record<string, string | null>;
   paginate?: boolean;
   currentPage?: number;
   totalItems?: number;
@@ -61,6 +62,8 @@ function DataTable<T>({
   onSearchChange,
   filterable = true,
   filterOptions = [],
+  onFilterChange,
+  filters: externalFilters,
   paginate = true,
   pageSize = 10,
   currentPage = 1,
@@ -71,7 +74,26 @@ function DataTable<T>({
     key: keyof T | null;
     direction: "asc" | "desc";
   }>({ key: null, direction: "asc" });
-  const [filters, setFilters] = useState<Record<string, string | null>>({});
+  // const [filters, setFilters] = useState<Record<string, string | null>>({});
+  const [internalFilters, setInternalFilters] = useState<
+    Record<string, string | null>
+  >({});
+  const filters = externalFilters ?? internalFilters;
+
+  const handleFilterChange = (key: string, value: string) => {
+    const newFilters = {
+      ...filters,
+      [key]: value === "" ? null : value,
+    };
+
+    if (onFilterChange) {
+      onFilterChange(newFilters); // ✅ notify parent
+    } else {
+      setInternalFilters(newFilters); // ✅ fallback internal
+    }
+
+    onPageChange?.(1); // reset to first page
+  };
 
   // Sorting
   const sortedData = useMemo(() => {
@@ -111,7 +133,6 @@ function DataTable<T>({
     setSortConfig({ key, direction });
   };
 
-
   // Filtering
   const filteredData = useMemo(() => {
     return sortedData.filter((item) => {
@@ -139,16 +160,17 @@ function DataTable<T>({
   }, [sortedData, searchTerm, filters, columns]);
 
   // Pagination
-  const totalPages = totalItems && pageSize ? Math.ceil(totalItems / pageSize) : 1;
+  const totalPages =
+    totalItems && pageSize ? Math.ceil(totalItems / pageSize) : 1;
 
   // Filter change
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value === "" ? null : value,
-    }));
-    onPageChange?.(1);
-  };
+  // const handleFilterChange = (key: string, value: string) => {
+  //   setFilters((prev) => ({
+  //     ...prev,
+  //     [key]: value === "" ? null : value,
+  //   }));
+  //   onPageChange?.(1);
+  // };
 
   // Pagination links
   const getPageLinks = (): number[] => {
@@ -217,7 +239,10 @@ function DataTable<T>({
                   key={String(column.key)}
                   className={column.key !== "actions" ? "cursor-pointer" : ""}
                   onClick={() => {
-                    if (column.key !== "actions" && typeof column.key !== "string") {
+                    if (
+                      column.key !== "actions" &&
+                      typeof column.key !== "string"
+                    ) {
                       requestSort(column.key);
                     }
                   }}
@@ -252,8 +277,8 @@ function DataTable<T>({
                       {column.render
                         ? column.render(item)
                         : item[column.key as keyof T] !== undefined
-                          ? String(item[column.key as keyof T])
-                          : ""}
+                        ? String(item[column.key as keyof T])
+                        : ""}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -278,7 +303,9 @@ function DataTable<T>({
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                onClick={() => currentPage > 1 && onPageChange?.(currentPage - 1)}
+                onClick={() =>
+                  currentPage > 1 && onPageChange?.(currentPage - 1)
+                }
                 className={
                   currentPage <= 1
                     ? "pointer-events-none opacity-50"
@@ -289,7 +316,6 @@ function DataTable<T>({
 
             {getPageLinks().map((page) => (
               <PaginationItem key={page}>
-
                 <PaginationLink
                   isActive={page === currentPage}
                   onClick={() => onPageChange?.(page)}
@@ -301,7 +327,9 @@ function DataTable<T>({
 
             <PaginationItem>
               <PaginationNext
-                onClick={() => currentPage < totalPages && onPageChange?.(currentPage + 1)}
+                onClick={() =>
+                  currentPage < totalPages && onPageChange?.(currentPage + 1)
+                }
                 className={
                   currentPage >= totalPages
                     ? "pointer-events-none opacity-50"
@@ -312,7 +340,6 @@ function DataTable<T>({
           </PaginationContent>
         </Pagination>
       )}
-
     </div>
   );
 }

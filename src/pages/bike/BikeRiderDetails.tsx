@@ -466,11 +466,11 @@ const BikeRiderDetails = () => {
               <SelectContent>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
+                {/* <SelectItem value="rejected">Rejected</SelectItem>
                 <SelectItem value="submitted">Submitted</SelectItem>
                 <SelectItem value="blocked">Blocked</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem> */}
               </SelectContent>
             </Select>
           )}

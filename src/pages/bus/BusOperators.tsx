@@ -86,19 +86,19 @@ const BusOperators = () => {
     },
   ];
 
-  const filterOptions = [
-    {
-      key: "status" as keyof BusOperator,
-      label: "Status",
-      options: [
-        { label: "approved", value: "approved" },
-        { label: "processing", value: "processing" },
-        { label: "submitted", value: "submitted" },
-        { label: "rejected", value: "rejected" },
-        { label: "blocked", value: "blocked" },
-      ],
-    },
-  ];
+  // const filterOptions = [
+  //   {
+  //     key: "status" as keyof BusOperator,
+  //     label: "Status",
+  //     options: [
+  //       { label: "approved", value: "approved" },
+  //       { label: "processing", value: "processing" },
+  //       { label: "submitted", value: "submitted" },
+  //       { label: "rejected", value: "rejected" },
+  //       { label: "blocked", value: "blocked" },
+  //     ],
+  //   },
+  // ];
 
   const handleRowClick = (operator: BusOperator) => {
     navigate(`/bus-management/operators/${operator.id}`);
@@ -135,7 +135,7 @@ const BusOperators = () => {
         onPageChange={(page) => setCurrentPage(page)}
         keyExtractor={(item) => item.id}
         onRowClick={handleRowClick}
-        filterOptions={filterOptions}
+        // filterOptions={filterOptions}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
       />

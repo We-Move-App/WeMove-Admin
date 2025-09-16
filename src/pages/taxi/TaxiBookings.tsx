@@ -14,11 +14,14 @@ import axiosInstance from "@/api/axiosInstance";
 const TaxiBookings = () => {
   const [bookings, setBookings] = useState<TaxiBooking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedBooking, setSelectedBooking] = useState<TaxiBooking | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<TaxiBooking | null>(
+    null
+  );
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalBookings, setTotalBookings] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const viewBookingDetails = (booking: TaxiBooking) => {
     setSelectedBooking(booking);
@@ -36,6 +39,7 @@ const TaxiBookings = () => {
               vehicleType: "taxi",
               page: currentPage,
               limit: pageSize,
+              search: searchTerm,
             },
           }
         );
@@ -55,7 +59,7 @@ const TaxiBookings = () => {
     };
 
     fetchBookings();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, searchTerm]);
 
   const columns = [
     { key: "bookingId" as keyof TaxiBooking, header: "Booking ID" },
@@ -103,17 +107,17 @@ const TaxiBookings = () => {
     },
   ];
 
-  const filterOptions = [
-    {
-      key: "status" as keyof TaxiBooking,
-      label: "Status",
-      options: [
-        { label: "Completed", value: "Completed" },
-        { label: "Cancelled", value: "Cancelled" },
-        { label: "Pending", value: "Pending" },
-      ],
-    },
-  ];
+  // const filterOptions = [
+  //   {
+  //     key: "status" as keyof TaxiBooking,
+  //     label: "Status",
+  //     options: [
+  //       { label: "Completed", value: "Completed" },
+  //       { label: "Cancelled", value: "Cancelled" },
+  //       { label: "Pending", value: "Pending" },
+  //     ],
+  //   },
+  // ];
 
   return (
     <>
@@ -131,13 +135,15 @@ const TaxiBookings = () => {
           columns={columns}
           data={bookings}
           keyExtractor={(item) => item.bookingId}
-          filterable
-          filterOptions={filterOptions}
+          // filterable
+          // filterOptions={filterOptions}
           paginate
           pageSize={pageSize}
           currentPage={currentPage}
           totalItems={totalBookings}
           onPageChange={setCurrentPage}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
         />
       )}
 
@@ -161,7 +167,10 @@ const TaxiBookings = () => {
                 <div>
                   <h4 className="text-sm text-gray-500">Amount</h4>
                   <p className="font-medium">
-                    ${selectedBooking.amount ? selectedBooking.amount.toFixed(2) : "0.00"}
+                    $
+                    {selectedBooking.amount
+                      ? selectedBooking.amount.toFixed(2)
+                      : "0.00"}
                   </p>
                 </div>
               </div>
@@ -181,7 +190,9 @@ const TaxiBookings = () => {
                     <h4 className="text-sm text-gray-500">Ride Date</h4>
                     <p className="font-medium">
                       {selectedBooking.rideDate
-                        ? new Date(selectedBooking.rideDate).toLocaleDateString("en-GB")
+                        ? new Date(selectedBooking.rideDate).toLocaleDateString(
+                            "en-GB"
+                          )
                         : "-"}
                     </p>
                   </div>

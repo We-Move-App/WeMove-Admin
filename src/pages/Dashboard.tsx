@@ -141,14 +141,14 @@ const Dashboard = () => {
         setBookingSummary(summary);
 
         // ✅ Log individual values
-        console.log("Total Bookings:", summary.totalBookings.bookings);
-        console.log("Hotel Bookings:", summary.hotelBookings.bookings);
-        console.log("Bus Bookings:", summary.busBookings.bookings);
-        console.log("Taxi Bookings:", summary.taxiBookings.bookings);
-        console.log("Bike Bookings:", summary.bikeBookings.bookings);
-        console.log("Completed Bookings:", summary.completedBookings.bookings);
-        console.log("Cancelled Bookings:", summary.cancelledBookings.bookings);
-        console.log("Revenue:", summary.revenue.amount);
+        // console.log("Total Bookings:", summary.totalBookings.bookings);
+        // console.log("Hotel Bookings:", summary.hotelBookings.bookings);
+        // console.log("Bus Bookings:", summary.busBookings.bookings);
+        // console.log("Taxi Bookings:", summary.taxiBookings.bookings);
+        // console.log("Bike Bookings:", summary.bikeBookings.bookings);
+        // console.log("Completed Bookings:", summary.completedBookings.bookings);
+        // console.log("Cancelled Bookings:", summary.cancelledBookings.bookings);
+        // console.log("Revenue:", summary.revenue.amount);
       } catch (error) {
         console.error("Error fetching dashboard data", error);
       }
@@ -368,55 +368,60 @@ const Dashboard = () => {
             <p>Loading...</p>
           ) : (
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <table className="admin-table w-full text-left">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2">ID</th>
-                    <th className="px-4 py-2">Service</th>
-                    <th className="px-4 py-2">Customer</th>
-                    <th className="px-4 py-2">Date</th>
-                    <th className="px-4 py-2">Amount</th>
-                    <th className="px-4 py-2">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.map((trx) => (
-                    <tr key={trx._id} className="border-t">
-                      <td className="px-4 py-2">{trx.transactionId}</td>
-                      <td className="px-4 py-2">{trx.description}</td>
-                      <td className="px-4 py-2">{trx.serviceType}</td>
-                      <td className="px-4 py-2">{formatDate(trx.createdAt)}</td>
-                      <td className="px-4 py-2">
-                        {trx.currency} {trx.amount}
-                      </td>
-                      <td className="px-4 py-2">
-                        <span
-                          className={`${
-                            trx.status === "SUCCESS"
-                              ? "status-approved"
-                              : trx.status === "PENDING"
-                              ? "status-pending"
-                              : "status-rejected"
-                          }`}
-                        >
-                          {trx.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-
-                  {transactions.length === 0 && (
+              {/* Scrollable container */}
+              <div className="max-h-96 overflow-y-auto">
+                <table className="admin-table w-full text-left">
+                  <thead className="sticky top-0 bg-white z-10">
                     <tr>
-                      <td
-                        colSpan={6}
-                        className="px-4 py-2 text-center text-gray-500"
-                      >
-                        No transactions found
-                      </td>
+                      <th className="px-4 py-2">ID</th>
+                      <th className="px-4 py-2">Service</th>
+                      <th className="px-4 py-2">Customer</th>
+                      <th className="px-4 py-2">Date</th>
+                      <th className="px-4 py-2">Amount</th>
+                      <th className="px-4 py-2">Status</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {transactions.map((trx) => (
+                      <tr key={trx._id} className="border-t">
+                        <td className="px-4 py-2">{trx.transactionId}</td>
+                        <td className="px-4 py-2">{trx.description}</td>
+                        <td className="px-4 py-2">{trx.serviceType}</td>
+                        <td className="px-4 py-2">
+                          {formatDate(trx.createdAt)}
+                        </td>
+                        <td className="px-4 py-2">
+                          {trx.currency} {trx.amount}
+                        </td>
+                        <td className="px-4 py-2">
+                          <span
+                            className={`${
+                              trx.status === "SUCCESS"
+                                ? "status-approved"
+                                : trx.status === "PENDING"
+                                ? "status-pending"
+                                : "status-rejected"
+                            }`}
+                          >
+                            {trx.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+
+                    {transactions.length === 0 && (
+                      <tr>
+                        <td
+                          colSpan={6}
+                          className="px-4 py-2 text-center text-gray-500"
+                        >
+                          No transactions found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

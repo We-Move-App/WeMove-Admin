@@ -63,6 +63,7 @@ const BikeRiders = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalDrivers, setTotalDrivers] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchRiders = async () => {
@@ -72,6 +73,7 @@ const BikeRiders = () => {
             vehicleType: "bike",
             page: currentPage,
             limit: pageSize,
+            search: searchTerm,
           },
         });
 
@@ -98,7 +100,7 @@ const BikeRiders = () => {
     };
 
     fetchRiders();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, searchTerm]);
 
   const handleRowClick = (rider: BikeRider) => {
     navigate(`/bike-management/riders/${rider.driverId}`);
@@ -135,17 +137,17 @@ const BikeRiders = () => {
     },
   ];
 
-  const filterOptions = [
-    {
-      key: "status" as keyof BikeRider,
-      label: "Status",
-      options: [
-        { label: "Approved", value: "approved" },
-        { label: "Pending", value: "pending" },
-        { label: "Rejected", value: "rejected" },
-      ],
-    },
-  ];
+  // const filterOptions = [
+  //   {
+  //     key: "status" as keyof BikeRider,
+  //     label: "Status",
+  //     options: [
+  //       { label: "Approved", value: "approved" },
+  //       { label: "Pending", value: "pending" },
+  //       { label: "Rejected", value: "rejected" },
+  //     ],
+  //   },
+  // ];
 
   return (
     <>
@@ -170,13 +172,15 @@ const BikeRiders = () => {
           data={riders}
           onRowClick={handleRowClick}
           keyExtractor={(item) => item.driverId}
-          filterable={true}
-          filterOptions={filterOptions}
+          // filterable={true}
+          // filterOptions={filterOptions}
           paginate={true}
           pageSize={10}
           currentPage={currentPage}
           totalItems={totalDrivers}
           onPageChange={(page) => setCurrentPage(page)}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
         />
       )}
     </>
