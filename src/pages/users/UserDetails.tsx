@@ -1,18 +1,30 @@
-
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 // import Layout from '@/components/layout/Layout';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User } from '@/types/admin';
-import { toast } from '@/hooks/use-toast';
-import { ChevronLeft } from 'lucide-react';
-import axiosInstance from '@/api/axiosInstance';
-import fileUploadInstance from '@/api/fileUploadInstance';
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { User } from "@/types/admin";
+import { toast } from "@/hooks/use-toast";
+import { ChevronLeft } from "lucide-react";
+import axiosInstance from "@/api/axiosInstance";
+import fileUploadInstance from "@/api/fileUploadInstance";
 
 // Available permissions
 const availablePermissions = [
@@ -21,14 +33,13 @@ const availablePermissions = [
   { id: "taxiManagement", label: "Manage Taxis" },
   { id: "bikeManagement", label: "Manage Bikes" },
   { id: "hotelManagement", label: "Manage Hotels" },
-  { id: "walletManagement", label: "Wallet Management" },
+  // { id: "walletManagement", label: "Wallet Management" },
   // { id: "reportsAnalytics", label: "Dashboard" },
-  { id: "notifications", label: "Notifications" },
+  // { id: "notifications", label: "Notifications" },
   { id: "roleManagement", label: "Role Management" },
   { id: "commissionManagement", label: "Commission Management" },
   { id: "couponManagement", label: "Coupon Management" },
 ];
-
 
 const UserDetails = () => {
   const navigate = useNavigate();
@@ -41,8 +52,8 @@ const UserDetails = () => {
     branch: user?.branch ?? {
       branchId: "",
       name: "",
-      location: ""
-    }
+      location: "",
+    },
   });
 
   const [loading, setLoading] = useState(true);
@@ -50,7 +61,6 @@ const UserDetails = () => {
   const [activityLoading, setActivityLoading] = useState(false);
   const [branches, setBranches] = useState<any[]>([]);
   const [searchAddress, setSearchAddress] = useState("");
-
 
   useEffect(() => {
     if (!userId) return;
@@ -65,10 +75,10 @@ const UserDetails = () => {
             ...userData,
             branch: userData.branch
               ? {
-                branchId: userData.branch.branchId,
-                name: userData.branch.name,
-                location: userData.branch.location,
-              }
+                  branchId: userData.branch.branchId,
+                  name: userData.branch.name,
+                  location: userData.branch.location,
+                }
               : null,
           };
 
@@ -84,7 +94,6 @@ const UserDetails = () => {
 
     fetchUser();
   }, [userId]);
-
 
   useEffect(() => {
     if (!userId) return;
@@ -129,9 +138,6 @@ const UserDetails = () => {
     }
   }, [isEditing, editedUser]);
 
-
-
-
   const handleSave = async () => {
     try {
       // Build permissions object (Dashboard always disabled)
@@ -171,12 +177,10 @@ const UserDetails = () => {
       // Update local state
       setIsEditing(false);
       setUser({ ...editedUser, permissions: updatedPermissions });
-
     } catch (err) {
       console.error("Failed to update user", err);
     }
   };
-
 
   const togglePermission = (id: string) => {
     if (!editedUser) return;
@@ -184,42 +188,41 @@ const UserDetails = () => {
     setEditedUser((prev) =>
       prev
         ? {
-          ...prev,
-          permissions: {
-            ...prev.permissions,
-            [id]: !prev.permissions[id],
-          },
-        }
+            ...prev,
+            permissions: {
+              ...prev.permissions,
+              [id]: !prev.permissions[id],
+            },
+          }
         : prev
     );
   };
 
-
   const handleRoleChange = (role: string) => {
-    setEditedUser(prev => {
+    setEditedUser((prev) => {
       if (!prev) return prev;
 
       // If changing to Admin, set all permissions
-      if (role === 'Admin') {
+      if (role === "Admin") {
         return {
           ...prev,
-          role: role as User['role'],
-          permissions: ['all']
+          role: role as User["role"],
+          permissions: ["all"],
         };
       }
 
       // If changing from Admin, set some default permissions
-      if (prev.role === 'Admin') {
+      if (prev.role === "Admin") {
         return {
           ...prev,
-          role: role as User['role'],
-          permissions: ['view_reports']
+          role: role as User["role"],
+          permissions: ["view_reports"],
         };
       }
 
       return {
         ...prev,
-        role: role as User['role']
+        role: role as User["role"],
       };
     });
   };
@@ -238,11 +241,10 @@ const UserDetails = () => {
 
   return (
     <>
-
       <Button
         variant="ghost"
         className="mb-4"
-        onClick={() => navigate('/user-management')}
+        onClick={() => navigate("/user-management")}
       >
         <ChevronLeft className="mr-2 h-4 w-4" /> Back to All Admins / Sub-admins
       </Button>
@@ -269,7 +271,9 @@ const UserDetails = () => {
               <CardHeader>
                 <CardTitle>Admin / Sub-admin Information</CardTitle>
                 <CardDescription>
-                  {isEditing ? "Edit Admin / Sub-admin details" : "View Admin / Sub-admin details"}
+                  {isEditing
+                    ? "Edit Admin / Sub-admin details"
+                    : "View Admin / Sub-admin details"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -279,7 +283,12 @@ const UserDetails = () => {
                     {isEditing ? (
                       <Input
                         value={editedUser.userName}
-                        onChange={(e) => setEditedUser({ ...editedUser, userName: e.target.value })}
+                        onChange={(e) =>
+                          setEditedUser({
+                            ...editedUser,
+                            userName: e.target.value,
+                          })
+                        }
                         placeholder="Enter full name"
                       />
                     ) : (
@@ -293,7 +302,12 @@ const UserDetails = () => {
                       <Input
                         type="email"
                         value={editedUser.email}
-                        onChange={(e) => setEditedUser({ ...editedUser, email: e.target.value })}
+                        onChange={(e) =>
+                          setEditedUser({
+                            ...editedUser,
+                            email: e.target.value,
+                          })
+                        }
                         placeholder="Enter email address"
                       />
                     ) : (
@@ -371,7 +385,8 @@ const UserDetails = () => {
                                   setEditedUser({
                                     ...editedUser,
                                     branch: {
-                                      branchId: editedUser.branch?.branchId || "",
+                                      branchId:
+                                        editedUser.branch?.branchId || "",
                                       name: branchName,
                                       location: branchName,
                                     },
@@ -384,10 +399,11 @@ const UserDetails = () => {
                             ))}
                           </div>
                         )}
-
                       </>
                     ) : (
-                      <p className="text-gray-700">{user.branch?.name || "N/A"}</p>
+                      <p className="text-gray-700">
+                        {user.branch?.name || "N/A"}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -395,13 +411,18 @@ const UserDetails = () => {
 
               {isEditing && (
                 <CardFooter className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => {
-                    setIsEditing(false);
-                    setEditedUser({ ...user });
-                  }}>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditedUser({ ...user });
+                    }}
+                  >
                     Cancel
                   </Button>
-                  <Button type="button" onClick={handleSave}>Save Changes</Button>
+                  <Button type="button" onClick={handleSave}>
+                    Save Changes
+                  </Button>
                 </CardFooter>
               )}
             </Card>
@@ -412,22 +433,28 @@ const UserDetails = () => {
               <CardHeader>
                 <CardTitle>User Permissions</CardTitle>
                 <CardDescription>
-                  {user.role === 'Admin'
+                  {user.role === "Admin"
                     ? "Admin users have full access to all features"
                     : "Manage what this user can access and modify"}
                 </CardDescription>
               </CardHeader>
 
-
               <CardContent>
                 <div className="border rounded-md p-4 max-h-96 overflow-y-auto">
                   <div className="space-y-4">
                     {availablePermissions.map((permission) => (
-                      <div key={permission.id} className="flex items-center space-x-2">
+                      <div
+                        key={permission.id}
+                        className="flex items-center space-x-2"
+                      >
                         <Checkbox
                           id={`permission-${permission.id}`}
-                          checked={Boolean(editedUser.permissions?.[permission.id])}
-                          onCheckedChange={() => togglePermission(permission.id)}
+                          checked={Boolean(
+                            editedUser.permissions?.[permission.id]
+                          )}
+                          onCheckedChange={() =>
+                            togglePermission(permission.id)
+                          }
                           disabled={!isEditing}
                         />
                         <label
@@ -443,10 +470,13 @@ const UserDetails = () => {
               </CardContent>
               {isEditing && (
                 <CardFooter className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => {
-                    setIsEditing(false);
-                    setEditedUser({ ...user });
-                  }}>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditedUser({ ...user });
+                    }}
+                  >
                     Cancel
                   </Button>
                   <Button onClick={handleSave}>Save Changes</Button>
@@ -459,7 +489,9 @@ const UserDetails = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Activity Log</CardTitle>
-                <CardDescription>Recent activities performed by this user</CardDescription>
+                <CardDescription>
+                  Recent activities performed by this user
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {activityLoading ? (
@@ -471,8 +503,10 @@ const UserDetails = () => {
                     {activity.map((act, index) => {
                       // Pick border color based on type
                       let borderColor = "border-gray-400";
-                      if (act.type === "login") borderColor = "border-green-500";
-                      if (act.type === "update") borderColor = "border-blue-500";
+                      if (act.type === "login")
+                        borderColor = "border-green-500";
+                      if (act.type === "update")
+                        borderColor = "border-blue-500";
                       if (act.type === "delete") borderColor = "border-red-500";
 
                       return (
@@ -483,7 +517,8 @@ const UserDetails = () => {
                           <p className="text-sm text-gray-500">{act.time}</p>
                           <p className="font-medium">{act.activity}</p>
                           <p className="text-xs text-gray-400">
-                            By {act.performedBy?.email} ({act.performedBy?.role})
+                            By {act.performedBy?.email} ({act.performedBy?.role}
+                            )
                           </p>
                         </div>
                       );
@@ -493,8 +528,6 @@ const UserDetails = () => {
               </CardContent>
             </Card>
           </TabsContent>
-
-
         </Tabs>
       </div>
     </>

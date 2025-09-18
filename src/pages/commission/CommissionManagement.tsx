@@ -33,8 +33,8 @@ const mockCommissions: Commission[] = [
     percentage: 10,
     fixedRate: null,
     commissionType: "percentage",
-    effectiveFrom: "2023-01-01T00:00",
-    effectiveTo: "2023-12-31T23:59",
+    // effectiveFrom: "2023-01-01T00:00",
+    // effectiveTo: "2023-12-31T23:59",
     isActive: true,
   },
   {
@@ -43,8 +43,8 @@ const mockCommissions: Commission[] = [
     percentage: 12,
     fixedRate: null,
     commissionType: "percentage",
-    effectiveFrom: "2023-01-01T00:00",
-    effectiveTo: "2023-12-31T23:59",
+    // effectiveFrom: "2023-01-01T00:00",
+    // effectiveTo: "2023-12-31T23:59",
     isActive: true,
   },
   {
@@ -53,8 +53,8 @@ const mockCommissions: Commission[] = [
     percentage: null,
     fixedRate: 50,
     commissionType: "fixed",
-    effectiveFrom: "2023-01-01T00:00",
-    effectiveTo: "2023-12-31T23:59",
+    // effectiveFrom: "2023-01-01T00:00",
+    // effectiveTo: "2023-12-31T23:59",
     isActive: true,
   },
   {
@@ -63,8 +63,8 @@ const mockCommissions: Commission[] = [
     percentage: 8,
     fixedRate: null,
     commissionType: "percentage",
-    effectiveFrom: "2023-01-01T00:00",
-    effectiveTo: "2023-12-31T23:59",
+    // effectiveFrom: "2023-01-01T00:00",
+    // effectiveTo: "2023-12-31T23:59",
     isActive: true,
   },
 ];
@@ -79,11 +79,11 @@ const CommissionManagement = () => {
     percentage: 0,
     fixedRate: null,
     commissionType: "percentage",
-    effectiveFrom: new Date().toISOString().split(".")[0].slice(0, 16),
-    effectiveTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
-      .toISOString()
-      .split(".")[0]
-      .slice(0, 16),
+    // effectiveFrom: new Date().toISOString().split(".")[0].slice(0, 16),
+    // effectiveTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+    //   .toISOString()
+    //   .split(".")[0]
+    //   .slice(0, 16),
     isActive: true,
   });
 
@@ -122,8 +122,8 @@ const CommissionManagement = () => {
               : null,
           fixedRate:
             item.commissionType === "fixed" ? item.commissionRate : null,
-          effectiveFrom: item.startDate,
-          effectiveTo: item.endDate,
+          // effectiveFrom: item.startDate,
+          // effectiveTo: item.endDate,
           status: formatStatus(item.status),
           isActive: item.status === "active",
         }));
@@ -147,13 +147,13 @@ const CommissionManagement = () => {
       percentage: 0,
       fixedRate: null,
       commissionType: "percentage",
-      effectiveFrom: new Date().toISOString().split(".")[0].slice(0, 16),
-      effectiveTo: new Date(
-        new Date().setFullYear(new Date().getFullYear() + 1)
-      )
-        .toISOString()
-        .split(".")[0]
-        .slice(0, 16),
+      // effectiveFrom: new Date().toISOString().split(".")[0].slice(0, 16),
+      // effectiveTo: new Date(
+      //   new Date().setFullYear(new Date().getFullYear() + 1)
+      // )
+      //   .toISOString()
+      //   .split(".")[0]
+      //   .slice(0, 16),
       isActive: true,
     });
     setIsDialogOpen(true);
@@ -182,8 +182,8 @@ const CommissionManagement = () => {
               : null,
           fixedRate:
             data.commissionType === "fixed" ? data.commissionRate : null,
-          effectiveFrom: new Date(data.startDate).toISOString().slice(0, 16), // format for datetime-local
-          effectiveTo: new Date(data.endDate).toISOString().slice(0, 16),
+          // effectiveFrom: new Date(data.startDate).toISOString().slice(0, 16),
+          // effectiveTo: new Date(data.endDate).toISOString().slice(0, 16),
           isActive: data.status === "active",
         };
 
@@ -212,8 +212,8 @@ const CommissionManagement = () => {
     try {
       let payload: any = {
         commissionType: currentCommission.commissionType,
-        startDate: new Date(currentCommission.effectiveFrom).toISOString(),
-        endDate: new Date(currentCommission.effectiveTo).toISOString(),
+        // startDate: new Date(currentCommission.effectiveFrom).toISOString(),
+        // endDate: new Date(currentCommission.effectiveTo).toISOString(),
         status: currentCommission.isActive ? "active" : "in_active",
       };
 
@@ -334,34 +334,34 @@ const CommissionManagement = () => {
         </div>
       ),
     },
-    {
-      key: "effectiveFrom",
-      header: "Effective From",
-      render: (commission: Commission) => (
-        <span>
-          {new Date(commission.effectiveFrom).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })}
-        </span>
-      ),
-    },
-    {
-      key: "effectiveTo",
-      header: "Effective To",
-      render: (commission: Commission) => (
-        <span>
-          {commission.effectiveTo
-            ? new Date(commission.effectiveTo).toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })
-            : "No End Date"}
-        </span>
-      ),
-    },
+    // {
+    //   key: "effectiveFrom",
+    //   header: "Effective From",
+    //   render: (commission: Commission) => (
+    //     <span>
+    //       {new Date(commission.effectiveFrom).toLocaleDateString("en-GB", {
+    //         day: "2-digit",
+    //         month: "short",
+    //         year: "numeric",
+    //       })}
+    //     </span>
+    //   ),
+    // },
+    // {
+    //   key: "effectiveTo",
+    //   header: "Effective To",
+    //   render: (commission: Commission) => (
+    //     <span>
+    //       {commission.effectiveTo
+    //         ? new Date(commission.effectiveTo).toLocaleDateString("en-GB", {
+    //             day: "2-digit",
+    //             month: "short",
+    //             year: "numeric",
+    //           })
+    //         : "No End Date"}
+    //     </span>
+    //   ),
+    // },
     {
       key: "isActive" as keyof Commission,
       header: "Status",
@@ -543,7 +543,7 @@ const CommissionManagement = () => {
               </div>
             )}
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <label className="text-sm font-medium">Start Date and Time</label>
               <Input
                 type="datetime-local"
@@ -563,7 +563,7 @@ const CommissionManagement = () => {
                   handleInputChange("effectiveTo", e.target.value)
                 }
               />
-            </div>
+            </div> */}
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Status</label>

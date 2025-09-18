@@ -349,8 +349,8 @@ export interface Commission {
   percentage: number | null;
   fixedRate: number | null;
   commissionType: "percentage" | "fixed";
-  effectiveFrom: string;
-  effectiveTo?: string;
+  // effectiveFrom: string;
+  // effectiveTo?: string;
   isActive: boolean;
 }
 
@@ -384,6 +384,7 @@ export interface WalletTransaction {
   id: string;
   userId: string;
   userName: string;
+  role: string;
   type: string;
   amount: number;
   date: string;

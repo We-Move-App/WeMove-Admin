@@ -72,8 +72,8 @@ const availablePermissions = [
   // { id: 'subadminManagement', label: 'Manage Sub-admins' },
   { id: "commissionManagement", label: "Manage Commissions" },
   { id: "couponManagement", label: "Manage Coupons" },
-  { id: "notifications", label: "Manage Notifications" },
-  { id: "walletManagement", label: "Wallet Management" }, // <-- missing
+  // { id: "notifications", label: "Manage Notifications" },
+  // { id: "walletManagement", label: "Wallet Management" },
 ];
 
 const UserManagement = () => {
