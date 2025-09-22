@@ -3,7 +3,7 @@ interface StatusBadgeProps {
 }
 
 const StatusBadge = ({ status }: StatusBadgeProps) => {
-  console.log("StatusBadge received:", status);
+  // console.log("StatusBadge received:", status);
   if (!status) {
     return (
       <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">

@@ -316,6 +316,25 @@ const UserDetails = () => {
                   </div>
 
                   <div className="space-y-2">
+                    <label className="text-sm font-medium">Mobile Number</label>
+                    {isEditing ? (
+                      <Input
+                        type="tel"
+                        value={editedUser.phoneNumber}
+                        onChange={(e) =>
+                          setEditedUser({
+                            ...editedUser,
+                            phoneNumber: e.target.value,
+                          })
+                        }
+                        placeholder="Enter mobile number"
+                      />
+                    ) : (
+                      <p className="text-gray-700">{user.phoneNumber}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
                     <label className="text-sm font-medium">Role</label>
                     {isEditing ? (
                       <Select
@@ -335,45 +354,18 @@ const UserDetails = () => {
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <label className="text-sm font-medium">
                       {isEditing ? "Choose Branch" : "Branch"}
                     </label>
 
                     {isEditing ? (
                       <>
-                        {/* Search input */}
                         <Input
                           placeholder="Type city or branch..."
                           value={searchAddress}
                           onChange={(e) => setSearchAddress(e.target.value)}
                         />
-
-                        {/* Dropdown results */}
-                        {/* {branches.length > 0 && (
-                          <div className="border rounded-md bg-white mt-2 max-h-48 overflow-y-auto">
-                            {branches.map((branch, idx) => (
-                              <div
-                                key={idx}
-                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                                onClick={() => {
-                                  setSearchAddress(branch.name);
-                                  setEditedUser({
-                                    ...editedUser,
-                                    branch: {
-                                      branchId: branch.branchId,
-                                      name: branch.name,
-                                      location: branch.location || branch.name,
-                                    },
-                                  });
-                                  setBranches([]);
-                                }}
-                              >
-                                {branch.name}
-                              </div>
-                            ))}
-                          </div>
-                        )} */}
                         {branches.length > 0 && (
                           <div className="border rounded-md bg-white mt-2 max-h-48 overflow-y-auto">
                             {branches.map((branchName, idx) => (
@@ -405,7 +397,7 @@ const UserDetails = () => {
                         {user.branch?.name || "N/A"}
                       </p>
                     )}
-                  </div>
+                  </div> */}
                 </div>
               </CardContent>
 

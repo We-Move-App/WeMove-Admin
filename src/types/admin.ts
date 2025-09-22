@@ -14,6 +14,7 @@ export interface User {
   id: string;
   userName: string;
   email: string;
+  phoneNumber?: string;
   role: "Admin" | "Subadmin";
   permissions: string[];
   createdAt: string;
@@ -393,18 +394,18 @@ export interface WalletTransaction {
 }
 
 // Notification related types
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type?: "info" | "success" | "warning" | "error";
-  recipientType?: string;
-  read?: boolean;
-  sentAt?: string;
-  status?: string;
-  userId?: string;
-  createdAt?: string;
-}
+// export interface Notification {
+//   id: string;
+//   title: string;
+//   message: string;
+//   type?: "info" | "success" | "warning" | "error";
+//   recipientType?: string;
+//   read?: boolean;
+//   sentAt?: string;
+//   status?: string;
+//   userId?: string;
+//   createdAt?: string;
+// }
 
 // Dashboard related types
 export interface BookingSummary {
@@ -426,4 +427,14 @@ export interface RevenueData {
   hotel: number;
   taxi: number;
   bike: number;
+}
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  image: string;
+  timestamp: string;
+  read: boolean;
+  type: "info" | "success" | "warning" | "error";
 }

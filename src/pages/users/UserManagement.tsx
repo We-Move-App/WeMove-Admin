@@ -72,6 +72,7 @@ const availablePermissions = [
   // { id: 'subadminManagement', label: 'Manage Sub-admins' },
   { id: "commissionManagement", label: "Manage Commissions" },
   { id: "couponManagement", label: "Manage Coupons" },
+  { id: "roleManagement", label: "Manage Roles" },
   // { id: "notifications", label: "Manage Notifications" },
   // { id: "walletManagement", label: "Wallet Management" },
 ];
@@ -85,7 +86,7 @@ const UserManagement = () => {
     email: string;
     phoneNumber: string;
     // password: string;
-    role: "Admin" | "SubAdmin";
+    role: "SuperAdmin" | "Admin" | "SubAdmin";
     permissions: string[];
     branchId: string;
     branchName: string;
@@ -110,11 +111,11 @@ const UserManagement = () => {
     percentage: 0,
     fixedRate: null,
     commissionType: "percentage",
-    effectiveFrom: new Date().toISOString().split(".")[0].slice(0, 16),
-    effectiveTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
-      .toISOString()
-      .split(".")[0]
-      .slice(0, 16),
+    // effectiveFrom: new Date().toISOString().split(".")[0].slice(0, 16),
+    // effectiveTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+    //   .toISOString()
+    //   .split(".")[0]
+    //   .slice(0, 16),
     isActive: true,
   });
   const [isEditing, setIsEditing] = useState(false);
@@ -125,6 +126,8 @@ const UserManagement = () => {
   const [totalBookings, setTotalBookings] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
+  const [role, setRole] = useState<string | null>(null);
+  const [adminProfile, setAdminProfile] = useState<any>(null);
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -188,6 +191,14 @@ const UserManagement = () => {
       fetchAdmins();
     }
   }, [newUser.role]);
+
+  useEffect(() => {
+    const storedRole = localStorage.getItem("role");
+    const storedProfile = localStorage.getItem("AdminProfile");
+
+    if (storedRole) setRole(storedRole);
+    if (storedProfile) setAdminProfile(JSON.parse(storedProfile));
+  }, []);
 
   const handleInputChange = (field: keyof Commission, value: any) => {
     setCurrentCommission((prev) => ({ ...prev, [field]: value }));
@@ -267,6 +278,104 @@ const UserManagement = () => {
     }
   };
 
+  // const handleAddUser = async () => {
+  //   if (!newUser.name || !newUser.email || !newUser.phoneNumber) {
+  //     toast({ title: "Please fill in all required fields.." });
+  //     return;
+  //   }
+
+  //   try {
+  //     let branchId = newUser.branchId;
+
+  //     // Only Admins can create/select branch
+  //     if (newUser.role === "Admin") {
+  //       if (!newUser.branchName) {
+  //         toast({ title: "Please select a branch for Admin" });
+  //         return;
+  //       }
+
+  //       const branchPayload = {
+  //         name: newUser.branchName,
+  //         location: query,
+  //       };
+
+  //       const branchRes = await axiosInstance.post("/branch", branchPayload);
+  //       branchId = branchRes.data?.data?.branch?._id;
+  //       console.log("Branch created/confirmed with ID:", branchId);
+  //     }
+
+  //     //  Permissions payload
+  //     const allBackendKeys = [
+  //       "reportsAnalytics",
+  //       "busManagement",
+  //       "hotelManagement",
+  //       "taxiManagement",
+  //       "bikeManagement",
+  //       "userManagement",
+  //       "roleManagement",
+  //       "commissionManagement",
+  //       "couponManagement",
+  //       "notifications",
+  //       "walletManagement",
+  //     ];
+
+  //     const permissionsPayload: Record<string, boolean> = {};
+  //     allBackendKeys.forEach((key) => {
+  //       permissionsPayload[key] =
+  //         key === "reportsAnalytics" ? true : newUser.permissions.includes(key);
+  //     });
+
+  //     // Build user payload
+  //     const userPayload: any = {
+  //       email: newUser.email,
+  //       userName: newUser.name,
+  //       phoneNumber: newUser.phoneNumber,
+  //       role: newUser.role,
+  //       permissions: permissionsPayload,
+  //       branch: branchId,
+  //     };
+
+  //     if (newUser.role === "SubAdmin") {
+  //       userPayload.reportingManger = newUser.adminId;
+  //     }
+
+  //     console.log("Creating user with payload:", userPayload);
+
+  //     // API call
+  //     let userRes;
+  //     if (newUser.role === "Admin") {
+  //       userRes = await axiosInstance.post("/auth/add-admin", userPayload);
+  //     } else if (newUser.role === "SubAdmin") {
+  //       userRes = await axiosInstance.post("/auth/add-SubAdmin", userPayload);
+  //     }
+
+  //     toast({ title: `${newUser.role} created successfully!` });
+
+  //     // Update local state
+  //     setUsers((prev) => [
+  //       ...prev,
+  //       { ...userRes!.data, id: userRes!.data.id || Date.now().toString() },
+  //     ]);
+
+  //     // Reset form
+  //     setNewUser({
+  //       name: "",
+  //       email: "",
+  //       phoneNumber: "",
+  //       role: "Admin",
+  //       permissions: [],
+  //       branchId: "",
+  //       branchName: "",
+  //       adminId: "",
+  //     });
+  //     setQuery("");
+  //     setIsDialogOpen(false);
+  //   } catch (error: any) {
+  //     console.error(error);
+  //     toast({ title: `Failed to create ${newUser.role}.` });
+  //   }
+  // };
+
   const handleAddUser = async () => {
     if (!newUser.name || !newUser.email || !newUser.phoneNumber) {
       toast({ title: "Please fill in all required fields.." });
@@ -276,24 +385,7 @@ const UserManagement = () => {
     try {
       let branchId = newUser.branchId;
 
-      // Only Admins can create/select branch
-      if (newUser.role === "Admin") {
-        if (!newUser.branchName) {
-          toast({ title: "Please select a branch for Admin" });
-          return;
-        }
-
-        const branchPayload = {
-          name: newUser.branchName,
-          location: query,
-        };
-
-        const branchRes = await axiosInstance.post("/branch", branchPayload);
-        branchId = branchRes.data?.data?.branch?._id;
-        console.log("Branch created/confirmed with ID:", branchId);
-      }
-
-      //  Permissions payload
+      // 🔑 Permissions payload
       const allBackendKeys = [
         "reportsAnalytics",
         "busManagement",
@@ -314,31 +406,58 @@ const UserManagement = () => {
           key === "reportsAnalytics" ? true : newUser.permissions.includes(key);
       });
 
-      // Build user payload
+      // 👤 Build base payload
       const userPayload: any = {
         email: newUser.email,
         userName: newUser.name,
         phoneNumber: newUser.phoneNumber,
-        role: newUser.role,
         permissions: permissionsPayload,
-        branch: branchId,
       };
 
-      if (newUser.role === "SubAdmin") {
-        userPayload.reportingManger = newUser.adminId;
+      // --- Role-based branching ---
+      let userRes;
+
+      // 🏢 SuperAdmin → Admin
+      if (role === "SuperAdmin" && newUser.role === "Admin") {
+        if (!newUser.branchName) {
+          toast({ title: "Please select a branch for Admin" });
+          return;
+        }
+
+        const branchPayload = { name: newUser.branchName, location: query };
+        const branchRes = await axiosInstance.post("/branch", branchPayload);
+        branchId = branchRes.data?.data?.branch?._id;
+
+        userPayload.role = "Admin";
+        userPayload.branch = branchId;
+
+        userRes = await axiosInstance.post("/auth/add-admin", userPayload);
       }
 
-      console.log("Creating user with payload:", userPayload);
+      // ⚡ SuperAdmin → SubAdmin
+      else if (role === "SuperAdmin" && newUser.role === "SubAdmin") {
+        if (!newUser.adminId) {
+          toast({ title: "Please assign an Admin for the Sub-Admin" });
+          return;
+        }
 
-      // API call
-      let userRes;
-      if (newUser.role === "Admin") {
-        userRes = await axiosInstance.post("/auth/add-admin", userPayload);
-      } else if (newUser.role === "SubAdmin") {
+        userPayload.role = "SubAdmin";
+        userPayload.reportingManager = newUser.adminId;
+        userPayload.branch = branchId;
+
         userRes = await axiosInstance.post("/auth/add-SubAdmin", userPayload);
       }
 
-      toast({ title: `${newUser.role} created successfully!` });
+      // ⚡ Admin → SubAdmin
+      else if (role === "Admin") {
+        userPayload.role = "SubAdmin";
+        // No branch, no reportingManager
+        userRes = await axiosInstance.post("/auth/add-SubAdmin", userPayload);
+      } else {
+        throw new Error("Invalid role combination for user creation");
+      }
+
+      toast({ title: `${userPayload.role} created successfully!` });
 
       // Update local state
       setUsers((prev) => [
@@ -369,14 +488,35 @@ const UserManagement = () => {
     navigate(`/user-management/${user.id}`);
   };
 
+  const filteredPermissions = availablePermissions.filter((perm) => {
+    // Hide "Manage Roles" if logged-in user is Admin
+    if (role === "Admin" && perm.id === "roleManagement") {
+      return false;
+    }
+
+    // If logged-in is SuperAdmin but creating SubAdmin → hide "Manage Roles"
+    if (
+      role === "SuperAdmin" &&
+      newUser.role === "SubAdmin" &&
+      perm.id === "roleManagement"
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
   return (
     <>
       <div className="mb-6 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">Role Management</h1>
-          <p className="text-gray-600">
+          {/* <p className="text-gray-600">
             Manage admin, sub-admin roles and their permissions
-          </p>
+          </p> */}
+          {role === "Admin"
+            ? "Manage sub-admin roles and their permissions"
+            : "Manage admin, sub-admin roles and their permissions"}
         </div>
 
         <Button
@@ -384,7 +524,8 @@ const UserManagement = () => {
           className="flex items-center gap-2"
         >
           <Plus size={16} />
-          Add Admin / Sub-admin
+          {/* Add Admin / Sub-admin */}
+          {role === "Admin" ? "Add Sub-Admin" : "Add Admin / Sub-admin"}
         </Button>
       </div>
 
@@ -406,7 +547,11 @@ const UserManagement = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Admin / Sub-admin</DialogTitle>
+            <DialogTitle>
+              {role === "Admin"
+                ? "Add New Sub-Admin"
+                : "Add New Admin / Sub-admin"}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -442,26 +587,67 @@ const UserManagement = () => {
                 placeholder="Enter email address"
               />
             </div>
+            {role !== "Admin" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Role</label>
+                <Select
+                  value={newUser.role}
+                  onValueChange={(value: "Admin" | "SubAdmin") =>
+                    setNewUser({ ...newUser, role: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Admin">Admin</SelectItem>
+                    <SelectItem value="SubAdmin">Sub-Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Role</label>
-              <Select
-                value={newUser.role}
-                onValueChange={(value: "Admin" | "SubAdmin") =>
-                  setNewUser({ ...newUser, role: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Admin">Admin</SelectItem>
-                  <SelectItem value="SubAdmin">Sub-Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {/* {newUser.role === "SubAdmin" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Assign Admin</label>
+                <Select
+                  value={newUser.adminId || ""}
+                  onValueChange={(value) => {
+                    const selectedAdmin = admins.find(
+                      (admin) => admin._id === value
+                    );
+                    if (selectedAdmin) {
+                      console.log("Admin ID:", selectedAdmin._id);
+                      console.log("Branch ID:", selectedAdmin.branch.branchId);
 
-            {newUser.role === "SubAdmin" && (
+                      setNewUser({
+                        ...newUser,
+                        adminId: selectedAdmin._id,
+                        branchId: selectedAdmin.branch.branchId,
+                      });
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an Admin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {loadingAdmins ? (
+                      <div className="p-2 text-sm">Loading admins...</div>
+                    ) : admins.length === 0 ? (
+                      <div className="p-2 text-sm">No admins found</div>
+                    ) : (
+                      admins.map((admin) => (
+                        <SelectItem key={admin._id} value={admin._id}>
+                          {admin.name} ({admin.branch.location})
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )} */}
+            {role !== "Admin" && newUser.role === "SubAdmin" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">Assign Admin</label>
                 <Select
@@ -501,8 +687,48 @@ const UserManagement = () => {
                 </Select>
               </div>
             )}
-
+            {/* 
             {newUser.role === "Admin" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Choose Branch</label>
+                <Command className="border rounded-md">
+                  <CommandInput
+                    placeholder="Type city name..."
+                    value={query}
+                    onValueChange={(val) => setQuery(val)}
+                  />
+                  <CommandList>
+                    {loading && <div className="p-2 text-sm">Loading...</div>}
+                    {!loading && branches.length === 0 && query.length > 2 && (
+                      <div className="p-2 text-sm">No results found</div>
+                    )}
+                    <CommandGroup>
+                      {branches.map((branch) => (
+                        <CommandItem
+                          key={branch.id}
+                          onSelect={() =>
+                            setNewUser({
+                              ...newUser,
+                              branchId: branch.id,
+                              branchName: branch.name,
+                            })
+                          }
+                        >
+                          {branch.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+                {newUser.branchName && (
+                  <p className="text-xs text-gray-400">
+                    Selected: {newUser.branchName}
+                  </p>
+                )}
+              </div>
+            )} */}
+
+            {role !== "Admin" && newUser.role === "Admin" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">Choose Branch</label>
                 <Command className="border rounded-md">
@@ -542,11 +768,46 @@ const UserManagement = () => {
               </div>
             )}
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <label className="text-sm font-medium">Permissions</label>
               <div className="border rounded-md p-4 max-h-48 overflow-y-auto">
                 <div className="space-y-2">
                   {availablePermissions.map((permission) => {
+                    const isDashboard = permission.id === "reportsAnalytics";
+                    return (
+                      <div
+                        key={permission.id}
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox
+                          id={`permission-${permission.id}`}
+                          checked={
+                            isDashboard ||
+                            newUser.permissions.includes(permission.id)
+                          }
+                          disabled={isDashboard}
+                          onCheckedChange={() => {
+                            if (!isDashboard) togglePermission(permission.id);
+                          }}
+                        />
+                        <label
+                          htmlFor={`permission-${permission.id}`}
+                          className="text-sm font-medium leading-none cursor-pointer"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div> */}
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Permissions</label>
+              <div className="border rounded-md p-4 max-h-48 overflow-y-auto">
+                <div className="space-y-2">
+                  {filteredPermissions.map((permission) => {
                     const isDashboard = permission.id === "reportsAnalytics";
                     return (
                       <div
@@ -581,7 +842,9 @@ const UserManagement = () => {
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleAddUser}>Add Admin / Sub-admin</Button>
+            <Button onClick={handleAddUser}>
+              {role === "Admin" ? "Add Sub-admin" : "Add Admin / Sub-admin"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
