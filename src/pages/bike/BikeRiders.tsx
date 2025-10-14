@@ -137,17 +137,17 @@ const BikeRiders = () => {
     },
   ];
 
-  // const filterOptions = [
-  //   {
-  //     key: "status" as keyof BikeRider,
-  //     label: "Status",
-  //     options: [
-  //       { label: "Approved", value: "approved" },
-  //       { label: "Pending", value: "pending" },
-  //       { label: "Rejected", value: "rejected" },
-  //     ],
-  //   },
-  // ];
+  const filterOptions = [
+    {
+      key: "status" as keyof BikeRider,
+      label: "Status",
+      options: [
+        { label: "Approved", value: "approved" },
+        { label: "Pending", value: "pending" },
+        { label: "Rejected", value: "rejected" },
+      ],
+    },
+  ];
 
   return (
     <>
@@ -172,8 +172,8 @@ const BikeRiders = () => {
           data={riders}
           onRowClick={handleRowClick}
           keyExtractor={(item) => item.driverId}
-          // filterable={true}
-          // filterOptions={filterOptions}
+          filterable={true}
+          filterOptions={filterOptions}
           paginate={true}
           pageSize={10}
           currentPage={currentPage}

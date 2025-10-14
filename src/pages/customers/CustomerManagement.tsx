@@ -94,6 +94,19 @@ const CustomerManagement = () => {
     },
   ];
 
+  const filterOptions = [
+    {
+      key: "status" as keyof Customer,
+      label: "Status",
+      options: [
+        { label: "Approved", value: "Approved" },
+        { label: "Submitted", value: "Submitted" },
+        { label: "Blocked", value: "Blocked" },
+        { label: "Rejected", value: "Rejected" },
+      ],
+    },
+  ];
+
   const handleRowClick = (customer: Customer) => {
     navigate(`/customer-management/${customer.id}`);
   };
@@ -115,6 +128,8 @@ const CustomerManagement = () => {
           onRowClick={handleRowClick}
           paginate={true}
           pageSize={10}
+          filterable
+          filterOptions={filterOptions}
           currentPage={currentPage}
           totalItems={totalUsers}
           onPageChange={(page) => setCurrentPage(page)}

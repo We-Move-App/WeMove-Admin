@@ -67,6 +67,11 @@ const Login = () => {
     }
   };
 
+  const onResetPassword = () => {
+    // For example, show a modal or navigate to password reset page
+    console.log("Reset password clicked");
+  };
+
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-gray-100 px-4"
@@ -129,7 +134,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-2 rounded-xl text-white transition ${
+            className={`w-full p-4 rounded-xl text-white transition ${
               loading ? "bg-green-700" : "bg-green-700 hover:bg-green-900"
             }`}
           >
@@ -138,12 +143,19 @@ const Login = () => {
           </button>
         </form>
 
-        {/* <p className="text-center text-sm text-gray-600 mt-4">
+        <p className="text-center text-sm text-gray-600 mt-4">
           Forgot password?{" "}
-          <a href="#" className="text-blue-500 hover:underline">
+          <a
+            href="#"
+            className="text-blue-500 hover:underline"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/reset-password");
+            }}
+          >
             Reset it here
           </a>
-        </p> */}
+        </p>
       </div>
     </div>
   );

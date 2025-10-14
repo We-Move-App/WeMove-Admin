@@ -6,6 +6,8 @@ import { WalletTransaction } from "@/types/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import StatusBadge from "@/components/ui/StatusBadge";
 import axiosInstance from "@/api/axiosInstance";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 // Mock data for wallet transactions
 // const mockWalletTransactions: WalletTransaction[] = [
@@ -300,73 +302,90 @@ const Wallet = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-500">
-              Total Transactions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-2">
-              <WalletIcon className="h-5 w-5 text-blue-500" />
-              <div className="text-2xl font-bold">{totalTransactions}</div>
-            </div>
-          </CardContent>
-        </Card>
+        {loading ? (
+          Array(4)
+            .fill(0)
+            .map((_, i) => (
+              <Card key={i}>
+                <CardHeader className="pb-2">
+                  <Skeleton width={100} height={15} />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton width={60} height={30} />
+                </CardContent>
+              </Card>
+            ))
+        ) : (
+          <>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-gray-500">
+                  Total Transactions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-2">
+                  <WalletIcon className="h-5 w-5 text-blue-500" />
+                  <div className="text-2xl font-bold">{totalTransactions}</div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-500">
-              Total Credits
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-2">
-              <div className="p-1 rounded-full bg-green-100">
-                <WalletIcon className="h-4 w-4 text-green-600" />
-              </div>
-              <div className="text-2xl font-bold text-green-600">
-                ${totalCredits.toFixed(2)}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-gray-500">
+                  Total Credits
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-2">
+                  <div className="p-1 rounded-full bg-green-100">
+                    <WalletIcon className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-green-600">
+                    ${totalCredits.toFixed(2)}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-500">
-              Total Debits
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-2">
-              <div className="p-1 rounded-full bg-red-100">
-                <WalletIcon className="h-4 w-4 text-red-600" />
-              </div>
-              <div className="text-2xl font-bold text-red-600">
-                ${totalDebits.toFixed(2)}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-gray-500">
+                  Total Debits
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-2">
+                  <div className="p-1 rounded-full bg-red-100">
+                    <WalletIcon className="h-4 w-4 text-red-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-red-600">
+                    ${totalDebits.toFixed(2)}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-500">
-              Pending Withdrawals
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-2">
-              <div className="p-1 rounded-full bg-amber-100">
-                <WalletIcon className="h-4 w-4 text-amber-600" />
-              </div>
-              <div className="text-2xl font-bold text-amber-600">
-                ${pendingWithdrawals.toFixed(2)}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-gray-500">
+                  Pending Withdrawals
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-2">
+                  <div className="p-1 rounded-full bg-amber-100">
+                    <WalletIcon className="h-4 w-4 text-amber-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-amber-600">
+                    ${pendingWithdrawals.toFixed(2)}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
 
       <div className="mb-6">
@@ -385,20 +404,35 @@ const Wallet = () => {
           totalItems={totalTransactions}
           onPageChange={(page) => setCurrentPage(page)}
         /> */}
-        <DataTable
-          columns={columns}
-          data={transactions}
-          keyExtractor={(item) => item.id}
-          searchable
-          exportable
-          filterable
-          filterOptions={filterOptions}
-          paginate
-          pageSize={pageSize}
-          currentPage={currentPage}
-          totalItems={totalTransactions} // 👈 totalRecords from backend
-          onPageChange={(page) => setCurrentPage(page)}
-        />
+        {loading ? (
+          <div>
+            {Array(5)
+              .fill(0)
+              .map((_, i) => (
+                <div key={i} className="flex justify-between p-2 border-b">
+                  <Skeleton width={100} />
+                  <Skeleton width={80} />
+                  <Skeleton width={60} />
+                  <Skeleton width={150} />
+                </div>
+              ))}
+          </div>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={transactions}
+            keyExtractor={(item) => item.id}
+            searchable
+            exportable
+            filterable
+            filterOptions={filterOptions}
+            paginate
+            pageSize={pageSize}
+            currentPage={currentPage}
+            totalItems={totalTransactions}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        )}
       </div>
     </>
   );

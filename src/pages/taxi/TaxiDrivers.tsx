@@ -52,16 +52,17 @@ const TaxiDrivers = () => {
     },
   ];
 
-  // const filterOptions = [
-  //   {
-  //     key: "status" as keyof TaxiDriver,
-  //     label: "Status",
-  //     options: [
-  //       { label: "Approved", value: "Approved" },
-  //       { label: "Rejected", value: "Rejected" },
-  //     ],
-  //   },
-  // ];
+  const filterOptions = [
+    {
+      key: "status" as keyof TaxiDriver,
+      label: "Status",
+      options: [
+        { label: "Approved", value: "Approved" },
+        { label: "Rejected", value: "Rejected" },
+        { label: "Pending", value: "Pending" },
+      ],
+    },
+  ];
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 500);
@@ -112,8 +113,8 @@ const TaxiDrivers = () => {
         columns={columns}
         data={drivers}
         keyExtractor={(item) => item.driverId}
-        // filterable={true}
-        // filterOptions={filterOptions}
+        filterable={true}
+        filterOptions={filterOptions}
         paginate={true}
         pageSize={10}
         currentPage={currentPage}

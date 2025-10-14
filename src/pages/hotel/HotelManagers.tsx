@@ -122,19 +122,19 @@ const HotelManagers = () => {
     },
   ];
 
-  // const filterOptions = [
-  //   {
-  //     key: "status" as keyof HotelManager,
-  //     label: "Status",
-  //     options: [
-  //       { label: "Approved", value: "Approved" },
-  //       { label: "Pending", value: "Pending" },
-  //       { label: "Submitted", value: "Submitted" },
-  //       { label: "Rejected", value: "Rejected" },
-  //       { label: "Blocked", value: "Blocked" },
-  //     ],
-  //   },
-  // ];
+  const filterOptions = [
+    {
+      key: "status" as keyof HotelManager,
+      label: "Status",
+      options: [
+        { label: "Approved", value: "Approved" },
+        { label: "Pending", value: "Pending" },
+        { label: "Submitted", value: "Submitted" },
+        { label: "Rejected", value: "Rejected" },
+        { label: "Blocked", value: "Blocked" },
+      ],
+    },
+  ];
 
   return (
     <>
@@ -167,8 +167,8 @@ const HotelManagers = () => {
           onPageChange={(page) => setCurrentPage(page)}
           onRowClick={handleRowClick}
           keyExtractor={(item) => item.id}
-          // filterable={true}
-          // filterOptions={filterOptions}
+          filterable={true}
+          filterOptions={filterOptions}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
         />

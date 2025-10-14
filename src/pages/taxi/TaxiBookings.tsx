@@ -107,17 +107,17 @@ const TaxiBookings = () => {
     },
   ];
 
-  // const filterOptions = [
-  //   {
-  //     key: "status" as keyof TaxiBooking,
-  //     label: "Status",
-  //     options: [
-  //       { label: "Completed", value: "Completed" },
-  //       { label: "Cancelled", value: "Cancelled" },
-  //       { label: "Pending", value: "Pending" },
-  //     ],
-  //   },
-  // ];
+  const filterOptions = [
+    {
+      key: "status" as keyof TaxiBooking,
+      label: "Status",
+      options: [
+        { label: "Completed", value: "Completed" },
+        { label: "Cancelled", value: "Cancelled" },
+        { label: "Pending", value: "Pending" },
+      ],
+    },
+  ];
 
   return (
     <>
@@ -135,8 +135,8 @@ const TaxiBookings = () => {
           columns={columns}
           data={bookings}
           keyExtractor={(item) => item.bookingId}
-          // filterable
-          // filterOptions={filterOptions}
+          filterable
+          filterOptions={filterOptions}
           paginate
           pageSize={pageSize}
           currentPage={currentPage}

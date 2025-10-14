@@ -26,17 +26,17 @@ interface NavItem {
   icon: JSX.Element;
   subItems?: { path: string; label: string }[];
   requiredPermission?:
-  | "userManagement"
-  | "busManagement"
-  | "taxiManagement"
-  | "hotelManagement"
-  | "walletManagement"
-  | "reportsAnalytics"
-  | "notifications"
-  | "roleManagement"
-  | "commissionManagement"
-  | "couponManagement"
-  | "bikeManagement";
+    | "userManagement"
+    | "busManagement"
+    | "taxiManagement"
+    | "hotelManagement"
+    | "walletManagement"
+    | "reportsAnalytics"
+    | "notifications"
+    | "roleManagement"
+    | "commissionManagement"
+    | "couponManagement"
+    | "bikeManagement";
 }
 
 const Sidebar = ({ adminProfile, adminAvatar }) => {
@@ -48,7 +48,12 @@ const Sidebar = ({ adminProfile, adminAvatar }) => {
   const permissions = adminProfile?.permissions || {};
   const role = adminProfile?.role || "";
   const navItems: NavItem[] = [
-    { path: "/dashboard", label: "Dashboard", icon: <Home size={20} />, requiredPermission: "reportsAnalytics" },
+    {
+      path: "/dashboard",
+      label: "Dashboard",
+      icon: <Home size={20} />,
+      requiredPermission: "reportsAnalytics",
+    },
     {
       path: "/bus-management",
       label: "Bus Management",
@@ -89,11 +94,46 @@ const Sidebar = ({ adminProfile, adminAvatar }) => {
         { path: "/bike-management/bookings", label: "Bike Bookings" },
       ],
     },
-    { path: "/customer-management", label: "User Management", icon: <Users size={20} />, requiredPermission: "userManagement" },
-    { path: "/user-management", label: "Admin Management", icon: <UserCog size={20} />, requiredPermission: "roleManagement" },
-    { path: "/commission-management", label: "Commission Management", icon: <Percent size={20} />, requiredPermission: "commissionManagement" },
-    { path: "/coupons", label: "Coupons", icon: <Tag size={20} />, requiredPermission: "couponManagement" },
-    { path: "/wallet", label: "Wallet", icon: <Wallet size={20} />, requiredPermission: "walletManagement" },
+    {
+      path: "/customer-management",
+      label: "User Management",
+      icon: <Users size={20} />,
+      requiredPermission: "userManagement",
+    },
+    // {
+    //   path: "/customer-management",
+    //   label: "User Management",
+    //   icon: <Users size={20} />,
+    //   requiredPermission: "userManagement",
+    //   subItems: [
+    //     { path: "/customer-management", label: "Users" },
+    //     { path: "/customer-management/bookings", label: "User Bookings" },
+    //   ],
+    // },
+    {
+      path: "/user-management",
+      label: "Admin Management",
+      icon: <UserCog size={20} />,
+      requiredPermission: "roleManagement",
+    },
+    {
+      path: "/commission-management",
+      label: "Commission Management",
+      icon: <Percent size={20} />,
+      requiredPermission: "commissionManagement",
+    },
+    {
+      path: "/coupons",
+      label: "Coupons",
+      icon: <Tag size={20} />,
+      requiredPermission: "couponManagement",
+    },
+    {
+      path: "/wallet",
+      label: "Wallet",
+      icon: <Wallet size={20} />,
+      requiredPermission: "walletManagement",
+    },
     // { path: "/notifications", label: "Notifications & Alerts", icon: <Bell size={20} />, requiredPermission: "notifications" },
   ];
 
@@ -171,13 +211,15 @@ const Sidebar = ({ adminProfile, adminAvatar }) => {
 
   return (
     <div
-      className={`admin-sidebar min-h-screen h-full ${isOpen ? "w-64" : "w-20"
-        } flex flex-col fixed left-0 top-0 bottom-0 z-40 transition-all duration-300 ease-in-out overflow-hidden`}
+      className={`admin-sidebar min-h-screen h-full ${
+        isOpen ? "w-64" : "w-20"
+      } flex flex-col fixed left-0 top-0 bottom-0 z-40 transition-all duration-300 ease-in-out overflow-hidden`}
     >
       <div className="flex items-center justify-between px-4 py-5 border-b border-white-100">
         <div
-          className={`flex items-center ${isOpen ? "" : "justify-center w-full"
-            }`}
+          className={`flex items-center ${
+            isOpen ? "" : "justify-center w-full"
+          }`}
         >
           {/* <BarChart className="text-blue-500" size={24} /> */}
           <img src={LogoImg} alt="" width={24} height={24} />
@@ -190,18 +232,19 @@ const Sidebar = ({ adminProfile, adminAvatar }) => {
         )} */}
       </div>
 
-
       <nav className="flex-1 py-4 overflow-y-auto">
         <ul>
           {navItems
-            .filter(item => permissions[item.requiredPermission])
+            .filter((item) => permissions[item.requiredPermission])
             .map((item) => (
               <li key={item.path} className="mb-1 px-2">
                 {item.subItems ? (
                   <>
                     <button
                       onClick={() => toggleSubNav(item.path)}
-                      className={`sidebar-menu-item w-full justify-between ${activeNavItem === item.path ? "bg-green-900" : ""}`}
+                      className={`sidebar-menu-item w-full justify-between ${
+                        activeNavItem === item.path ? "bg-green-900" : ""
+                      }`}
                     >
                       <div className="flex items-center">
                         {item.icon}
@@ -209,7 +252,11 @@ const Sidebar = ({ adminProfile, adminAvatar }) => {
                       </div>
                       {isOpen && (
                         <span
-                          className={`transform transition-transform ${expandedSubNav === item.path ? "rotate-180" : "rotate-0"}`}
+                          className={`transform transition-transform ${
+                            expandedSubNav === item.path
+                              ? "rotate-180"
+                              : "rotate-0"
+                          }`}
                         >
                           ▼
                         </span>
@@ -221,7 +268,11 @@ const Sidebar = ({ adminProfile, adminAvatar }) => {
                           <Link
                             key={subItem.path}
                             to={subItem.path}
-                            className={`block py-2 px-3 rounded-md text-sm ${location.pathname === subItem.path ? "bg-green-900 text-white" : "hover:bg-green-900"}`}
+                            className={`block py-2 px-3 rounded-md text-sm ${
+                              location.pathname === subItem.path
+                                ? "bg-green-900 text-white"
+                                : "hover:bg-green-900"
+                            }`}
                           >
                             {subItem.label}
                           </Link>
@@ -232,7 +283,9 @@ const Sidebar = ({ adminProfile, adminAvatar }) => {
                 ) : (
                   <Link
                     to={item.path}
-                    className={`sidebar-menu-item ${location.pathname === item.path ? "bg-green-900" : ""}`}
+                    className={`sidebar-menu-item ${
+                      location.pathname === item.path ? "bg-green-900" : ""
+                    }`}
                   >
                     {item.icon}
                     {isOpen && <span className="ml-3">{item.label}</span>}
@@ -242,7 +295,6 @@ const Sidebar = ({ adminProfile, adminAvatar }) => {
             ))}
         </ul>
       </nav>
-
 
       {/* <div className="p-4 border-t border-white-100">
         {isOpen ? (
@@ -297,8 +349,8 @@ const Sidebar = ({ adminProfile, adminAvatar }) => {
                 {adminProfile?.userName
                   ? adminProfile.userName.charAt(0).toUpperCase()
                   : adminProfile?.email
-                    ? adminProfile.email.charAt(0).toUpperCase()
-                    : "A"}
+                  ? adminProfile.email.charAt(0).toUpperCase()
+                  : "A"}
               </div>
             )}
             <div className="ml-3">
@@ -323,8 +375,8 @@ const Sidebar = ({ adminProfile, adminAvatar }) => {
                 {adminProfile?.userName
                   ? adminProfile.userName.charAt(0).toUpperCase()
                   : adminProfile?.email
-                    ? adminProfile.email.charAt(0).toUpperCase()
-                    : "A"}
+                  ? adminProfile.email.charAt(0).toUpperCase()
+                  : "A"}
               </div>
             )}
           </div>

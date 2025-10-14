@@ -127,25 +127,17 @@ const BikeBookings = () => {
     },
   ];
 
-  // const filterOptions = [
-  //   {
-  //     key: "status" as keyof TaxiBooking,
-  //     label: "Status",
-  //     options: [
-  //       { label: "Completed", value: "Completed" },
-  //       { label: "Cancelled", value: "Cancelled" },
-  //       { label: "Pending", value: "Pending" },
-  //     ],
-  //   },
-  //   {
-  //     key: "vehicleType" as keyof TaxiBooking,
-  //     label: "Vehicle Type",
-  //     options: [
-  //       { label: "Scooter", value: "Scooter" },
-  //       { label: "MotorBike", value: "MotorBike" },
-  //     ],
-  //   },
-  // ];
+  const filterOptions = [
+    {
+      key: "status" as keyof TaxiBooking,
+      label: "Status",
+      options: [
+        { label: "Completed", value: "Completed" },
+        { label: "Cancelled", value: "Cancelled" },
+        { label: "Pending", value: "Pending" },
+      ],
+    },
+  ];
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -196,8 +188,8 @@ const BikeBookings = () => {
           columns={columns}
           data={bookings}
           keyExtractor={(item) => item.bookingId}
-          // filterable
-          // filterOptions={filterOptions}
+          filterable
+          filterOptions={filterOptions}
           paginate
           pageSize={pageSize}
           currentPage={currentPage}

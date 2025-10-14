@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "@/api/axiosInstance";
 import {
   Table,
@@ -9,24 +9,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Customer, BusBooking, HotelBooking } from "@/types/admin";
 import { ChevronDown, ChevronLeft } from "lucide-react";
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { SelectIcon } from "@radix-ui/react-select";
 import { StatusDropdown } from "@/components/ui/StatusDropdown";
 
@@ -34,11 +30,10 @@ const CustomerDetails = () => {
   const { customerId } = useParams();
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const [customerData, setCustomerData] = useState<any>(null)
+  const [customerData, setCustomerData] = useState<any>(null);
   // const [formData, setFormData] = useState({
   //   status: "pending",
   // });
-
 
   interface NormalizedBooking {
     id: string;
@@ -52,7 +47,9 @@ const CustomerDetails = () => {
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const { data } = await axiosInstance.get(`/user-management/users/${customerId}`);
+        const { data } = await axiosInstance.get(
+          `/user-management/users/${customerId}`
+        );
 
         // Normalize bookings
         const allBookings: NormalizedBooking[] = [
@@ -97,7 +94,6 @@ const CustomerDetails = () => {
     fetchCustomer();
   }, [customerId]);
 
-
   if (loading) {
     return (
       <div className="p-6">
@@ -109,9 +105,7 @@ const CustomerDetails = () => {
   if (!customerData) {
     return (
       <div className="p-6">
-        <h1 className="text-2xl font-bold text-red-500">
-          Customer not found
-        </h1>
+        <h1 className="text-2xl font-bold text-red-500">Customer not found</h1>
       </div>
     );
   }
@@ -132,15 +126,21 @@ const CustomerDetails = () => {
     }
   };
 
-  const { personalInfo, bookingSummary, allBookings, busBookings, hotelBookings, rideBookings } =
-    customerData;
+  const {
+    personalInfo,
+    bookingSummary,
+    allBookings,
+    busBookings,
+    hotelBookings,
+    rideBookings,
+  } = customerData;
 
   return (
     <>
       <Button
         variant="ghost"
         className="mb-4"
-        onClick={() => navigate('/customer-management')}
+        onClick={() => navigate("/customer-management")}
       >
         <ChevronLeft className="mr-2 h-4 w-4" /> Back to All Users
       </Button>
@@ -247,15 +247,17 @@ const CustomerDetails = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {customerData.allBookings.map((b: NormalizedBooking) => (
-                          <TableRow key={b.id}>
-                            <TableCell>{b.id}</TableCell>
-                            <TableCell>{b.type}</TableCell>
-                            <TableCell>{b.date}</TableCell>
-                            <TableCell>₹{b.amount}</TableCell>
-                            <TableCell>{b.status}</TableCell>
-                          </TableRow>
-                        ))}
+                        {customerData.allBookings.map(
+                          (b: NormalizedBooking) => (
+                            <TableRow key={b.id}>
+                              <TableCell>{b.id}</TableCell>
+                              <TableCell>{b.type}</TableCell>
+                              <TableCell>{b.date}</TableCell>
+                              <TableCell>₹{b.amount}</TableCell>
+                              <TableCell>{b.status}</TableCell>
+                            </TableRow>
+                          )
+                        )}
                       </TableBody>
                     </Table>
                   )}
@@ -289,7 +291,9 @@ const CustomerDetails = () => {
                             <TableCell>{b.busBookingId}</TableCell>
                             <TableCell>{b.busNumber || "-"}</TableCell>
                             <TableCell>{b.route || "-"}</TableCell>
-                            <TableCell>{new Date(b.date).toLocaleDateString()}</TableCell>
+                            <TableCell>
+                              {new Date(b.date).toLocaleDateString()}
+                            </TableCell>
                             <TableCell>₹{b.amount}</TableCell>
                             <TableCell>{b.status}</TableCell>
                           </TableRow>
@@ -325,9 +329,7 @@ const CustomerDetails = () => {
                           <TableRow key={b.id}>
                             <TableCell>{b.id}</TableCell>
                             <TableCell>{b.hotelId}</TableCell>
-                            <TableCell>
-                              {b.stayDuration}
-                            </TableCell>
+                            <TableCell>{b.stayDuration}</TableCell>
                             <TableCell>₹{b.amount}</TableCell>
                             <TableCell>{b.status}</TableCell>
                           </TableRow>
@@ -360,7 +362,12 @@ const CustomerDetails = () => {
                         {rideBookings.map((b) => (
                           <TableRow key={b.bookingId}>
                             <TableCell>{b.bookingId}</TableCell>
-                            <TableCell> {new Date(b.date).toLocaleDateString("en-GB")} </TableCell>
+                            <TableCell>
+                              {" "}
+                              {new Date(b.date).toLocaleDateString(
+                                "en-GB"
+                              )}{" "}
+                            </TableCell>
                             <TableCell>₹{b.amount}</TableCell>
                             <TableCell>{b.status}</TableCell>
                           </TableRow>
@@ -371,7 +378,6 @@ const CustomerDetails = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-
           </Tabs>
         </div>
       </div>

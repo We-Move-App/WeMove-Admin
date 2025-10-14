@@ -165,7 +165,7 @@ const Navbar = ({ adminProfile, adminAvatar }) => {
             <Menu size={24} />
           </button>
 
-          <div className="relative md:w-64">
+          {/* <div className="relative md:w-64">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <Search className="text-gray-500" size={18} />
             </div>
@@ -174,7 +174,7 @@ const Navbar = ({ adminProfile, adminAvatar }) => {
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2"
               placeholder="Search"
             />
-          </div>
+          </div> */}
         </div>
 
         {/* Right Side */}

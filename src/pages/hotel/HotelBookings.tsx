@@ -155,18 +155,18 @@ const HotelBookings = () => {
     },
   ];
 
-  // const filterOptions = [
-  //   {
-  //     key: "status" as keyof HotelBooking,
-  //     label: "Status",
-  //     options: [
-  //       { label: "Confirmed", value: "Confirmed" },
-  //       { label: "Completed", value: "Completed" },
-  //       { label: "Cancelled", value: "Cancelled" },
-  //       { label: "Pending", value: "Pending" },
-  //     ],
-  //   },
-  // ];
+  const filterOptions = [
+    {
+      key: "status" as keyof HotelBooking,
+      label: "Status",
+      options: [
+        { label: "Booked", value: "Booked" },
+        { label: "Completed", value: "Completed" },
+        // { label: "Cancelled", value: "Cancelled" },
+        // { label: "Pending", value: "Pending" },
+      ],
+    },
+  ];
 
   return (
     <>
@@ -181,15 +181,15 @@ const HotelBookings = () => {
         columns={columns}
         data={bookings}
         keyExtractor={(item) => item.id}
-        // filterable={true}
-        // searchable={true}
-        // exportable={true}
+        filterable={true}
+        searchable={true}
+        exportable={true}
         paginate={true}
         pageSize={pageSize}
         currentPage={currentPage}
         totalItems={totalHotelBookings}
         onPageChange={(page) => setCurrentPage(page)}
-        // filterOptions={filterOptions}
+        filterOptions={filterOptions}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
       />
