@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import Layout from '@/components/layout/Layout';
 import DataTable from "@/components/ui/DataTable";
@@ -13,7 +13,7 @@ const BusBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(5);
   const [totalBusOperators, setTotalBusOperators] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   // const [fromOptions, setFromOptions] = useState<
@@ -93,6 +93,7 @@ const BusBookings = () => {
             createdAt: booking.createdAt
               ? new Date(booking.createdAt).toLocaleString("en-GB")
               : "N/A",
+            passengers: booking.passengers || [],
           };
         });
         // const uniqueFrom = Array.from(
@@ -156,7 +157,7 @@ const BusBookings = () => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/bus-management/bookings/${booking.id}`);
+            navigate(`/bus-management/bookings/${booking.bookingId}`);
           }}
           className="action-button flex items-center"
         >
@@ -200,13 +201,18 @@ const BusBookings = () => {
   //   },
   // ];
 
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+
+  const handleRowToggle = (bookingId: string) => {
+    setExpandedRow(expandedRow === bookingId ? null : bookingId);
+  };
+
   return (
     <>
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Bus Bookings</h1>
         <p className="text-gray-600">View and manage all bus bookings</p>
       </div>
-
       <DataTable
         columns={columns}
         data={bookings}
@@ -225,6 +231,54 @@ const BusBookings = () => {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
       />
+
+      {/* <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr>
+              <th className="border-b px-2 py-1">Bus Name</th>
+              <th className="border-b px-2 py-1">Phone</th>
+              <th className="border-b px-2 py-1">Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bookings.map((booking) =>
+              booking.passengers?.map((p, idx) => (
+                <Fragment key={`${booking.bookingId}-${idx}`}>
+                  <tr
+                    className="cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleRowToggle(booking.bookingId)}
+                  >
+                    <td className="border-b px-2 py-1">{p.name}</td>
+                    <td className="border-b px-2 py-1">{p.contactNumber}</td>
+                    <td className="border-b px-2 py-1">{p.email}</td>
+                  </tr>
+
+                  {expandedRow === booking.bookingId && idx === 0 && (
+                    <tr>
+                      <td colSpan={3} className="bg-gray-50 p-4 border-b">
+                        <DataTable
+                          columns={columns}
+                          data={[booking]}
+                          paginate
+                          pageSize={pageSize}
+                          currentPage={currentPage}
+                          totalItems={totalBusOperators}
+                          onPageChange={setCurrentPage}
+                          keyExtractor={(item) => item.id}
+                          onRowClick={handleRowClick}
+                          searchTerm={searchTerm}
+                          onSearchChange={setSearchTerm}
+                        />
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div> */}
     </>
   );
 };

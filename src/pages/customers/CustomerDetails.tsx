@@ -1,385 +1,421 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "@/api/axiosInstance";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import { Customer, BusBooking, HotelBooking } from "@/types/admin";
-import { ChevronDown, ChevronLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import StatusBadge from "@/components/ui/StatusBadge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { SelectIcon } from "@radix-ui/react-select";
-import { StatusDropdown } from "@/components/ui/StatusDropdown";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Save, SquarePen } from "lucide-react";
+import UploadField from "@/components/ui/UploadField";
+import BranchSelect from "@/components/branch-select/BranchSelect";
+import dummyProfile from "@/assets/dummy-data/user-image.jpg";
+import dummyIdFront from "@/assets/dummy-data/id-front.jpg";
+import dummyIdBack from "@/assets/dummy-data/id-back.jpg";
+import dummyBankDetails from "@/assets/dummy-data/hdfc.jpg";
 
 const CustomerDetails = () => {
-  const { customerId } = useParams();
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const [customerData, setCustomerData] = useState<any>(null);
-  // const [formData, setFormData] = useState({
-  //   status: "pending",
-  // });
+  const [isEditMode, setIsEditMode] = useState(true);
 
-  interface NormalizedBooking {
-    id: string;
-    type: "bus" | "hotel" | "ride";
-    date: string;
-    amount: number;
-    status: string;
-    extra?: Record<string, any>;
-  }
+  const [operator, setOperator] = useState({
+    id: "1",
+    name: "",
+    companyName: "",
+    mobile: "",
+    email: "",
+    branch: "",
+    status: "pending",
+    profilePhoto: dummyProfile,
+    address: "",
+    idCardFront: dummyIdFront,
+    idCardBack: dummyIdBack,
+    bankName: "",
+    bankAccountNumber: "",
+    accountHolderName: "",
+    bankAccountDetails: dummyBankDetails,
+  });
 
-  useEffect(() => {
-    const fetchCustomer = async () => {
-      try {
-        const { data } = await axiosInstance.get(
-          `/user-management/users/${customerId}`
-        );
+  const statusOptions = [
+    "approved",
+    "processing",
+    "submitted",
+    "rejected",
+    "blocked",
+  ];
+  const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
+    undefined
+  );
 
-        // Normalize bookings
-        const allBookings: NormalizedBooking[] = [
-          ...data.busBookings.map((b: any) => ({
-            id: b.busBookingId,
-            type: "bus",
-            date: b.date,
-            amount: b.amount,
-            status: b.status,
-            extra: b,
-          })),
-          ...data.hotelBookings.map((h: any) => ({
-            id: h.id,
-            type: "hotel",
-            date: h.stayDuration,
-            amount: h.amount,
-            status: h.status,
-            extra: h,
-          })),
-          ...data.rideBookings.map((r: any) => ({
-            id: r.bookingId,
-            type: "ride",
-            date: r.rideDate,
-            amount: r.amount,
-            status: r.status,
-            extra: r,
-          })),
-        ];
+  const [remarks, setRemarks] = useState("");
 
-        setCustomerData({
-          ...data,
-          status: data.status ?? data.personalInfo?.status ?? "pending",
-          allBookings,
-        });
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setOperator({ ...operator, [name]: value });
 
-    fetchCustomer();
-  }, [customerId]);
-
-  if (loading) {
-    return (
-      <div className="p-6">
-        <h1 className="text-xl font-semibold">Loading...</h1>
-      </div>
-    );
-  }
-
-  if (!customerData) {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold text-red-500">Customer not found</h1>
-      </div>
-    );
-  }
-
-  const handleStatusChange = async (nextStatus: string) => {
-    console.log("Sending PUT request with body:", { status: nextStatus });
-
-    try {
-      const res = await axiosInstance.put(
-        `/user-management/users/verify/${customerId}`,
-        { status: nextStatus }
-      );
-      console.log("API response:", res.data);
-
-      setCustomerData((prev) => ({ ...prev, status: nextStatus }));
-    } catch (err) {
-      console.error("Failed to update status", err);
+    // Reset remarks if status changes
+    if (name === "status") {
+      setRemarks("");
     }
   };
 
-  const {
-    personalInfo,
-    bookingSummary,
-    allBookings,
-    busBookings,
-    hotelBookings,
-    rideBookings,
-  } = customerData;
+  const handleFileChange = (field: string, file: File) => {
+    setOperator({ ...operator, [field]: file });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted:", operator);
+  };
 
   return (
     <>
-      <Button
-        variant="ghost"
-        className="mb-4"
-        onClick={() => navigate("/customer-management")}
-      >
-        <ChevronLeft className="mr-2 h-4 w-4" /> Back to All Users
-      </Button>
+      <div className="mb-6">
+        <button
+          onClick={() => navigate("/bus-management/operators")}
+          className="flex items-center text-green-700 hover:text-green-900 mb-4"
+        >
+          <ArrowLeft size={18} className="mr-1" />
+          Back to Users
+        </button>
+      </div>
 
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">Customer Details</h1>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 gap-6">
+            {/* Basic Information */}
+            <div className="form-section col-span-full">
+              <h2 className="form-section-title">Basic Information</h2>
+              <div className="grid grid-cols-1 gap-4">
+                <UploadField
+                  label="Profile Photo"
+                  value={operator.profilePhoto}
+                  onChange={(file) => handleFileChange("profilePhoto", file)}
+                  showCloseButton={isEditMode}
+                />
 
-        {/* Personal Info & Booking Summary */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium">ID</TableCell>
-                    <TableCell>{personalInfo.id}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Name</TableCell>
-                    <TableCell>{personalInfo.name}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Email</TableCell>
-                    <TableCell>{personalInfo.email}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Mobile</TableCell>
-                    <TableCell>{personalInfo.mobile}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Status</TableCell>
-                    <TableCell>
-                      <StatusDropdown
-                        value={(customerData.status as any) || "pending"}
-                        onChange={handleStatusChange}
-                      />
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={operator.name}
+                      onChange={handleInputChange}
+                      className="filter-input w-full"
+                      style={{ outline: "none" }}
+                      required
+                    />
+                  </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Booking Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4 text-center">
-                  <p className="text-lg font-medium text-blue-700">
-                    {bookingSummary.busBookings}
-                  </p>
-                  <p className="text-sm text-blue-600">Bus Bookings</p>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Mobile
+                    </label>
+                    <input
+                      type="text"
+                      name="mobile"
+                      value={operator.mobile}
+                      onChange={handleInputChange}
+                      className="filter-input w-full"
+                      style={{ outline: "none" }}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email ID
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={operator.email}
+                      onChange={handleInputChange}
+                      className="filter-input w-full"
+                      style={{ outline: "none" }}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    <select
+                      name="status"
+                      value={operator.status}
+                      onChange={handleInputChange}
+                      className="filter-select w-full"
+                    >
+                      {statusOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+
+                    {(operator.status === "rejected" ||
+                      operator.status === "blocked") && (
+                      <div className="mt-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Remarks
+                        </label>
+                        <textarea
+                          value={remarks}
+                          onChange={(e) => setRemarks(e.target.value)}
+                          className="filter-input w-full h-20"
+                          placeholder="Enter remarks..."
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Choose Branch
+                    </label>
+                    <BranchSelect
+                      value={selectedBranch}
+                      onChange={setSelectedBranch}
+                    />
+                  </div>
+                </div> */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={operator.name}
+                      onChange={handleInputChange}
+                      className="filter-input w-full"
+                      style={{ outline: "none" }}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Mobile
+                    </label>
+                    <input
+                      type="text"
+                      name="mobile"
+                      value={operator.mobile}
+                      onChange={handleInputChange}
+                      className="filter-input w-full"
+                      style={{ outline: "none" }}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email ID
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={operator.email}
+                      onChange={handleInputChange}
+                      className="filter-input w-full"
+                      style={{ outline: "none" }}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    <select
+                      name="status"
+                      value={operator.status}
+                      onChange={handleInputChange}
+                      className="filter-select w-full"
+                    >
+                      {statusOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Choose Branch
+                    </label>
+                    <BranchSelect
+                      value={selectedBranch}
+                      onChange={setSelectedBranch}
+                    />
+                  </div>
                 </div>
-                <div className="bg-green-50 rounded-lg p-4 text-center">
-                  <p className="text-lg font-medium text-green-700">
-                    {bookingSummary.hotelBookings}
-                  </p>
-                  <p className="text-sm text-green-600">Hotel Bookings</p>
+
+                {/* Remarks field - appears below the grid when status is rejected/blocked */}
+                {(operator.status === "rejected" ||
+                  operator.status === "blocked") && (
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Remarks
+                    </label>
+                    <textarea
+                      value={remarks}
+                      onChange={(e) => setRemarks(e.target.value)}
+                      className="filter-input w-full resize-none"
+                      style={{ outline: "none" }}
+                      rows={4}
+                      placeholder="Enter remarks for rejection or blocking..."
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Company Information */}
+            <div className="form-section col-span-full">
+              <h2 className="form-section-title">Company Information</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    name="companyName"
+                    value={operator.companyName}
+                    onChange={handleInputChange}
+                    className="filter-input w-full"
+                    style={{ outline: "none" }}
+                    required
+                  />
                 </div>
-                <div className="bg-purple-50 rounded-lg p-4 text-center">
-                  <p className="text-lg font-medium text-purple-700">
-                    {bookingSummary.rideBookings}
-                  </p>
-                  <p className="text-sm text-purple-600">Ride Bookings</p>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Company Address
+                  </label>
+                  <textarea
+                    name="address"
+                    value={operator.address}
+                    onChange={(e) =>
+                      setOperator({ ...operator, address: e.target.value })
+                    }
+                    className="filter-input w-full h-24"
+                  />
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
 
-        {/* Tabs for Bookings */}
-        <div className="mt-8">
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-4">
-              <TabsTrigger value="all">All Bookings</TabsTrigger>
-              <TabsTrigger value="bus">Bus Bookings</TabsTrigger>
-              <TabsTrigger value="hotel">Hotel Bookings</TabsTrigger>
-              <TabsTrigger value="ride">Ride Bookings</TabsTrigger>
-            </TabsList>
+            {/* Identity Verification */}
+            <div className="form-section col-span-full">
+              <h2 className="form-section-title">Identity Verification</h2>
+              <div className="grid grid-cols-1 gap-4">
+                <UploadField
+                  label="ID Card Front"
+                  value={operator.idCardFront}
+                  onChange={(file) => handleFileChange("idCardFront", file)}
+                  showCloseButton
+                />
 
-            {/* All Bookings */}
-            <TabsContent value="all">
-              <Card>
-                <CardHeader>
-                  <CardTitle>All Bookings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {customerData.allBookings.length === 0 ? (
-                    <p className="text-center py-4">No booking history found</p>
-                  ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>ID</TableHead>
-                          <TableHead>Type</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Amount</TableHead>
-                          <TableHead>Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {customerData.allBookings.map(
-                          (b: NormalizedBooking) => (
-                            <TableRow key={b.id}>
-                              <TableCell>{b.id}</TableCell>
-                              <TableCell>{b.type}</TableCell>
-                              <TableCell>{b.date}</TableCell>
-                              <TableCell>₹{b.amount}</TableCell>
-                              <TableCell>{b.status}</TableCell>
-                            </TableRow>
-                          )
-                        )}
-                      </TableBody>
-                    </Table>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            {/* Bus Bookings */}
-            <TabsContent value="bus">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Bus Bookings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {busBookings.length === 0 ? (
-                    <p className="text-center py-4">No bus bookings found</p>
-                  ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>ID</TableHead>
-                          <TableHead>Bus No.</TableHead>
-                          <TableHead>Route</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Amount</TableHead>
-                          <TableHead>Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {busBookings.map((b) => (
-                          <TableRow key={b.busBookingId}>
-                            <TableCell>{b.busBookingId}</TableCell>
-                            <TableCell>{b.busNumber || "-"}</TableCell>
-                            <TableCell>{b.route || "-"}</TableCell>
-                            <TableCell>
-                              {new Date(b.date).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell>₹{b.amount}</TableCell>
-                            <TableCell>{b.status}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            {/* Hotel Bookings */}
-            <TabsContent value="hotel">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Hotel Bookings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {hotelBookings.length === 0 ? (
-                    <p className="text-center py-4">No hotel bookings found</p>
-                  ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>ID</TableHead>
-                          <TableHead>Hotel ID</TableHead>
-                          <TableHead>Stay</TableHead>
-                          <TableHead>Amount</TableHead>
-                          <TableHead>Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {hotelBookings.map((b) => (
-                          <TableRow key={b.id}>
-                            <TableCell>{b.id}</TableCell>
-                            <TableCell>{b.hotelId}</TableCell>
-                            <TableCell>{b.stayDuration}</TableCell>
-                            <TableCell>₹{b.amount}</TableCell>
-                            <TableCell>{b.status}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="ride">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Ride Bookings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {rideBookings.length === 0 ? (
-                    <p className="text-center py-4">No ride bookings found</p>
-                  ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>ID</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Amount</TableHead>
-                          <TableHead>Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {rideBookings.map((b) => (
-                          <TableRow key={b.bookingId}>
-                            <TableCell>{b.bookingId}</TableCell>
-                            <TableCell>
-                              {" "}
-                              {new Date(b.date).toLocaleDateString(
-                                "en-GB"
-                              )}{" "}
-                            </TableCell>
-                            <TableCell>₹{b.amount}</TableCell>
-                            <TableCell>{b.status}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
+                <UploadField
+                  label="ID Card Back"
+                  value={operator.idCardBack}
+                  onChange={(file) => handleFileChange("idCardBack", file)}
+                  showCloseButton
+                />
+              </div>
+            </div>
+
+            {/* Bank Details */}
+            <div className="form-section col-span-full">
+              <h2 className="form-section-title">Bank Details</h2>
+              <div className="flex flex-col flex-col-reverse gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Bank Name
+                    </label>
+                    <input
+                      type="text"
+                      name="bankName"
+                      value={operator.bankName}
+                      onChange={handleInputChange}
+                      className="filter-input w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Account Number
+                    </label>
+                    <input
+                      type="text"
+                      name="bankAccountNumber"
+                      value={operator.bankAccountNumber}
+                      onChange={handleInputChange}
+                      className="filter-input w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Account Holder Name
+                    </label>
+                    <input
+                      type="text"
+                      name="accountHolderName"
+                      value={operator.accountHolderName}
+                      onChange={handleInputChange}
+                      className="filter-input w-full"
+                    />
+                  </div>
+                </div>
+
+                <UploadField
+                  label="Bank Account Details"
+                  value={operator.bankAccountDetails}
+                  onChange={(file) =>
+                    handleFileChange("bankAccountDetails", file)
+                  }
+                  showCloseButton
+                />
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-end mt-6">
+              <button
+                type="button"
+                onClick={() => navigate("/bus-management/operators")}
+                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 mr-3"
+              >
+                Cancel
+              </button>
+
+              {!isEditMode ? (
+                <button
+                  type="button"
+                  onClick={() => setIsEditMode(true)}
+                  className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
+                >
+                  <SquarePen size={18} className="mr-2" />
+                  Edit
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
+                >
+                  <Save size={18} className="mr-2" />
+                  Save
+                </button>
+              )}
+            </div>
+          </div>
+        </form>
       </div>
     </>
   );

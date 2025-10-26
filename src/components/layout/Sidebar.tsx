@@ -99,19 +99,13 @@ const Sidebar = ({ adminProfile, adminAvatar }) => {
       label: "User Management",
       icon: <Users size={20} />,
       requiredPermission: "userManagement",
+      subItems: [
+        { path: "/customer-management", label: "Users" },
+        { path: "/customer-management/bookings", label: "User Bookings" },
+      ],
     },
-    // {
-    //   path: "/customer-management",
-    //   label: "User Management",
-    //   icon: <Users size={20} />,
-    //   requiredPermission: "userManagement",
-    //   subItems: [
-    //     { path: "/customer-management", label: "Users" },
-    //     { path: "/customer-management/bookings", label: "User Bookings" },
-    //   ],
-    // },
     {
-      path: "/user-management",
+      path: "/admin-management",
       label: "Admin Management",
       icon: <UserCog size={20} />,
       requiredPermission: "roleManagement",

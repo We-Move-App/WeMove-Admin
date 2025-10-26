@@ -247,7 +247,7 @@ const UserManagement = () => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/user-management/${user.id}`);
+            navigate(`/admin-management/${user.id}`);
           }}
           className="action-button flex items-center"
         >

@@ -49,6 +49,7 @@ import Wallet from "@/pages/wallet/Wallet";
 import NotificationsManagement from "@/pages/notifications/NotificationsManagement";
 import Settings from "@/pages/settings/Settings";
 import PasswordReset from "@/pages/reset-password/PasswordReset";
+import CustomerBookingDetails from "@/pages/customers/CustomerBookingDetails";
 
 const AppRoutes = () => {
   const navigate = useNavigate();
@@ -111,18 +112,22 @@ const AppRoutes = () => {
 
         {/* Customer Management */}
         <Route path="/customer-management" element={<CustomerManagement />} />
-        {/* <Route
-        path="/customer-management/bookings"
-        element={<CustomerBookings />}
-      /> */}
         <Route
           path="/customer-management/:customerId"
           element={<CustomerDetails />}
         />
+        <Route
+          path="/customer-management/bookings"
+          element={<CustomerBookings />}
+        />
+        <Route
+          path="/customer-management/bookings/:bookingId"
+          element={<CustomerBookingDetails />}
+        />
 
         {/* User Management */}
-        <Route path="/user-management" element={<UserManagement />} />
-        <Route path="/user-management/:userId" element={<UserDetails />} />
+        <Route path="/admin-management" element={<UserManagement />} />
+        <Route path="/admin-management/:userId" element={<UserDetails />} />
 
         {/* Misc */}
         <Route
