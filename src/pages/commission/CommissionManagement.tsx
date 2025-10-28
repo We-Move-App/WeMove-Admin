@@ -409,9 +409,13 @@ const CommissionManagement = () => {
         <h1 className="text-2xl font-bold">Commission Management</h1>
         {(() => {
           const existingServices = commissions.map((c) => c.serviceType);
-          const allServicesAdded = ["Bus", "Hotel", "Taxi", "Bike"].every(
-            (service) => existingServices.includes(service)
-          );
+          const allServicesAdded = [
+            "Bus",
+            "Hotel",
+            "Taxi",
+            "Bike",
+            "Transfer",
+          ].every((service) => existingServices.includes(service));
 
           return !allServicesAdded ? (
             <Button onClick={handleAddNew} className="flex items-center gap-2">
@@ -456,6 +460,7 @@ const CommissionManagement = () => {
                   <SelectItem value="Hotel">Hotel</SelectItem>
                   <SelectItem value="Taxi">Taxi</SelectItem>
                   <SelectItem value="Bike">Bike</SelectItem>
+                  <SelectItem value="Transfer">User Transfer</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -467,7 +472,7 @@ const CommissionManagement = () => {
                 onValueChange={(value) =>
                   handleCommissionTypeChange(value as "percentage" | "fixed")
                 }
-                className="flex space-x-4"
+                className="flex"
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="percentage" id="percentage" />

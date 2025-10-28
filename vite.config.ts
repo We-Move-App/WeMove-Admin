@@ -8,6 +8,9 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 5174,
+    allowedHosts: [
+      "italiano-telecommunications-celtic-drink.trycloudflare.com",
+    ],
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(
     Boolean

@@ -235,6 +235,22 @@ const CustomerBookingDetails = () => {
   const { customerId } = useParams<{ customerId: string }>();
   const navigate = useNavigate();
   const [customerData, setCustomerData] = useState<CustomerData | null>(null);
+  const [searchAll, setSearchAll] = useState("");
+  const [searchBus, setSearchBus] = useState("");
+  const [searchHotel, setSearchHotel] = useState("");
+  const [searchRide, setSearchRide] = useState("");
+  const [searchPayment, setSearchPayment] = useState("");
+
+  const filterData = (data, searchTerm) => {
+    return data.filter(
+      (item) =>
+        item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.type &&
+          item.type.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.status &&
+          item.status.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  };
 
   useEffect(() => {
     // Mock fetch
@@ -328,20 +344,59 @@ const CustomerBookingDetails = () => {
         <div className="mt-8">
           <Tabs defaultValue="all" className="w-full">
             <TabsList className="mb-4">
-              <TabsTrigger value="all">All Bookings</TabsTrigger>
-              <TabsTrigger value="bus">Bus Bookings</TabsTrigger>
-              <TabsTrigger value="hotel">Hotel Bookings</TabsTrigger>
-              <TabsTrigger value="ride">Ride Bookings</TabsTrigger>
-              <TabsTrigger value="payment">Payment Transactions</TabsTrigger>
+              {/* <TabsTrigger value="all"></TabsTrigger> */}
+              <TabsTrigger
+                value="all"
+                className="data-[state=active]:bg-[#3E7C68] data-[state=active]:text-white
+                 data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
+              >
+                All Bookings
+              </TabsTrigger>
+              <TabsTrigger
+                value="bus"
+                className="data-[state=active]:bg-[#3E7C68] data-[state=active]:text-white
+                 data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
+              >
+                Bus Bookings
+              </TabsTrigger>
+              <TabsTrigger
+                value="hotel"
+                className="data-[state=active]:bg-[#3E7C68] data-[state=active]:text-white
+                 data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
+              >
+                Hotel Bookings
+              </TabsTrigger>
+              <TabsTrigger
+                value="ride"
+                className="data-[state=active]:bg-[#3E7C68] data-[state=active]:text-white
+                 data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
+              >
+                Ride Bookings
+              </TabsTrigger>
+              <TabsTrigger
+                value="payment"
+                className="data-[state=active]:bg-[#3E7C68] data-[state=active]:text-white
+                 data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
+              >
+                Payment Transactions
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="all">
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                   <CardTitle>All Bookings</CardTitle>
+                  <input
+                    type="text"
+                    placeholder="Search bookings..."
+                    value={searchAll}
+                    onChange={(e) => setSearchAll(e.target.value)}
+                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </CardHeader>
                 <CardContent>
-                  {customerData.allBookings.length === 0 ? (
+                  {filterData(customerData.allBookings, searchAll).length ===
+                  0 ? (
                     <p className="text-center py-4">No booking history found</p>
                   ) : (
                     <>
@@ -357,7 +412,7 @@ const CustomerBookingDetails = () => {
                         </TableHeader>
                         <TableBody>
                           {paginate(
-                            customerData.allBookings,
+                            filterData(customerData.allBookings, searchAll),
                             currentPageAll,
                             pageSize
                           ).map((b) => (
@@ -374,7 +429,9 @@ const CustomerBookingDetails = () => {
 
                       <PaginationComponent
                         currentPage={currentPageAll}
-                        totalItems={customerData.allBookings.length}
+                        totalItems={
+                          filterData(customerData.allBookings, searchAll).length
+                        }
                         pageSize={pageSize}
                         onPageChange={setCurrentPageAll}
                       />
@@ -386,8 +443,15 @@ const CustomerBookingDetails = () => {
 
             <TabsContent value="bus">
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                   <CardTitle>Bus Bookings</CardTitle>
+                  <input
+                    type="text"
+                    placeholder="Search bookings..."
+                    value={searchRide}
+                    onChange={(e) => setSearchRide(e.target.value)}
+                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </CardHeader>
                 <CardContent>
                   {customerData.busBookings.length === 0 ? (
@@ -433,8 +497,15 @@ const CustomerBookingDetails = () => {
 
             <TabsContent value="hotel">
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                   <CardTitle>Hotel Bookings</CardTitle>
+                  <input
+                    type="text"
+                    placeholder="Search bookings..."
+                    value={searchRide}
+                    onChange={(e) => setSearchRide(e.target.value)}
+                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </CardHeader>
                 <CardContent>
                   {customerData.hotelBookings.length === 0 ? (
@@ -480,11 +551,19 @@ const CustomerBookingDetails = () => {
 
             <TabsContent value="ride">
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                   <CardTitle>Ride Bookings</CardTitle>
+                  <input
+                    type="text"
+                    placeholder="Search bookings..."
+                    value={searchRide}
+                    onChange={(e) => setSearchRide(e.target.value)}
+                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </CardHeader>
                 <CardContent>
-                  {customerData.rideBookings.length === 0 ? (
+                  {filterData(customerData.rideBookings, searchRide).length ===
+                  0 ? (
                     <p className="text-center py-4">No ride bookings found</p>
                   ) : (
                     <>
@@ -499,7 +578,7 @@ const CustomerBookingDetails = () => {
                         </TableHeader>
                         <TableBody>
                           {paginate(
-                            customerData.rideBookings,
+                            filterData(customerData.rideBookings, searchRide),
                             currentPageAll,
                             pageSize
                           ).map((b) => (
@@ -527,11 +606,43 @@ const CustomerBookingDetails = () => {
 
             <TabsContent value="payment">
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                   <CardTitle>Payment Transactions</CardTitle>
+                  <input
+                    type="text"
+                    placeholder="Search transactions..."
+                    value={searchPayment}
+                    onChange={(e) => setSearchPayment(e.target.value)}
+                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </CardHeader>
+
                 <CardContent>
-                  {customerData.rideBookings.length === 0 ? (
+                  {/* Total Balance Card (Admin only) */}
+                  <div className="mb-6">
+                    <div className="relative bg-[#3E7C68] text-white rounded-2xl p-6 w-full max-w-sm shadow-md overflow-hidden">
+                      <div className="absolute -top-8 -right-8 w-28 h-28 bg-[#F7B24A] rounded-full opacity-90"></div>
+                      <div className="relative z-10">
+                        <p className="text-sm font-medium mb-2">
+                          Digital Debit Card
+                        </p>
+                        <p className="tracking-widest mb-3">
+                          ***** ***** ***** ****
+                        </p>
+                        <div className="flex items-baseline space-x-1 mb-2">
+                          <p className="text-2xl font-bold">
+                            {customerData.walletBalance
+                              ? customerData.walletBalance.toLocaleString()
+                              : "0"}
+                          </p>
+                          <span className="text-sm font-semibold">XAF</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {filterData(customerData.paymentTransactions, searchPayment)
+                    .length === 0 ? (
                     <p className="text-center py-4">
                       No payment transaction found
                     </p>
@@ -548,13 +659,15 @@ const CustomerBookingDetails = () => {
                         </TableHeader>
                         <TableBody>
                           {paginate(
-                            customerData.paymentTransactions,
+                            filterData(
+                              customerData.paymentTransactions,
+                              searchPayment
+                            ),
                             currentPageAll,
                             pageSize
                           ).map((b) => (
                             <TableRow key={b.id}>
                               <TableCell>{b.id}</TableCell>
-                              <TableCell>{b.type}</TableCell>
                               <TableCell>{b.date}</TableCell>
                               <TableCell>₹{b.amount}</TableCell>
                               <TableCell>{b.status}</TableCell>
@@ -562,9 +675,15 @@ const CustomerBookingDetails = () => {
                           ))}
                         </TableBody>
                       </Table>
+
                       <PaginationComponent
                         currentPage={currentPageAll}
-                        totalItems={customerData.paymentTransactions.length}
+                        totalItems={
+                          filterData(
+                            customerData.paymentTransactions,
+                            searchPayment
+                          ).length
+                        }
                         pageSize={pageSize}
                         onPageChange={setCurrentPageAll}
                       />

@@ -7,6 +7,7 @@ import { busBookings } from "@/data/mockData";
 import { BusBooking } from "@/types/admin";
 import { Eye } from "lucide-react";
 import axiosInstance from "@/api/axiosInstance";
+import Loader from "@/components/ui/loader";
 
 const BusBookings = () => {
   const navigate = useNavigate();
@@ -207,12 +208,17 @@ const BusBookings = () => {
     setExpandedRow(expandedRow === bookingId ? null : bookingId);
   };
 
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <>
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Bus Bookings</h1>
         <p className="text-gray-600">View and manage all bus bookings</p>
       </div>
+
       <DataTable
         columns={columns}
         data={bookings}

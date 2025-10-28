@@ -648,7 +648,7 @@ const Coupons = () => {
                 onValueChange={(value) =>
                   handleDiscountTypeChange(value as "percentage" | "fixed")
                 }
-                className="flex space-x-4"
+                className="flex"
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="percentage" id="percentage-discount" />

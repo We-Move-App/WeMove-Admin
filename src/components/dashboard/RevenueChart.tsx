@@ -10,22 +10,36 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import axiosInstance from "@/api/axiosInstance";
+import CustomerDetailsSkeleton from "../ui/loader-skeleton";
 
 const pastelBlue = "#3b82f6";
 
 const RevenueChart = () => {
   const [formattedData, setFormattedData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRevenue = async () => {
       try {
-        const response = await axiosInstance.get("/dashboard/top-analytics?filter=monthly");
+        const response = await axiosInstance.get(
+          "/dashboard/top-analytics?filter=monthly"
+        );
         const revenue = response.data.data.revenue.totalRevenue;
 
         // All months
         const allMonths = [
-          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
         ];
 
         // Map API data to short month names
@@ -36,16 +50,16 @@ const RevenueChart = () => {
 
         // Prepare chart data for all months up to the current month
         const currentMonthIndex = new Date().getMonth();
-        const data = allMonths
-          .slice(0, currentMonthIndex + 1)
-          .map((month) => ({
-            name: month,
-            revenue: monthMap[month] ?? 0, // fill 0 if no data from API
-          }));
+        const data = allMonths.slice(0, currentMonthIndex + 1).map((month) => ({
+          name: month,
+          revenue: monthMap[month] ?? 0, // fill 0 if no data from API
+        }));
 
         setFormattedData(data);
       } catch (error) {
         console.error("Error fetching revenue data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -53,37 +67,45 @@ const RevenueChart = () => {
   }, []);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-medium">Revenue Trends</h3>
-        <div className="flex items-center space-x-2">
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-blue-500 mr-1"></div>
-            <span className="text-xs text-gray-500">Revenue</span>
-          </div>
-        </div>
-      </div>
+    <>
+      {loading ? (
+        <CustomerDetailsSkeleton />
+      ) : (
+        <>
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-medium">Revenue Trends</h3>
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full bg-blue-500 mr-1"></div>
+                  <span className="text-xs text-gray-500">Revenue</span>
+                </div>
+              </div>
+            </div>
 
-      <div className="w-full h-80">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={formattedData}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="revenue"
-              stroke={pastelBlue}
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+            <div className="w-full h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={formattedData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke={pastelBlue}
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </>
+      )}
+    </>
   );
 };
 

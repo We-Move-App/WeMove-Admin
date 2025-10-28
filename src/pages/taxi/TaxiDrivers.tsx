@@ -8,6 +8,8 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/api/axiosInstance";
 import { useDebounce } from "@/hooks/useDebounce";
+import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
+import Loader from "@/components/ui/loader";
 
 const TaxiDrivers = () => {
   const navigate = useNavigate();
@@ -91,7 +93,12 @@ const TaxiDrivers = () => {
     fetchDrivers();
   }, [currentPage, pageSize, searchTerm]);
 
-  if (loading) return <p>Loading drivers...</p>;
+  if (loading)
+    return (
+      <>
+        <Loader />
+      </>
+    );
   if (error) return <p>Error: {error}</p>;
 
   return (

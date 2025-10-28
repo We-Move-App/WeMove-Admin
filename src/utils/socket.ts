@@ -1,4 +1,3 @@
-// src/utils/socket.ts
 import { io, Socket } from "socket.io-client";
 
 const SOCKET_URL = "http://139.59.20.155:8000";

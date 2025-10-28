@@ -25,6 +25,7 @@ import { toast } from "@/hooks/use-toast";
 import { ChevronLeft } from "lucide-react";
 import axiosInstance from "@/api/axiosInstance";
 import fileUploadInstance from "@/api/fileUploadInstance";
+import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 
 // Available permissions
 const availablePermissions = [
@@ -227,13 +228,13 @@ const UserDetails = () => {
     });
   };
 
-  if (loading) return <p className="p-6">Loading user details...</p>;
+  if (loading) return <CustomerDetailsSkeleton />;
 
   if (!user || !editedUser) {
     return (
       <>
         <div className="p-6">
-          <h1 className="text-2xl font-bold text-red-500">User not found</h1>
+          <h1 className="text-2xl font-bold text-red-500">Admin not found</h1>
         </div>
       </>
     );
@@ -244,7 +245,7 @@ const UserDetails = () => {
       <Button
         variant="ghost"
         className="mb-4"
-        onClick={() => navigate("/user-management")}
+        onClick={() => navigate("/admin-management")}
       >
         <ChevronLeft className="mr-2 h-4 w-4" /> Back to All Admins / Sub-admins
       </Button>

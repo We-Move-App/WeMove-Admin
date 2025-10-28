@@ -3,13 +3,15 @@ import { useParams, useNavigate } from "react-router-dom";
 // import Layout from '@/components/layout/Layout';
 import { busBookings } from "@/data/mockData";
 import { BusBooking } from "@/types/admin";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader } from "lucide-react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import axiosInstance from "@/api/axiosInstance";
+import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 
 const BusBookingDetails = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState<BusBooking | null>(null);
 
   useEffect(() => {
@@ -69,7 +71,7 @@ const BusBookingDetails = () => {
   useEffect(() => {
     const fetchBookingDetails = async () => {
       if (!bookingId) return;
-
+      setLoading(true);
       try {
         const response = await axiosInstance.get(
           `/bus-management/bus-booking-details/${bookingId}`
@@ -102,20 +104,25 @@ const BusBookingDetails = () => {
         });
       } catch (error) {
         console.error("Error fetching booking details:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchBookingDetails();
   }, [bookingId]);
 
-  if (!booking) {
-    return (
-      <>
-        <div className="flex justify-center items-center h-64">
-          <p className="text-gray-500">Booking not found</p>
-        </div>
-      </>
-    );
+  // if (!booking) {
+  //   return (
+  //     <>
+  //       <div className="flex justify-center items-center h-64">
+  //         <p className="text-gray-500">Booking not found</p>
+  //       </div>
+  //     </>
+  //   );
+  // }
+  if (loading) {
+    return <CustomerDetailsSkeleton />;
   }
   return (
     <>

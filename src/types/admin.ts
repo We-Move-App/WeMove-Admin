@@ -300,6 +300,7 @@ export interface BikeBooking {
 // Customer related types
 export interface Customer {
   id: string;
+  userId: string;
   name: string;
   mobile: string;
   email: string;

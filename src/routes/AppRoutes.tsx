@@ -112,10 +112,7 @@ const AppRoutes = () => {
 
         {/* Customer Management */}
         <Route path="/customer-management" element={<CustomerManagement />} />
-        <Route
-          path="/customer-management/:customerId"
-          element={<CustomerDetails />}
-        />
+        <Route path="/customer-management/:id" element={<CustomerDetails />} />
         <Route
           path="/customer-management/bookings"
           element={<CustomerBookings />}

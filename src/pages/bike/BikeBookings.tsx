@@ -11,6 +11,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import axiosInstance from "@/api/axiosInstance";
+import Loader from "@/components/ui/loader";
 
 // Mock data for bike bookings
 // const mockBikeBookings: BikeBooking[] = [
@@ -182,7 +183,7 @@ const BikeBookings = () => {
       </div>
 
       {loading ? (
-        <p>Loading bookings...</p>
+        <Loader />
       ) : (
         <DataTable
           columns={columns}

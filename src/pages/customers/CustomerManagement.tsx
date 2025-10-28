@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import DataTable from "@/components/ui/DataTable";
 import { Eye, History } from "lucide-react";
 import { Customer } from "@/types/admin";
@@ -19,9 +19,11 @@ import {
 } from "@/components/ui/table";
 import axiosInstance from "@/api/axiosInstance";
 import StatusBadge from "@/components/ui/StatusBadge";
+import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 
 const CustomerManagement = () => {
   const navigate = useNavigate();
+  const { userId } = useParams();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
@@ -43,13 +45,14 @@ const CustomerManagement = () => {
         if (response.data.success) {
           const apiUsers = response.data.data.map((u: any) => ({
             id: u._id,
+            userId: u.userId,
             name: u.fullName,
             mobile: u.phoneNumber,
             email: u.email,
             status: u.verificationStatus,
           }));
           setCustomers(apiUsers);
-          setTotalUsers(response.data?.total || 0);
+          setTotalUsers(response.data?.totaluser || 0);
         }
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -119,7 +122,9 @@ const CustomerManagement = () => {
       </div>
 
       {loading ? (
-        <p>Loading users...</p>
+        <>
+          <CustomerDetailsSkeleton />
+        </>
       ) : (
         <DataTable
           columns={columns}

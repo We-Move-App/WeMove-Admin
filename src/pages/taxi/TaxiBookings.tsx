@@ -10,6 +10,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import axiosInstance from "@/api/axiosInstance";
+import Loader from "@/components/ui/loader";
 
 const TaxiBookings = () => {
   const [bookings, setBookings] = useState<TaxiBooking[]>([]);
@@ -129,7 +130,7 @@ const TaxiBookings = () => {
       </div>
 
       {loading ? (
-        <p>Loading bookings...</p>
+        <Loader />
       ) : (
         <DataTable
           columns={columns}

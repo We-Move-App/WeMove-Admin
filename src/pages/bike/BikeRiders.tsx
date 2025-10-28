@@ -7,6 +7,7 @@ import { BikeRider } from "@/types/admin";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/api/axiosInstance";
+import Loader from "@/components/ui/loader";
 
 // Mock data for bike riders
 // const mockBikeRiders: BikeRider[] = [
@@ -165,7 +166,7 @@ const BikeRiders = () => {
       </div>
 
       {loading ? (
-        <p>Loading riders...</p>
+        <Loader />
       ) : (
         <DataTable
           columns={columns}

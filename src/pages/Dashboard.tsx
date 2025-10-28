@@ -3,7 +3,15 @@ import { useEffect, useState } from "react";
 import StatsCard from "@/components/ui/StatsCard";
 import BookingChart from "@/components/dashboard/BookingChart";
 import RevenueChart from "@/components/dashboard/RevenueChart";
-import { Hotel, Bus, Car, Bike, CreditCard, Download } from "lucide-react";
+import {
+  Hotel,
+  Bus,
+  Car,
+  Bike,
+  CreditCard,
+  Download,
+  User,
+} from "lucide-react";
 import {
   bookingSummary,
   monthlyBookingData,
@@ -14,6 +22,7 @@ import {
 import axiosInstance from "@/api/axiosInstance";
 import axios from "axios";
 import DashboardSkeleton from "@/components/ui/DashboardSkeleton";
+import Loader from "@/components/ui/loader";
 
 type BookingStats = {
   filter: string;
@@ -78,6 +87,14 @@ const Dashboard = () => {
 
   const role = localStorage.getItem("role");
   const permissions = JSON.parse(localStorage.getItem("permissions") || "{}");
+  const [userSummary, setUserSummary] = useState({
+    totalUsers: 0,
+    busUsers: 0,
+    hotelUsers: 0,
+    bikeUsers: 0,
+    taxiUsers: 0,
+    normalUsers: 0,
+  });
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -152,6 +169,8 @@ const Dashboard = () => {
         // console.log("Revenue:", summary.revenue.amount);
       } catch (error) {
         console.error("Error fetching dashboard data", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -181,6 +200,21 @@ const Dashboard = () => {
     };
 
     fetchTransactions();
+  }, []);
+
+  useEffect(() => {
+    const fetchUserSummary = async () => {
+      try {
+        const res = await axiosInstance.get("/dashboard/user-summary");
+        if (res.data?.data) {
+          setUserSummary(res.data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user summary:", error);
+      }
+    };
+
+    fetchUserSummary();
   }, []);
 
   const formatDate = (dateStr: string) => {
@@ -314,6 +348,42 @@ const Dashboard = () => {
                 iconBgColor="bg-indigo-500"
               />
             )}
+
+            {/* --- USER SUMMARY --- */}
+            <StatsCard
+              title="Total Users"
+              value={userSummary.totalUsers?.toLocaleString() ?? "0"}
+              icon={<CreditCard size={20} />}
+              iconBgColor="bg-sky-500"
+            />
+
+            <StatsCard
+              title="Bus Users"
+              value={userSummary.busUsers?.toLocaleString() ?? "0"}
+              icon={<Bus size={20} />}
+              iconBgColor="bg-yellow-500"
+            />
+
+            <StatsCard
+              title="Hotel Users"
+              value={userSummary.hotelUsers?.toLocaleString() ?? "0"}
+              icon={<Hotel size={20} />}
+              iconBgColor="bg-purple-500"
+            />
+
+            <StatsCard
+              title="Taxi Users"
+              value={userSummary.taxiUsers?.toLocaleString() ?? "0"}
+              icon={<Car size={20} />}
+              iconBgColor="bg-orange-500"
+            />
+
+            <StatsCard
+              title="Bike Users"
+              value={userSummary.bikeUsers?.toLocaleString() ?? "0"}
+              icon={<Bike size={20} />}
+              iconBgColor="bg-red-500"
+            />
           </div>
 
           {/* Charts */}
@@ -360,8 +430,14 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <BookingChart />
-              {role === "SuperAdmin" && <RevenueChart />}
+              {loading ? (
+                <Loader />
+              ) : (
+                <>
+                  <BookingChart />
+                  {role === "SuperAdmin" && <RevenueChart />}
+                </>
+              )}
             </div>
           </div>
 
@@ -371,7 +447,7 @@ const Dashboard = () => {
               <h2 className="text-xl font-medium mb-4">Recent Transactions</h2>
 
               {loading ? (
-                <p>Loading...</p>
+                <Loader />
               ) : (
                 <div className="bg-white rounded-lg shadow-md overflow-hidden">
                   {/* Scrollable container */}

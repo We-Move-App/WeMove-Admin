@@ -39,9 +39,14 @@ const StatusBadge = ({ status }: StatusBadgeProps) => {
     const statusLower = status?.toString().trim().toLowerCase();
 
     if (
-      ["approved", "active", "completed", "confirmed", "paid"].includes(
-        statusLower
-      )
+      [
+        "approved",
+        "active",
+        "completed",
+        "confirmed",
+        "paid",
+        "success",
+      ].includes(statusLower)
     ) {
       return "bg-green-100 text-green-800";
     }

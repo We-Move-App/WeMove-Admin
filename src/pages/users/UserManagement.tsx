@@ -151,6 +151,7 @@ const UserManagement = () => {
 
         console.log("Fetched admins:", res.data);
         const usersData = res.data?.data?.data || [];
+        const total = res.data?.data?.total || res.data?.total || 0;
         setUsers(
           usersData.map((user: any) => ({
             id: user._id,
@@ -162,6 +163,7 @@ const UserManagement = () => {
             branch: user.branch,
           }))
         );
+        setTotalBookings(total);
       } catch (err: any) {
         console.error("Failed to fetch users:", err);
         setError(err?.response?.data?.message || "Failed to fetch users");
