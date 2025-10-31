@@ -259,6 +259,12 @@ const CustomerBookingDetails = () => {
     paymentTransactions: [],
   });
 
+  const [bookingSummary, setBookingSummary] = useState({
+    bus: "",
+    hotel: "",
+    ride: "",
+  });
+
   const [searchAll, setSearchAll] = useState("");
   const [searchBus, setSearchBus] = useState("");
   const [searchHotel, setSearchHotel] = useState("");
@@ -339,6 +345,21 @@ const CustomerBookingDetails = () => {
     userBalance();
   }, []);
 
+  useEffect(() => {
+    const bookingSummary = async () => {
+      try {
+        const res = await axiosInstance.get(
+          `/user-management/bookings/${id}?filter=count`
+        );
+        setBookingSummary(res.data?.data?.countsByType);
+        console.log("Booking Summary: ", res.data.data?.countsByType);
+      } catch (error) {
+        console.error("Error fetching the data", error);
+      }
+    };
+    bookingSummary();
+  }, []);
+
   const personalInfo = customerData
     ? {
         id: customerData.id,
@@ -348,13 +369,13 @@ const CustomerBookingDetails = () => {
       }
     : { id: "-", name: "-", email: "-", mobile: "-" };
 
-  const bookingSummary = customerData
-    ? {
-        busBookings: customerData.busBookings.length,
-        hotelBookings: customerData.hotelBookings.length,
-        rideBookings: customerData.rideBookings.length,
-      }
-    : { busBookings: 0, hotelBookings: 0, rideBookings: 0 };
+  // const bookingSummary = customerData
+  //   ? {
+  //       busBookings: customerData.busBookings.length,
+  //       hotelBookings: customerData.hotelBookings.length,
+  //       rideBookings: customerData.rideBookings.length,
+  //     }
+  //   : { busBookings: 0, hotelBookings: 0, rideBookings: 0 };
 
   const handleStatusChange = (newStatus: string) => {
     if (customerData) {
@@ -403,19 +424,19 @@ const CustomerBookingDetails = () => {
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-blue-50 rounded-lg p-4 text-center">
                   <p className="text-lg font-medium text-blue-700">
-                    {bookingSummary.busBookings}
+                    {bookingSummary.bus}
                   </p>
                   <p className="text-sm text-blue-600">Bus Bookings</p>
                 </div>
                 <div className="bg-green-50 rounded-lg p-4 text-center">
                   <p className="text-lg font-medium text-green-700">
-                    {bookingSummary.hotelBookings}
+                    {bookingSummary.hotel}
                   </p>
                   <p className="text-sm text-green-600">Hotel Bookings</p>
                 </div>
                 <div className="bg-purple-50 rounded-lg p-4 text-center">
                   <p className="text-lg font-medium text-purple-700">
-                    {bookingSummary.rideBookings}
+                    {bookingSummary.ride}
                   </p>
                   <p className="text-sm text-purple-600">Ride Bookings</p>
                 </div>

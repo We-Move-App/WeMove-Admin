@@ -745,18 +745,16 @@ const HotelBookings = () => {
     },
   ];
 
-  const filterOptions = [
-    {
-      key: "status" as keyof HotelBooking,
-      label: "Status",
-      options: [
-        { label: "Booked", value: "Booked" },
-        { label: "Completed", value: "Completed" },
-        // { label: "Cancelled", value: "Cancelled" },
-        // { label: "Pending", value: "Pending" },
-      ],
-    },
-  ];
+  // const filterOptions = [
+  //   {
+  //     key: "status" as keyof HotelBooking,
+  //     label: "Status",
+  //     options: [
+  //       { label: "Booked", value: "Booked" },
+  //       { label: "Completed", value: "Completed" },
+  //     ],
+  //   },
+  // ];
 
   return (
     <>
@@ -779,7 +777,7 @@ const HotelBookings = () => {
         currentPage={currentPage}
         totalItems={totalHotelBookings}
         onPageChange={(page) => setCurrentPage(page)}
-        filterOptions={filterOptions}
+        // filterOptions={filterOptions}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
       />

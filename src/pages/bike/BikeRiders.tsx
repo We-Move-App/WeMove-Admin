@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, Plus } from "lucide-react";
+import { BadgeCheck, Eye, Plus } from "lucide-react";
 // import Layout from '@/components/layout/Layout';
 import DataTable from "@/components/ui/DataTable";
 import { BikeRider } from "@/types/admin";
@@ -109,7 +109,18 @@ const BikeRiders = () => {
   };
 
   const columns = [
-    { key: "name" as keyof BikeRider, header: "Name" },
+    {
+      key: "name" as keyof BikeRider,
+      header: "Name",
+      render: (rider: BikeRider) => (
+        <div className="flex items-center gap-2">
+          <span>{rider.name}</span>
+          {rider.status === "approved" && (
+            <BadgeCheck className="text-green-500 w-4 h-4" />
+          )}
+        </div>
+      ),
+    },
     { key: "mobile" as keyof BikeRider, header: "Mobile" },
     { key: "email" as keyof BikeRider, header: "Email" },
     // { key: "vehicleType" as keyof BikeRider, header: "Vehicle Type" },

@@ -4,13 +4,15 @@ import { BusOperator } from "@/types/admin";
 export const fetchBusOperators = async (
   page: number,
   limit: number,
-  searchTerm?: string
+  searchTerm?: string,
+  status?: string
 ): Promise<{ data: BusOperator[]; total: number }> => {
   const response = await axiosInstance.get("/bus-management/bus-operators", {
     params: {
       page,
       limit,
       search: searchTerm,
+      filter: status,
     },
   });
 

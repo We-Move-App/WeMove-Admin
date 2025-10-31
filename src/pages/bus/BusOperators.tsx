@@ -19,6 +19,7 @@ const BusOperators = () => {
   const [pageSize] = useState(10);
   const [totalBusOperators, setTotalBusOperators] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
 
   useEffect(() => {
     const loadBusOperators = async () => {
@@ -26,7 +27,8 @@ const BusOperators = () => {
         const { data, total } = await fetchBusOperators(
           currentPage,
           pageSize,
-          searchTerm
+          searchTerm,
+          selectedStatus
         );
         setOperators(data);
         setTotalBusOperators(total);
@@ -40,7 +42,7 @@ const BusOperators = () => {
     };
 
     loadBusOperators();
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, searchTerm, selectedStatus]);
 
   const columns = [
     {
@@ -113,6 +115,7 @@ const BusOperators = () => {
       options: [
         { label: "approved", value: "approved" },
         { label: "processing", value: "processing" },
+        { label: "pending", value: "pending" },
         { label: "submitted", value: "submitted" },
         { label: "rejected", value: "rejected" },
         { label: "blocked", value: "blocked" },
@@ -158,6 +161,12 @@ const BusOperators = () => {
         filterOptions={filterOptions}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
+        filters={{ status: selectedStatus }}
+        onFilterChange={(filters) => {
+          setSelectedStatus(filters.status || "");
+          setCurrentPage(1);
+        }}
+        // onFilterChange={(filters) => setSelectedStatus(filters.status || "")}
       />
     </>
   );
