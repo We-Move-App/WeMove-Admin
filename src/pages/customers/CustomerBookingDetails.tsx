@@ -15,6 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { StatusDropdown } from "@/components/ui/StatusDropdown";
 import PaginationComponent from "@/components/pagination/PaginationComponent";
+import axiosInstance from "@/api/axiosInstance";
+import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 
 // Mock Customer Data
 interface NormalizedBooking {
@@ -25,8 +27,17 @@ interface NormalizedBooking {
   status: string;
 }
 
+interface HotelBookings {
+  bookingId: string;
+}
+
+interface RideTransaction {
+  bookingId: string;
+}
+
 interface PaymentTransaction {
-  id: string;
+  userId: string;
+  createdAt: string;
   date: string;
   amount: number;
   method: "Credit Card" | "UPI" | "Net Banking" | "Wallet";
@@ -40,222 +51,293 @@ interface CustomerData {
   status: string;
   allBookings: NormalizedBooking[];
   busBookings: NormalizedBooking[];
-  hotelBookings: NormalizedBooking[];
-  rideBookings: NormalizedBooking[];
+  hotelBookings: HotelBookings[];
+  rideBookings: RideTransaction[];
   paymentTransactions: PaymentTransaction[];
 }
 
-const mockCustomerData: CustomerData = {
-  id: "C-1001",
-  name: "Riya Sharma",
-  email: "riya.sharma@example.com",
-  mobile: "+91 9876543210",
-  status: "active",
-  allBookings: [
-    {
-      id: "B-1001",
-      type: "Bus",
-      date: "2025-10-15",
-      amount: 850,
-      status: "Completed",
-    },
-    {
-      id: "H-2001",
-      type: "Hotel",
-      date: "2025-10-16",
-      amount: 5200,
-      status: "Completed",
-    },
-    {
-      id: "R-3001",
-      type: "Ride",
-      date: "2025-10-17",
-      amount: 450,
-      status: "Pending",
-    },
-  ],
-  busBookings: [
-    {
-      id: "B-1001",
-      type: "Bus",
-      date: "2025-10-15",
-      amount: 850,
-      status: "Completed",
-    },
-    {
-      id: "B-1001",
-      type: "Bus",
-      date: "2025-10-15",
-      amount: 850,
-      status: "Completed",
-    },
-    {
-      id: "B-1001",
-      type: "Bus",
-      date: "2025-10-15",
-      amount: 850,
-      status: "Completed",
-    },
-    {
-      id: "B-1001",
-      type: "Bus",
-      date: "2025-10-15",
-      amount: 850,
-      status: "Completed",
-    },
-  ],
-  hotelBookings: [
-    {
-      id: "H-2001",
-      type: "Hotel",
-      date: "2025-10-16",
-      amount: 5200,
-      status: "Completed",
-    },
-    {
-      id: "H-2001",
-      type: "Hotel",
-      date: "2025-10-16",
-      amount: 5200,
-      status: "Completed",
-    },
-    {
-      id: "H-2001",
-      type: "Hotel",
-      date: "2025-10-16",
-      amount: 5200,
-      status: "Completed",
-    },
-    {
-      id: "H-2001",
-      type: "Hotel",
-      date: "2025-10-16",
-      amount: 5200,
-      status: "Completed",
-    },
-    {
-      id: "H-2001",
-      type: "Hotel",
-      date: "2025-10-16",
-      amount: 5200,
-      status: "Completed",
-    },
-    {
-      id: "H-2001",
-      type: "Hotel",
-      date: "2025-10-16",
-      amount: 5200,
-      status: "Completed",
-    },
-    {
-      id: "H-2001",
-      type: "Hotel",
-      date: "2025-10-16",
-      amount: 5200,
-      status: "Completed",
-    },
-  ],
-  rideBookings: [
-    {
-      id: "R-3001",
-      type: "Ride",
-      date: "2025-10-17",
-      amount: 450,
-      status: "Pending",
-    },
-    {
-      id: "R-3001",
-      type: "Ride",
-      date: "2025-10-17",
-      amount: 450,
-      status: "Pending",
-    },
-    {
-      id: "R-3001",
-      type: "Ride",
-      date: "2025-10-17",
-      amount: 450,
-      status: "Pending",
-    },
-    {
-      id: "R-3001",
-      type: "Ride",
-      date: "2025-10-17",
-      amount: 450,
-      status: "Pending",
-    },
-    {
-      id: "R-3001",
-      type: "Ride",
-      date: "2025-10-17",
-      amount: 450,
-      status: "Pending",
-    },
-  ],
-  paymentTransactions: [
-    {
-      id: "P-5001",
-      date: "2025-10-15",
-      amount: 850,
-      method: "UPI",
-      status: "Completed",
-    },
-    {
-      id: "P-5002",
-      date: "2025-10-16",
-      amount: 5200,
-      method: "Credit Card",
-      status: "Completed",
-    },
-    {
-      id: "P-5003",
-      date: "2025-10-17",
-      amount: 450,
-      method: "Wallet",
-      status: "Pending",
-    },
-    {
-      id: "P-5004",
-      date: "2025-10-18",
-      amount: 1200,
-      method: "Net Banking",
-      status: "Failed",
-    },
-    {
-      id: "P-5005",
-      date: "2025-10-19",
-      amount: 300,
-      method: "UPI",
-      status: "Completed",
-    },
-  ],
-};
+// const mockCustomerData: CustomerData = {
+//   id: "C-1001",
+//   name: "Riya Sharma",
+//   email: "riya.sharma@example.com",
+//   mobile: "+91 9876543210",
+//   status: "active",
+//   allBookings: [
+//     {
+//       id: "B-1001",
+//       type: "Bus",
+//       date: "2025-10-15",
+//       amount: 850,
+//       status: "Completed",
+//     },
+//     {
+//       id: "H-2001",
+//       type: "Hotel",
+//       date: "2025-10-16",
+//       amount: 5200,
+//       status: "Completed",
+//     },
+//     {
+//       id: "R-3001",
+//       type: "Ride",
+//       date: "2025-10-17",
+//       amount: 450,
+//       status: "Pending",
+//     },
+//   ],
+//   busBookings: [
+//     {
+//       id: "B-1001",
+//       type: "Bus",
+//       date: "2025-10-15",
+//       amount: 850,
+//       status: "Completed",
+//     },
+//     {
+//       id: "B-1001",
+//       type: "Bus",
+//       date: "2025-10-15",
+//       amount: 850,
+//       status: "Completed",
+//     },
+//     {
+//       id: "B-1001",
+//       type: "Bus",
+//       date: "2025-10-15",
+//       amount: 850,
+//       status: "Completed",
+//     },
+//     {
+//       id: "B-1001",
+//       type: "Bus",
+//       date: "2025-10-15",
+//       amount: 850,
+//       status: "Completed",
+//     },
+//   ],
+//   hotelBookings: [
+//     {
+//       id: "H-2001",
+//       type: "Hotel",
+//       date: "2025-10-16",
+//       amount: 5200,
+//       status: "Completed",
+//     },
+//     {
+//       id: "H-2001",
+//       type: "Hotel",
+//       date: "2025-10-16",
+//       amount: 5200,
+//       status: "Completed",
+//     },
+//     {
+//       id: "H-2001",
+//       type: "Hotel",
+//       date: "2025-10-16",
+//       amount: 5200,
+//       status: "Completed",
+//     },
+//     {
+//       id: "H-2001",
+//       type: "Hotel",
+//       date: "2025-10-16",
+//       amount: 5200,
+//       status: "Completed",
+//     },
+//     {
+//       id: "H-2001",
+//       type: "Hotel",
+//       date: "2025-10-16",
+//       amount: 5200,
+//       status: "Completed",
+//     },
+//     {
+//       id: "H-2001",
+//       type: "Hotel",
+//       date: "2025-10-16",
+//       amount: 5200,
+//       status: "Completed",
+//     },
+//     {
+//       id: "H-2001",
+//       type: "Hotel",
+//       date: "2025-10-16",
+//       amount: 5200,
+//       status: "Completed",
+//     },
+//   ],
+//   rideBookings: [
+//     {
+//       id: "R-3001",
+//       type: "Ride",
+//       date: "2025-10-17",
+//       amount: 450,
+//       status: "Pending",
+//     },
+//     {
+//       id: "R-3001",
+//       type: "Ride",
+//       date: "2025-10-17",
+//       amount: 450,
+//       status: "Pending",
+//     },
+//     {
+//       id: "R-3001",
+//       type: "Ride",
+//       date: "2025-10-17",
+//       amount: 450,
+//       status: "Pending",
+//     },
+//     {
+//       id: "R-3001",
+//       type: "Ride",
+//       date: "2025-10-17",
+//       amount: 450,
+//       status: "Pending",
+//     },
+//     {
+//       id: "R-3001",
+//       type: "Ride",
+//       date: "2025-10-17",
+//       amount: 450,
+//       status: "Pending",
+//     },
+//   ],
+//   paymentTransactions: [
+//     {
+//       id: "P-5001",
+//       date: "2025-10-15",
+//       amount: 850,
+//       method: "UPI",
+//       status: "Completed",
+//     },
+//     {
+//       id: "P-5002",
+//       date: "2025-10-16",
+//       amount: 5200,
+//       method: "Credit Card",
+//       status: "Completed",
+//     },
+//     {
+//       id: "P-5003",
+//       date: "2025-10-17",
+//       amount: 450,
+//       method: "Wallet",
+//       status: "Pending",
+//     },
+//     {
+//       id: "P-5004",
+//       date: "2025-10-18",
+//       amount: 1200,
+//       method: "Net Banking",
+//       status: "Failed",
+//     },
+//     {
+//       id: "P-5005",
+//       date: "2025-10-19",
+//       amount: 300,
+//       method: "UPI",
+//       status: "Completed",
+//     },
+//   ],
+// };
 
 const CustomerBookingDetails = () => {
-  const { customerId } = useParams<{ customerId: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [customerData, setCustomerData] = useState<CustomerData | null>(null);
+  // const [customerData, setCustomerData] = useState<CustomerData | null>(null);
+  const [customerData, setCustomerData] = useState<CustomerData>({
+    id: "",
+    name: "",
+    email: "",
+    mobile: "",
+    status: "",
+    allBookings: [],
+    busBookings: [],
+    hotelBookings: [],
+    rideBookings: [],
+    paymentTransactions: [],
+  });
+
   const [searchAll, setSearchAll] = useState("");
   const [searchBus, setSearchBus] = useState("");
   const [searchHotel, setSearchHotel] = useState("");
   const [searchRide, setSearchRide] = useState("");
   const [searchPayment, setSearchPayment] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [userBalance, setUserBalance] = useState({
+    balance: "",
+    cardNumber: "",
+  });
 
-  const filterData = (data, searchTerm) => {
-    return data.filter(
-      (item) =>
-        item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item.type &&
-          item.type.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (item.status &&
-          item.status.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+  const filterData = (data: any[], searchTerm: string) => {
+    return data.filter((item) => {
+      const id = item.id?.toLowerCase() || "";
+      const type = item.type?.toLowerCase() || "";
+      const status = item.status?.toLowerCase() || "";
+      return (
+        id.includes(searchTerm.toLowerCase()) ||
+        type.includes(searchTerm.toLowerCase()) ||
+        status.includes(searchTerm.toLowerCase())
+      );
+    });
   };
 
+  // useEffect(() => {
+  //   // Mock fetch
+  //   setCustomerData(mockCustomerData);
+  // }, [customerId]);
+
   useEffect(() => {
-    // Mock fetch
-    setCustomerData(mockCustomerData);
-  }, [customerId]);
+    const fetchCustomerDetails = async () => {
+      setLoading(true);
+      try {
+        const response = await axiosInstance.get(
+          `/user-management/bookings/${id}?filter=${activeTab}`
+        );
+        console.log("API response:", response.data);
+        const apiData = response.data?.data || {};
+
+        // Same data parsing logic...
+        const bookings = apiData.bookings || [];
+        const userInfo = bookings?.[0]?.user?.[0] || {};
+
+        setCustomerData({
+          id: userInfo._id || "",
+          name: userInfo.name || "",
+          email: userInfo.email || "",
+          mobile: userInfo.phoneNumber || "",
+          status: "Active",
+          allBookings: activeTab === "all" ? bookings : [],
+          busBookings: activeTab === "bus" ? bookings : [],
+          hotelBookings: activeTab === "hotel" ? bookings : [],
+          rideBookings: activeTab === "ride" ? bookings : [],
+          paymentTransactions: activeTab === "transactions" ? bookings : [],
+        });
+      } catch (err) {
+        setError("Failed to fetch customer data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) fetchCustomerDetails();
+  }, [id, activeTab]);
+
+  useEffect(() => {
+    const userBalance = async () => {
+      try {
+        const res = await axiosInstance.get(`/user-management/wallet/${id}`);
+        setUserBalance(res.data?.data);
+        console.log("User Balance: ", res.data.data);
+      } catch (error) {
+        console.error("Error fetching the data", error);
+      }
+    };
+    userBalance();
+  }, []);
 
   const personalInfo = customerData
     ? {
@@ -294,7 +376,9 @@ const CustomerBookingDetails = () => {
     return data.slice(start, end);
   };
 
-  if (!customerData) return <p>Loading...</p>;
+  // if (!customerData) return <p>Loading...</p>;
+  if (loading) return <CustomerDetailsSkeleton />;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <>
@@ -342,40 +426,44 @@ const CustomerBookingDetails = () => {
 
         {/* Tabs */}
         <div className="mt-8">
-          <Tabs defaultValue="all" className="w-full">
+          {/* <Tabs defaultValue="all" className="w-full"> */}
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
             <TabsList className="mb-4">
               {/* <TabsTrigger value="all"></TabsTrigger> */}
               <TabsTrigger
                 value="all"
-                className="data-[state=active]:bg-[#3E7C68] data-[state=active]:text-white
-                 data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
+                className="data-[state=active]:!bg-[#3E7C68] data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
               >
                 All Bookings
               </TabsTrigger>
               <TabsTrigger
                 value="bus"
-                className="data-[state=active]:bg-[#3E7C68] data-[state=active]:text-white
+                className="data-[state=active]:!bg-[#3E7C68] data-[state=active]:text-white
                  data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
               >
                 Bus Bookings
               </TabsTrigger>
               <TabsTrigger
                 value="hotel"
-                className="data-[state=active]:bg-[#3E7C68] data-[state=active]:text-white
+                className="data-[state=active]:!bg-[#3E7C68] data-[state=active]:text-white
                  data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
               >
                 Hotel Bookings
               </TabsTrigger>
               <TabsTrigger
                 value="ride"
-                className="data-[state=active]:bg-[#3E7C68] data-[state=active]:text-white
+                className="data-[state=active]:!bg-[#3E7C68] data-[state=active]:text-white
                  data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
               >
                 Ride Bookings
               </TabsTrigger>
               <TabsTrigger
-                value="payment"
-                className="data-[state=active]:bg-[#3E7C68] data-[state=active]:text-white
+                value="transactions"
+                className="data-[state=active]:!bg-[#3E7C68] data-[state=active]:text-white
                  data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
               >
                 Payment Transactions
@@ -417,11 +505,17 @@ const CustomerBookingDetails = () => {
                             pageSize
                           ).map((b) => (
                             <TableRow key={b.id}>
-                              <TableCell>{b.id}</TableCell>
-                              <TableCell>{b.type}</TableCell>
-                              <TableCell>{b.date}</TableCell>
-                              <TableCell>₹{b.amount}</TableCell>
-                              <TableCell>{b.status}</TableCell>
+                              <TableCell>{b.bookingId}</TableCell>
+                              <TableCell>{b.vehicleType || b.source}</TableCell>
+                              <TableCell>
+                                {new Date(b.createdAt).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell>
+                                ₹{b.finalAmount || b.fare || b.price}
+                              </TableCell>
+                              <TableCell>
+                                <StatusBadge status={b.paymentStatus} />
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -474,11 +568,15 @@ const CustomerBookingDetails = () => {
                             pageSize
                           ).map((b) => (
                             <TableRow key={b.id}>
-                              <TableCell>{b.id}</TableCell>
-                              <TableCell>{b.type}</TableCell>
-                              <TableCell>{b.date}</TableCell>
-                              <TableCell>₹{b.amount}</TableCell>
-                              <TableCell>{b.status}</TableCell>
+                              <TableCell>{b.bookingId}</TableCell>
+                              {/* <TableCell>{b.type}</TableCell> */}
+                              <TableCell>
+                                {new Date(b.createdAt).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell>₹{b.price}</TableCell>
+                              <TableCell>
+                                <StatusBadge status={b.status} />
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -528,11 +626,15 @@ const CustomerBookingDetails = () => {
                             pageSize
                           ).map((b) => (
                             <TableRow key={b.id}>
-                              <TableCell>{b.id}</TableCell>
-                              <TableCell>{b.type}</TableCell>
-                              <TableCell>{b.date}</TableCell>
-                              <TableCell>₹{b.amount}</TableCell>
-                              <TableCell>{b.status}</TableCell>
+                              <TableCell>{b.bookingId}</TableCell>
+                              <TableCell>
+                                {new Date(b.createdAt).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell>₹{b.finalAmount}</TableCell>
+                              {/* <TableCell>{b.status}</TableCell> */}
+                              <TableCell>
+                                <StatusBadge status={b.status} />
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -571,6 +673,7 @@ const CustomerBookingDetails = () => {
                         <TableHeader>
                           <TableRow>
                             <TableHead>ID</TableHead>
+                            <TableHead>Type</TableHead>
                             <TableHead>Date</TableHead>
                             <TableHead>Amount</TableHead>
                             <TableHead>Status</TableHead>
@@ -583,11 +686,15 @@ const CustomerBookingDetails = () => {
                             pageSize
                           ).map((b) => (
                             <TableRow key={b.id}>
-                              <TableCell>{b.id}</TableCell>
-                              <TableCell>{b.type}</TableCell>
-                              <TableCell>{b.date}</TableCell>
-                              <TableCell>₹{b.amount}</TableCell>
-                              <TableCell>{b.status}</TableCell>
+                              <TableCell>{b.bookingId}</TableCell>
+                              <TableCell>{b.vehicleType}</TableCell>
+                              <TableCell>
+                                {new Date(b.createdAt).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell>₹{b.fare}</TableCell>
+                              <TableCell>
+                                <StatusBadge status={b.paymentStatus} />
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -604,7 +711,7 @@ const CustomerBookingDetails = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="payment">
+            <TabsContent value="transactions">
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                   <CardTitle>Payment Transactions</CardTitle>
@@ -627,13 +734,14 @@ const CustomerBookingDetails = () => {
                           Digital Debit Card
                         </p>
                         <p className="tracking-widest mb-3">
-                          ***** ***** ***** ****
+                          {userBalance.cardNumber || "***** ***** ***** ****"}
                         </p>
                         <div className="flex items-baseline space-x-1 mb-2">
                           <p className="text-2xl font-bold">
-                            {customerData.walletBalance
+                            {/* {userBalance.balance
                               ? customerData.walletBalance.toLocaleString()
-                              : "0"}
+                              : "0"} */}
+                            {userBalance.balance}
                           </p>
                           <span className="text-sm font-semibold">XAF</span>
                         </div>
@@ -654,6 +762,7 @@ const CustomerBookingDetails = () => {
                             <TableHead>ID</TableHead>
                             <TableHead>Date</TableHead>
                             <TableHead>Amount</TableHead>
+                            <TableHead>Type</TableHead>
                             <TableHead>Status</TableHead>
                           </TableRow>
                         </TableHeader>
@@ -667,10 +776,15 @@ const CustomerBookingDetails = () => {
                             pageSize
                           ).map((b) => (
                             <TableRow key={b.id}>
-                              <TableCell>{b.id}</TableCell>
-                              <TableCell>{b.date}</TableCell>
+                              <TableCell>{b.userId}</TableCell>
+                              <TableCell>
+                                {new Date(b.createdAt).toLocaleDateString()}
+                              </TableCell>
                               <TableCell>₹{b.amount}</TableCell>
-                              <TableCell>{b.status}</TableCell>
+                              <TableCell>{b.type}</TableCell>
+                              <TableCell>
+                                <StatusBadge status={b.status} />
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>

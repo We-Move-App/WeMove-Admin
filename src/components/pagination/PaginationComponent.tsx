@@ -1,13 +1,5 @@
-import { useState } from "react";
+import React from "react";
 
-// Helper to get paginated data (can stay outside)
-const paginate = (data: any[], page: number, pageSize: number) => {
-  const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-  return data.slice(start, end);
-};
-
-// Reusable pagination component
 const PaginationComponent = ({
   currentPage,
   totalItems,
@@ -22,30 +14,45 @@ const PaginationComponent = ({
   const totalPages = Math.ceil(totalItems / pageSize);
   if (totalPages <= 1) return null;
 
+  // Only show 3 pages at a time
+  const maxVisible = 3;
+  const startPage = Math.floor((currentPage - 1) / maxVisible) * maxVisible + 1;
+  const endPage = Math.min(startPage + maxVisible - 1, totalPages);
+
   return (
-    <div className="flex justify-end mt-2 space-x-2">
+    <div className="flex justify-center mt-4 mb-6 space-x-2">
+      {/* Prev Button */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="px-3 py-1 border rounded disabled:opacity-50"
+        className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-gray-100"
       >
         Prev
       </button>
-      {[...Array(totalPages)].map((_, i) => (
+
+      {/* Page Numbers (only 3 shown) */}
+      {Array.from(
+        { length: endPage - startPage + 1 },
+        (_, i) => startPage + i
+      ).map((page) => (
         <button
-          key={i}
-          onClick={() => onPageChange(i + 1)}
+          key={page}
+          onClick={() => onPageChange(page)}
           className={`px-3 py-1 border rounded ${
-            currentPage === i + 1 ? "bg-blue-500 text-white" : ""
+            currentPage === page
+              ? "bg-green-900 text-white border-green-900"
+              : "hover:bg-gray-100"
           }`}
         >
-          {i + 1}
+          {page}
         </button>
       ))}
+
+      {/* Next Button */}
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="px-3 py-1 border rounded disabled:opacity-50"
+        className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-gray-100"
       >
         Next
       </button>

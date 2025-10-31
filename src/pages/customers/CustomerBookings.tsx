@@ -9,6 +9,7 @@ import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 // Mock Data Type
 interface CustomerBooking {
   id: string;
+  userId: string;
   bookingId: string;
   customerName: string;
   customerEmail: string;
@@ -91,7 +92,8 @@ const CustomerBookings = () => {
       if (response.data.success) {
         const mappedData: CustomerBooking[] = (response.data.data || []).map(
           (item: any, index: number) => ({
-            id: `${index + 1 + (currentPage - 1) * pageSize}`,
+            id: item._id,
+            userId: item.userId,
             bookingId: item.bookingId || "-",
             customerName: item.fullName || "N/A",
             customerEmail: item.email || "N/A",
@@ -137,11 +139,11 @@ const CustomerBookings = () => {
   }, [currentPage, searchTerm]);
 
   const handleRowClick = (booking: CustomerBooking) => {
-    navigate(`/customer-management/bookings/${booking.bookingId}`);
+    navigate(`/customer-management/bookings/${booking.id}`);
   };
 
   const columns = [
-    { key: "id" as keyof CustomerBooking, header: "ID" },
+    { key: "userId" as keyof CustomerBooking, header: "ID" },
     { key: "bookingId" as keyof CustomerBooking, header: "Booking ID" },
     { key: "customerName" as keyof CustomerBooking, header: "Customer Name" },
     { key: "customerEmail" as keyof CustomerBooking, header: "Email" },
@@ -167,7 +169,7 @@ const CustomerBookings = () => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/customer-management/bookings/${booking.bookingId}`);
+            navigate(`/customer-management/bookings/${booking.id}`);
           }}
           className="action-button flex items-center"
         >

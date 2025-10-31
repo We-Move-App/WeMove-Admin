@@ -414,7 +414,7 @@ const CommissionManagement = () => {
             "Hotel",
             "Taxi",
             "Bike",
-            "Transfer",
+            // "Transfer",
           ].every((service) => existingServices.includes(service));
 
           return !allServicesAdded ? (

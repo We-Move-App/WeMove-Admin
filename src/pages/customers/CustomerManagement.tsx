@@ -34,12 +34,19 @@ const CustomerManagement = () => {
   const [pageSize] = useState(10);
   const [totalUsers, setTotalUsers] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [status, setStatus] = useState<string>("");
 
   useEffect(() => {
     const fetchCustomers = async () => {
+      setLoading(true);
       try {
         const response = await axiosInstance.get("/user-management/users", {
-          params: { page: currentPage, limit: pageSize, search: searchTerm },
+          params: {
+            page: currentPage,
+            limit: pageSize,
+            search: searchTerm,
+            verificationStatus: status,
+          },
         });
 
         if (response.data.success) {
@@ -52,7 +59,7 @@ const CustomerManagement = () => {
             status: u.verificationStatus,
           }));
           setCustomers(apiUsers);
-          setTotalUsers(response.data?.totaluser || 0);
+          setTotalUsers(response.data?.totalUsers || 0);
         }
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -62,7 +69,7 @@ const CustomerManagement = () => {
     };
 
     fetchCustomers();
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, searchTerm, status]);
 
   const handleShowHistory = (customer: Customer) => {
     setSelectedCustomer(customer);
@@ -132,14 +139,18 @@ const CustomerManagement = () => {
           keyExtractor={(item) => item.id}
           onRowClick={handleRowClick}
           paginate={true}
-          pageSize={10}
-          filterable
-          filterOptions={filterOptions}
+          pageSize={pageSize}
           currentPage={currentPage}
           totalItems={totalUsers}
-          onPageChange={(page) => setCurrentPage(page)}
+          onPageChange={setCurrentPage}
+          filterable
+          filterOptions={filterOptions}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
+          onFilterChange={(filters) => {
+            setStatus(filters.status || "");
+            setCurrentPage(1);
+          }}
         />
       )}
     </>

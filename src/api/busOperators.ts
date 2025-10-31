@@ -30,6 +30,7 @@ export const fetchBusOperators = async (
       mobile: user.phoneNumber,
       status: user.verificationStatus,
       numberOfBuses: user.busCount || 0,
+      balance: user.balance,
       companyName: user.companyName || "",
     })),
   };

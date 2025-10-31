@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
 
 const SOCKET_URL = "http://139.59.20.155:8000";
+// const SOCKET_URL = "https://volvo-improving-spring-way.trycloudflare.com";
 
 let socket: Socket | null = null;
 

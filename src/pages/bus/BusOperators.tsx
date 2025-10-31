@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 // import Layout from "@/components/layout/Layout";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { Plus, Eye } from "lucide-react";
+import { Plus, Eye, BadgeCheck } from "lucide-react";
 import { busOperators } from "@/data/mockData";
 import { BusOperator } from "@/types/admin";
 import { Button } from "@/components/ui/button";
@@ -43,16 +43,20 @@ const BusOperators = () => {
   }, [currentPage, pageSize, searchTerm]);
 
   const columns = [
-    { key: "name" as keyof BusOperator, header: "Name" },
-    { key: "mobile" as keyof BusOperator, header: "Mobile" },
-    { key: "email" as keyof BusOperator, header: "Email ID" },
     {
-      key: "status" as keyof BusOperator,
-      header: "Status",
+      key: "name" as keyof BusOperator,
+      header: "Name",
       render: (operator: BusOperator) => (
-        <StatusBadge status={operator.status} />
+        <div className="flex items-center gap-2">
+          <span>{operator.name}</span>
+          {operator.status === "approved" && (
+            <BadgeCheck className="text-green-500 w-4 h-4" />
+          )}
+        </div>
       ),
     },
+    { key: "mobile" as keyof BusOperator, header: "Mobile" },
+    { key: "email" as keyof BusOperator, header: "Email ID" },
     {
       key: "numberOfBuses" as keyof BusOperator,
       header: "Number of Buses",
@@ -66,6 +70,22 @@ const BusOperators = () => {
         >
           {operator.numberOfBuses}
         </span>
+      ),
+    },
+    {
+      key: "balance" as keyof BusOperator,
+      header: "Wallet Balance",
+      render: (operator: BusOperator) => (
+        <span className="text-gray-800 font-medium">
+          ₹{operator.balance?.toLocaleString() ?? 0}
+        </span>
+      ),
+    },
+    {
+      key: "status" as keyof BusOperator,
+      header: "Status",
+      render: (operator: BusOperator) => (
+        <StatusBadge status={operator.status} />
       ),
     },
     {

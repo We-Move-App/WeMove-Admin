@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, Plus } from "lucide-react";
+import { BadgeCheck, Eye, Plus } from "lucide-react";
 // import Layout from '@/components/layout/Layout';
 import DataTable from "@/components/ui/DataTable";
 import { HotelManager } from "@/types/admin";
@@ -95,9 +95,29 @@ const HotelManagers = () => {
   };
 
   const columns = [
-    { key: "name" as keyof HotelManager, header: "Name" },
+    {
+      key: "name" as keyof HotelManager,
+      header: "Name",
+      render: (manager: HotelManager) => (
+        <div className="flex items-center gap-2">
+          <span>{manager.name}</span>
+          {manager.status === "approved" && (
+            <BadgeCheck className="text-green-500 w-4 h-4" />
+          )}
+        </div>
+      ),
+    },
     { key: "mobile" as keyof HotelManager, header: "Mobile" },
     { key: "email" as keyof HotelManager, header: "Email" },
+    {
+      key: "balance" as keyof HotelManager,
+      header: "Wallet Balance",
+      render: (manager: HotelManager) => (
+        <span className="text-gray-800 font-medium">
+          ₹{manager.balance?.toLocaleString() ?? 0}
+        </span>
+      ),
+    },
     {
       key: "status" as keyof HotelManager,
       header: "Status",

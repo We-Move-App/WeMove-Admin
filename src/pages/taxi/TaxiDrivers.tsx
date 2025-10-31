@@ -33,6 +33,15 @@ const TaxiDrivers = () => {
       header: "Registration Number",
     },
     {
+      key: "balance" as keyof TaxiDriver,
+      header: "Wallet Balance",
+      render: (driver: TaxiDriver) => (
+        <span className="text-gray-800 font-medium">
+          ₹{driver.balance?.toLocaleString() ?? 0}
+        </span>
+      ),
+    },
+    {
       key: "status" as keyof TaxiDriver,
       header: "Status",
       render: (driver: TaxiDriver) => <StatusBadge status={driver.status} />,

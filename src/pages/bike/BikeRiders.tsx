@@ -86,6 +86,7 @@ const BikeRiders = () => {
           name: rider.name,
           email: rider.email || "-",
           mobile: rider.mobile || "-",
+          balance: rider.balance,
           status: rider.status,
           vehicleType: rider.vehicleType,
           registrationNumber: rider.registrationNumber,
@@ -115,6 +116,15 @@ const BikeRiders = () => {
     {
       key: "registrationNumber" as keyof BikeRider,
       header: "Registration Number",
+    },
+    {
+      key: "balance" as keyof BikeRider,
+      header: "Wallet Balance",
+      render: (rider: BikeRider) => (
+        <span className="text-gray-800 font-medium">
+          ₹{rider.balance?.toLocaleString() ?? 0}
+        </span>
+      ),
     },
     {
       key: "status" as keyof BikeRider,

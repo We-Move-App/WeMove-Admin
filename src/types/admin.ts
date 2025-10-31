@@ -52,12 +52,13 @@ export interface BusOperator {
     | "active"
     | "inactive"
     | "pending"
-    | "Approved"
+    | "approved"
     | "Rejected"
     | "Submitted"
     | "Blocked"
     | "Pending";
   numberOfBuses?: number;
+  balance?: number;
   busCount?: number;
   joinDate?: string;
   // Additional properties used in BusOperatorDetails.tsx
@@ -129,12 +130,13 @@ export interface HotelManager {
   phone?: string;
   address?: string;
   city?: string;
+  balance?: string;
   state?: string;
   status:
     | "active"
     | "inactive"
     | "pending"
-    | "Approved"
+    | "approved"
     | "Rejected"
     | "Submitted"
     | "Blocked"
@@ -202,6 +204,7 @@ export interface TaxiDriver {
   branch?: string;
   mobile?: string;
   phone?: string;
+  balance?: string;
   licenseNumber?: string;
   vehicleNumber?: string;
   vehicleType?: string;
@@ -261,6 +264,7 @@ export interface BikeRider {
   phone?: string;
   licenseNumber?: string;
   bikeNumber?: string;
+  balance?: string;
   bikeModel?: string;
   vehicleType?: string;
   vehicleRegistrationNumber?: string;

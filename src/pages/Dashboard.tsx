@@ -23,6 +23,8 @@ import axiosInstance from "@/api/axiosInstance";
 import axios from "axios";
 import DashboardSkeleton from "@/components/ui/DashboardSkeleton";
 import Loader from "@/components/ui/loader";
+import { Pagination } from "@/components/ui/pagination";
+import PaginationComponent from "@/components/pagination/PaginationComponent";
 
 type BookingStats = {
   filter: string;
@@ -84,17 +86,19 @@ const Dashboard = () => {
     },
     revenue: { filter: "", amount: 0, trend: 0, status: "increased" },
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const pageSize = 10;
 
   const role = localStorage.getItem("role");
   const permissions = JSON.parse(localStorage.getItem("permissions") || "{}");
   const [userSummary, setUserSummary] = useState({
-    totalUsers: 0,
-    busUsers: 0,
-    hotelUsers: 0,
-    bikeUsers: 0,
-    taxiUsers: 0,
-    normalUsers: 0,
+    users: 0,
+    busOperators: 0,
+    hotelManagers: 0,
+    drivers: 0,
   });
+  // const [totalCounts, setTotalCounts] = useState();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -179,11 +183,12 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchTransactions = async () => {
+      setLoading(true);
       try {
         const accessToken = localStorage.getItem("accessToken");
 
         const response = await axiosInstance.get(
-          "/wallet/transactions/admin?page=1",
+          `/wallet/transactions/admin?page=${currentPage}&limit=${pageSize}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -191,7 +196,9 @@ const Dashboard = () => {
           }
         );
 
-        setTransactions(response.data.data.transactions);
+        const { transactions, totalCount } = response.data.data;
+        setTransactions(transactions);
+        setTotalItems(totalCount);
       } catch (error) {
         console.error("Error fetching transactions:", error);
       } finally {
@@ -200,7 +207,7 @@ const Dashboard = () => {
     };
 
     fetchTransactions();
-  }, []);
+  }, [currentPage]);
 
   useEffect(() => {
     const fetchUserSummary = async () => {
@@ -225,6 +232,24 @@ const Dashboard = () => {
       year: "numeric",
     });
   };
+
+  useEffect(() => {
+    const fetchTotalCounts = async () => {
+      setLoading(true);
+      try {
+        const res = await axiosInstance.get("dashboard/total-counts");
+        if (res.data?.data) {
+          setUserSummary(res.data.data);
+          console.log(setUserSummary);
+        }
+      } catch (error) {
+        console.error("Error fetching the data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTotalCounts();
+  }, []);
 
   return (
     <>
@@ -352,37 +377,30 @@ const Dashboard = () => {
             {/* --- USER SUMMARY --- */}
             <StatsCard
               title="Total Users"
-              value={userSummary.totalUsers?.toLocaleString() ?? "0"}
+              value={userSummary.users?.toLocaleString() ?? "0"}
               icon={<CreditCard size={20} />}
               iconBgColor="bg-sky-500"
             />
 
             <StatsCard
               title="Bus Users"
-              value={userSummary.busUsers?.toLocaleString() ?? "0"}
+              value={userSummary.busOperators?.toLocaleString() ?? "0"}
               icon={<Bus size={20} />}
               iconBgColor="bg-yellow-500"
             />
 
             <StatsCard
               title="Hotel Users"
-              value={userSummary.hotelUsers?.toLocaleString() ?? "0"}
+              value={userSummary.hotelManagers?.toLocaleString() ?? "0"}
               icon={<Hotel size={20} />}
               iconBgColor="bg-purple-500"
             />
 
             <StatsCard
-              title="Taxi Users"
-              value={userSummary.taxiUsers?.toLocaleString() ?? "0"}
+              title="Ride Users"
+              value={userSummary.drivers?.toLocaleString() ?? "0"}
               icon={<Car size={20} />}
               iconBgColor="bg-orange-500"
-            />
-
-            <StatsCard
-              title="Bike Users"
-              value={userSummary.bikeUsers?.toLocaleString() ?? "0"}
-              icon={<Bike size={20} />}
-              iconBgColor="bg-red-500"
             />
           </div>
 
@@ -503,6 +521,14 @@ const Dashboard = () => {
                         )}
                       </tbody>
                     </table>
+                    <div className="mt-4 mb-6 flex justify-center">
+                      <PaginationComponent
+                        currentPage={currentPage}
+                        totalItems={totalItems}
+                        pageSize={pageSize}
+                        onPageChange={(page) => setCurrentPage(page)}
+                      />
+                    </div>
                   </div>
                 </div>
               )}

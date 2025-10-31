@@ -118,7 +118,7 @@ const AppRoutes = () => {
           element={<CustomerBookings />}
         />
         <Route
-          path="/customer-management/bookings/:bookingId"
+          path="/customer-management/bookings/:id"
           element={<CustomerBookingDetails />}
         />
 
