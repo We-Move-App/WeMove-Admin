@@ -33,7 +33,7 @@ const BikeRiderDetails = () => {
     name: "",
     mobile: "",
     email: "",
-    status: "Approved",
+    status: "approved",
     vehicleType: "",
   });
 
@@ -436,6 +436,14 @@ const BikeRiderDetails = () => {
 
   const isReadOnly = mode === "view";
 
+  const statusOptions = [
+    "approved",
+    "processing",
+    "submitted",
+    "rejected",
+    "blocked",
+  ];
+
   return (
     <>
       <Button
@@ -454,7 +462,7 @@ const BikeRiderDetails = () => {
         </h1>
         <div className="flex gap-2">
           {/* status handling */}
-          {mode !== "post" && (
+          {/* {mode !== "post" && (
             <Select
               value={driver.status}
               disabled={mode === "view"}
@@ -466,23 +474,38 @@ const BikeRiderDetails = () => {
               <SelectContent>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
-                {/* <SelectItem value="rejected">Rejected</SelectItem>
-                <SelectItem value="submitted">Submitted</SelectItem>
-                <SelectItem value="blocked">Blocked</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem> */}
               </SelectContent>
             </Select>
-          )}
+          )} */}
 
           {/* action buttons */}
           {mode === "view" && (
-            <Button onClick={() => setMode("edit")}>Edit</Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="default"
+                className="bg-gray-300 text-gray-800 border-gray-300 hover:bg-gray-300 hover:text-gray-900"
+                onClick={() => navigate("/taxi-management/drivers")}
+              >
+                Cancel
+              </Button>
+              <Button onClick={() => setMode("edit")}>Edit</Button>
+            </div>
           )}
           {(mode === "post" || mode === "edit") && (
-            <Button onClick={handleSubmit}>
-              {mode === "post" ? "Create" : "Save Changes"}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="default"
+                className="bg-gray-300 text-gray-800 border-gray-300 hover:bg-gray-300 hover:text-gray-900"
+                onClick={() => navigate("/taxi-management/drivers")}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleSubmit}>
+                {mode === "post" ? "Create" : "Save Changes"}
+              </Button>
+            </div>
           )}
         </div>
       </div>
@@ -571,6 +594,60 @@ const BikeRiderDetails = () => {
                     value={driver.address || ""}
                     onChange={(e) => handleChange("address", e.target.value)}
                   />
+                </div>
+                <div className="space-y-4">
+                  {/* Status Field */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">
+                        {driver.status}
+                      </p>
+                    ) : (
+                      <Select
+                        value={driver.status}
+                        onValueChange={(value: string) =>
+                          handleChange("status", value)
+                        }
+                        // disabled={mode === "view"}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {statusOptions.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option.charAt(0).toUpperCase() + option.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+
+                  {/* Remark Field (conditionally rendered) */}
+                  {(driver.status === "rejected" ||
+                    driver.status === "blocked") && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Remark
+                      </label>
+                      <textarea
+                        name="remark"
+                        value={driver.remark || ""}
+                        onChange={(e) =>
+                          setDriver({ ...driver, remark: e.target.value })
+                        }
+                        className="filter-input w-full h-24"
+                        placeholder="Enter reason for rejection or blocking"
+                        required
+                        disabled={mode === "view"}
+                      />
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">

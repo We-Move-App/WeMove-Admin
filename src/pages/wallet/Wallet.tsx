@@ -149,27 +149,27 @@ const Wallet = () => {
     { key: "description" as keyof WalletTransaction, header: "Description" },
   ];
 
-  const filterOptions = [
-    {
-      key: "type" as keyof WalletTransaction,
-      label: "Type",
-      options: [
-        { label: "Credit", value: "Credit" },
-        { label: "Debit", value: "Debit" },
-        { label: "Transfer", value: "Transfer" },
-        { label: "Withdrawal", value: "Withdrawal" },
-      ],
-    },
-    {
-      key: "status" as keyof WalletTransaction,
-      label: "Status",
-      options: [
-        { label: "Completed", value: "Completed" },
-        { label: "Pending", value: "Pending" },
-        { label: "Failed", value: "Failed" },
-      ],
-    },
-  ];
+  // const filterOptions = [
+  //   {
+  //     key: "type" as keyof WalletTransaction,
+  //     label: "Type",
+  //     options: [
+  //       { label: "Credit", value: "Credit" },
+  //       { label: "Debit", value: "Debit" },
+  //       { label: "Transfer", value: "Transfer" },
+  //       { label: "Withdrawal", value: "Withdrawal" },
+  //     ],
+  //   },
+  //   {
+  //     key: "status" as keyof WalletTransaction,
+  //     label: "Status",
+  //     options: [
+  //       { label: "Completed", value: "Completed" },
+  //       { label: "Pending", value: "Pending" },
+  //       { label: "Failed", value: "Failed" },
+  //     ],
+  //   },
+  // ];
 
   // useEffect(() => {
   //   const fetchTransactions = async () => {
@@ -390,20 +390,6 @@ const Wallet = () => {
 
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-4">Transaction History</h2>
-        {/* <DataTable
-          columns={columns}
-          data={transactions}
-          keyExtractor={(item) => item.id}
-          searchable={true}
-          exportable={true}
-          filterable={true}
-          filterOptions={filterOptions}
-          paginate={true}
-          pageSize={10}
-          currentPage={currentPage}
-          totalItems={totalTransactions}
-          onPageChange={(page) => setCurrentPage(page)}
-        /> */}
         {loading ? (
           <div>
             {Array(5)
@@ -424,8 +410,8 @@ const Wallet = () => {
             keyExtractor={(item) => item.id}
             searchable
             exportable
-            filterable
-            filterOptions={filterOptions}
+            // filterable
+            // filterOptions={filterOptions}
             paginate
             pageSize={pageSize}
             currentPage={currentPage}

@@ -2,10 +2,10 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   // Deployed URL
-  // baseURL: "http://139.59.20.155:8000/api/v1/admin",
+  baseURL: "http://139.59.20.155:8000/api/v1/admin",
   // Local URL
-  baseURL:
-    "https://expects-myspace-stopping-scientific.trycloudflare.com/api/v1/admin",
+  // baseURL:
+  //   "https://paragraph-joe-later-discover.trycloudflare.com/api/v1/admin",
 
   headers: {
     "Content-Type": "application/json",

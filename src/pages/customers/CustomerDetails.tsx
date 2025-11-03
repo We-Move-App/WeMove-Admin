@@ -28,6 +28,7 @@ const CustomerDetails = () => {
     zoneCode: "",
     area: "",
     city: "",
+    remarks: "",
     status: "",
     nationality: "Cameroon",
     nationalIdExpiry: "",
@@ -134,6 +135,7 @@ const CustomerDetails = () => {
             zoneCode: user.zoneCode || "",
             area: user.area || "",
             city: user.city || "",
+            remarks: user.remarks || "",
             status: user.verificationStatus || "",
             nationality: user.nationality
               ? user.nationality.charAt(0).toUpperCase() +
@@ -152,6 +154,7 @@ const CustomerDetails = () => {
                 (doc) => doc.documentType === "national_identity_card_back"
               )?.file?.url || dummyIdBack,
           });
+          setRemarks(user.remarks || "");
         }
       } catch (error) {
         console.error("Error fetching customer details:", error);

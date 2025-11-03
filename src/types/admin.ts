@@ -47,15 +47,16 @@ export interface BusOperator {
   phone?: string;
   address?: string;
   city?: string;
+  remark?: string;
   state?: string;
   status:
     | "active"
     | "inactive"
     | "pending"
     | "approved"
-    | "Rejected"
+    | "rejected"
     | "Submitted"
-    | "Blocked"
+    | "blocked"
     | "Pending";
   numberOfBuses?: number;
   balance?: number;
@@ -130,6 +131,7 @@ export interface HotelManager {
   phone?: string;
   address?: string;
   city?: string;
+  remark?: string;
   balance?: string;
   state?: string;
   status:
@@ -137,9 +139,9 @@ export interface HotelManager {
     | "inactive"
     | "pending"
     | "approved"
-    | "Rejected"
+    | "rejected"
     | "Submitted"
-    | "Blocked"
+    | "blocked"
     | "Pending";
   roomCount?: number;
   joinDate?: string;
@@ -203,6 +205,7 @@ export interface TaxiDriver {
   email: string;
   branch?: string;
   mobile?: string;
+  remark?: string;
   phone?: string;
   balance?: string;
   licenseNumber?: string;
@@ -214,10 +217,10 @@ export interface TaxiDriver {
     | "inactive"
     | "pending"
     | "approved"
-    | "Rejected"
-    | "Submitted"
-    | "Blocked"
-    | "Pending";
+    | "rejected"
+    | "submitted"
+    | "blocked"
+    | "pending";
   joinDate?: string;
 
   // Extra details

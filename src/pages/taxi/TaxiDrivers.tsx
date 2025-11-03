@@ -19,6 +19,7 @@ const TaxiDrivers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalDrivers, setTotalDrivers] = useState(0);
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
 
   const handleRowClick = (driver: TaxiDriver) => {
     navigate(`/taxi-management/drivers/${driver.driverId}`);
@@ -79,9 +80,9 @@ const TaxiDrivers = () => {
       key: "status" as keyof TaxiDriver,
       label: "Status",
       options: [
-        { label: "Approved", value: "Approved" },
-        { label: "Rejected", value: "Rejected" },
-        { label: "Pending", value: "Pending" },
+        { label: "Approved", value: "approved" },
+        // { label: "Rejected", value: "Rejected" },
+        { label: "Pending", value: "pending" },
       ],
     },
   ];
@@ -99,6 +100,7 @@ const TaxiDrivers = () => {
             page: currentPage,
             limit: pageSize,
             search: searchTerm,
+            filter: selectedStatus,
           },
         });
         setDrivers(response.data?.data || []);
@@ -111,7 +113,7 @@ const TaxiDrivers = () => {
     };
 
     fetchDrivers();
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, searchTerm, selectedStatus]);
 
   if (loading)
     return (
@@ -149,6 +151,11 @@ const TaxiDrivers = () => {
         onPageChange={(page) => setCurrentPage(page)}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
+        filters={{ status: selectedStatus }}
+        onFilterChange={(filters) => {
+          setSelectedStatus(filters.status || "");
+          setCurrentPage(1);
+        }}
       />
     </>
   );

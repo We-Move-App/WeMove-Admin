@@ -49,10 +49,10 @@ const HotelManagerDetails = () => {
       active: "active",
       inactive: "inactive",
       pending: "Pending",
-      approved: "Approved",
-      rejected: "Rejected",
+      approved: "approved",
+      rejected: "rejected",
       submitted: "Submitted",
-      blocked: "Blocked",
+      blocked: "blocked",
     };
     return map[status.toLowerCase()] ?? "Pending";
   };
@@ -334,6 +334,14 @@ const HotelManagerDetails = () => {
     }
   };
 
+  const statusOptions = [
+    "approved",
+    "processing",
+    "submitted",
+    "rejected",
+    "blocked",
+  ];
+
   if (loading) return <Loader />;
   if (!manager) {
     return (
@@ -375,7 +383,7 @@ const HotelManagerDetails = () => {
             ? "Add New Hotel Manager"
             : `Hotel Manager: ${manager.name}`}
         </h1>
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           {!isNewManager && (
             <Select
               value={manager.status}
@@ -390,10 +398,11 @@ const HotelManagerDetails = () => {
                 <SelectItem value="Approved">Approved</SelectItem>
                 <SelectItem value="Submitted">Submitted</SelectItem>
                 <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="Rejected">Rejected</SelectItem>
+                <SelectItem value="Blocked">Blocked</SelectItem>
               </SelectContent>
             </Select>
           )}
-          {/* <Button onClick={handleSubmit}>Save Changes</Button> */}
           <div className="flex gap-2">
             {mode === "view" && id !== "new" && (
               <Button
@@ -411,6 +420,33 @@ const HotelManagerDetails = () => {
               </Button>
             )}
           </div>
+        </div> */}
+
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="default"
+            className="bg-gray-300 text-gray-800 border-gray-300 hover:bg-gray-300 hover:text-gray-900"
+            onClick={() => navigate("/hotel-management/managers")}
+          >
+            Cancel
+          </Button>
+
+          {mode === "view" && id !== "new" && (
+            <Button
+              onClick={() =>
+                navigate(`/hotel-management/managers/${id}?mode=edit`)
+              }
+            >
+              Edit
+            </Button>
+          )}
+
+          {(mode === "edit" || mode === "post") && (
+            <Button onClick={handleSubmit}>
+              {mode === "post" ? "Create Manager" : "Save Changes"}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -470,6 +506,53 @@ const HotelManagerDetails = () => {
                     onChange={(e) => handleChange("email", e.target.value)}
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status
+                  </label>
+                  {mode === "view" ? (
+                    <p className="filter-input w-full bg-gray-100">
+                      {manager.status}
+                    </p>
+                  ) : (
+                    <select
+                      name="status"
+                      value={manager.status}
+                      onChange={(e) =>
+                        handleChange(
+                          "status",
+                          e.target.value as HotelManager["status"]
+                        )
+                      }
+                      className="filter-select w-full"
+                    >
+                      {statusOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+
+                {(manager.status === "rejected" ||
+                  manager.status === "blocked") && (
+                  <div className="col-span-full">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Remark
+                    </label>
+                    <textarea
+                      name="remark"
+                      value={manager.remark || ""}
+                      onChange={(e) =>
+                        setManager({ ...manager, remark: e.target.value })
+                      }
+                      className="filter-input w-full h-24"
+                      placeholder="Enter reason for rejection or blocking"
+                      required
+                    />
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     Choose Branch

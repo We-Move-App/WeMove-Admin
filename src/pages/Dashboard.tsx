@@ -482,7 +482,7 @@ const Dashboard = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {transactions.map((trx) => (
+                        {/* {transactions.map((trx) => (
                           <tr key={trx._id} className="border-t">
                             <td className="px-4 py-2">{trx.transactionId}</td>
                             <td className="px-4 py-2">{trx.description}</td>
@@ -507,9 +507,46 @@ const Dashboard = () => {
                               </span>
                             </td>
                           </tr>
-                        ))}
+                        ))} */}
+                        {transactions && transactions.length > 0 ? (
+                          transactions.map((trx) => (
+                            <tr key={trx._id} className="border-t">
+                              <td className="px-4 py-2">{trx.transactionId}</td>
+                              <td className="px-4 py-2">{trx.description}</td>
+                              <td className="px-4 py-2">{trx.serviceType}</td>
+                              <td className="px-4 py-2">
+                                {formatDate(trx.createdAt)}
+                              </td>
+                              <td className="px-4 py-2">
+                                {trx.currency} {trx.amount}
+                              </td>
+                              <td className="px-4 py-2">
+                                <span
+                                  className={
+                                    trx.status === "SUCCESS"
+                                      ? "status-approved"
+                                      : trx.status === "PENDING"
+                                      ? "status-pending"
+                                      : "status-rejected"
+                                  }
+                                >
+                                  {trx.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td
+                              colSpan={6}
+                              className="text-center py-4 text-gray-500"
+                            >
+                              No transactions found
+                            </td>
+                          </tr>
+                        )}
 
-                        {transactions.length === 0 && (
+                        {/* {transactions.length === 0 && (
                           <tr>
                             <td
                               colSpan={6}
@@ -518,7 +555,7 @@ const Dashboard = () => {
                               No transactions found
                             </td>
                           </tr>
-                        )}
+                        )} */}
                       </tbody>
                     </table>
                     <div className="mt-4 mb-6 flex justify-center">

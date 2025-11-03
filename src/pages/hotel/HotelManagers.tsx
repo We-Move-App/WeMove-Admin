@@ -67,6 +67,7 @@ const HotelManagers = () => {
   const [pageSize] = useState(10);
   const [totalHotelManagers, setTotalHotelManagers] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
 
   useEffect(() => {
     const getManagers = async () => {
@@ -75,7 +76,8 @@ const HotelManagers = () => {
         const { data, total } = await fetchHotelManagers(
           currentPage,
           pageSize,
-          searchTerm
+          searchTerm,
+          selectedStatus
         );
         setManagers(data);
         setTotalHotelManagers(total);
@@ -88,7 +90,7 @@ const HotelManagers = () => {
     };
 
     getManagers();
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, searchTerm, selectedStatus]);
 
   const handleRowClick = (manager: HotelManager) => {
     navigate(`/hotel-management/managers/${manager.id}?mode=view`);
@@ -147,11 +149,11 @@ const HotelManagers = () => {
       key: "status" as keyof HotelManager,
       label: "Status",
       options: [
-        { label: "Approved", value: "Approved" },
-        { label: "Pending", value: "Pending" },
-        { label: "Submitted", value: "Submitted" },
-        { label: "Rejected", value: "Rejected" },
-        { label: "Blocked", value: "Blocked" },
+        { label: "Approved", value: "approved" },
+        { label: "Pending", value: "pending" },
+        { label: "Submitted", value: "submitted" },
+        { label: "Rejected", value: "rejected" },
+        { label: "Blocked", value: "blocked" },
       ],
     },
   ];
@@ -191,6 +193,11 @@ const HotelManagers = () => {
           filterOptions={filterOptions}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
+          filters={{ status: selectedStatus }}
+          onFilterChange={(filters) => {
+            setSelectedStatus(filters.status || "");
+            setCurrentPage(1);
+          }}
         />
       )}
     </>

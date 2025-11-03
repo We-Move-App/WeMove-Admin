@@ -34,7 +34,13 @@ const BusOperatorDetails = () => {
     ? "edit"
     : "view";
 
-  const statusOptions = ["approved", "processing", "submitted"];
+  const statusOptions = [
+    "approved",
+    "processing",
+    "submitted",
+    "rejected",
+    "blocked",
+  ];
   const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
     undefined
   );
@@ -152,6 +158,14 @@ const BusOperatorDetails = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (
+      (operator.status === "rejected" || operator.status === "blocked") &&
+      !operator.remark
+    ) {
+      toast({ title: "Error", description: "Remark is required." });
+      return;
+    }
+
     try {
       // Upload files only if they are new (File instance)
       const avatarFile =
@@ -175,7 +189,6 @@ const BusOperatorDetails = () => {
           : operator?.bankAccountDetails || null;
 
       if (isNewOperator) {
-        // ✅ POST payload (nested)
         const postPayload = {
           basicInfo: {
             fullName: operator?.name,
@@ -214,7 +227,6 @@ const BusOperatorDetails = () => {
           description: `${operator?.name} has been added successfully.`,
         });
       } else {
-        // ✅ PUT payload (flat)
         const putPayload = {
           fullName: operator?.name,
           companyName: operator?.companyName,
@@ -354,25 +366,6 @@ const BusOperatorDetails = () => {
                       />
                     )}
                   </div>
-                  {/* <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Company Name
-                    </label>
-                    {mode === "view" ? (
-                      <p className="filter-input w-full bg-gray-100">{operator.companyName}</p>
-                    ) : (
-                      <input
-                        type="text"
-                        name="companyName"
-                        value={operator.companyName}
-                        onChange={handleInputChange}
-                        className="filter-input w-full"
-                        style={{ outline: "none" }}
-                        required
-                      />
-                    )}
-                  </div> */}
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Mobile
@@ -439,7 +432,26 @@ const BusOperatorDetails = () => {
                     )}
                   </div>
 
-                  <div>
+                  {(operator.status === "rejected" ||
+                    operator.status === "blocked") && (
+                    <div className="col-span-full">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Remark
+                      </label>
+                      <textarea
+                        name="remark"
+                        value={operator.remark || ""}
+                        onChange={(e) =>
+                          setOperator({ ...operator, remark: e.target.value })
+                        }
+                        className="filter-input w-full h-24"
+                        placeholder="Enter reason for rejection or blocking"
+                        required
+                      />
+                    </div>
+                  )}
+
+                  <div className="">
                     <label className="block text-sm font-medium mb-1">
                       Choose Branch
                     </label>
@@ -454,6 +466,22 @@ const BusOperatorDetails = () => {
                       />
                     )}
                   </div>
+
+                  {/* <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Choose Branch
+                    </label>
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">
+                        {operator.branch}
+                      </p>
+                    ) : (
+                      <BranchSelect
+                        value={selectedBranch}
+                        onChange={setSelectedBranch}
+                      />
+                    )}
+                  </div> */}
                 </div>
               </div>
             </div>

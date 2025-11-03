@@ -4,10 +4,11 @@ import { HotelManager } from "@/types/admin";
 export const fetchHotelManagers = async (
   page: number,
   limit: number,
-  searchTerm?: string
+  searchTerm?: string,
+  status?: string
 ): Promise<{ data: HotelManager[]; total: number }> => {
   const response = await axiosInstance.get("/hotel-management/hotel-managers", {
-    params: { page, limit, search: searchTerm },
+    params: { page, limit, search: searchTerm, filter: status },
   });
 
   const users = response.data?.data || [];

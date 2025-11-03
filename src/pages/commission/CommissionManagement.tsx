@@ -90,52 +90,98 @@ const CommissionManagement = () => {
   const [commissions, setCommissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // useEffect(() => {
+  //   const fetchCommissions = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const response = await axiosInstance.get(
+  //         "/commission-management/get-all"
+  //       );
+
+  //       const capitalizeFirstLetter = (str: string) =>
+  //         str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+
+  //       const formatStatus = (status: string) => {
+  //         switch (status) {
+  //           case "in_active":
+  //             return "Inactive";
+  //           case "active":
+  //             return "Active";
+  //           default:
+  //             return capitalizeFirstLetter(status);
+  //         }
+  //       };
+
+  //       const mapped = response.data.data.map((item: any) => ({
+  //         id: item._id,
+  //         serviceType: capitalizeFirstLetter(item.serviceType),
+  //         commissionType: item.commissionType,
+  //         percentage:
+  //           item.commissionType === "percentage"
+  //             ? item.commissionPercentage
+  //             : null,
+  //         fixedRate:
+  //           item.commissionType === "fixed" ? item.commissionRate : null,
+  //         // effectiveFrom: item.startDate,
+  //         // effectiveTo: item.endDate,
+  //         status: formatStatus(item.status),
+  //         isActive: item.status === "active",
+  //       }));
+
+  //       setCommissions(mapped);
+  //     } catch (error) {
+  //       console.error("Error fetching commissions:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchCommissions();
+  // }, []);
+
+  const fetchCommissions = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        "/commission-management/get-all"
+      );
+
+      const capitalizeFirstLetter = (str: string) =>
+        str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+
+      const formatStatus = (status: string) => {
+        switch (status) {
+          case "in_active":
+            return "Inactive";
+          case "active":
+            return "Active";
+          default:
+            return capitalizeFirstLetter(status);
+        }
+      };
+
+      const mapped = response.data.data.map((item: any) => ({
+        id: item._id,
+        serviceType: capitalizeFirstLetter(item.serviceType),
+        commissionType: item.commissionType,
+        percentage:
+          item.commissionType === "percentage"
+            ? item.commissionPercentage
+            : null,
+        fixedRate: item.commissionType === "fixed" ? item.commissionRate : null,
+        status: formatStatus(item.status),
+        isActive: item.status === "active",
+      }));
+
+      setCommissions(mapped);
+    } catch (error) {
+      console.error("Error fetching commissions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchCommissions = async () => {
-      setLoading(true);
-      try {
-        const response = await axiosInstance.get(
-          "/commission-management/get-all"
-        );
-
-        const capitalizeFirstLetter = (str: string) =>
-          str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
-
-        const formatStatus = (status: string) => {
-          switch (status) {
-            case "in_active":
-              return "Inactive";
-            case "active":
-              return "Active";
-            default:
-              return capitalizeFirstLetter(status);
-          }
-        };
-
-        const mapped = response.data.data.map((item: any) => ({
-          id: item._id,
-          serviceType: capitalizeFirstLetter(item.serviceType),
-          commissionType: item.commissionType,
-          percentage:
-            item.commissionType === "percentage"
-              ? item.commissionPercentage
-              : null,
-          fixedRate:
-            item.commissionType === "fixed" ? item.commissionRate : null,
-          // effectiveFrom: item.startDate,
-          // effectiveTo: item.endDate,
-          status: formatStatus(item.status),
-          isActive: item.status === "active",
-        }));
-
-        setCommissions(mapped);
-      } catch (error) {
-        console.error("Error fetching commissions:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCommissions();
   }, []);
 
@@ -239,13 +285,22 @@ const CommissionManagement = () => {
         );
       }
 
+      // if (res.status === 200 || res.status === 201) {
+      //   toast({
+      //     title: "Success",
+      //     description: "Commission saved successfully",
+      //   });
+      //   setIsDialogOpen(false);
+      // }
       if (res.status === 200 || res.status === 201) {
         toast({
           title: "Success",
           description: "Commission saved successfully",
         });
         setIsDialogOpen(false);
-        // await fetchCommissions();
+
+        // 🔹 Refresh the table
+        fetchCommissions();
       }
     } catch (error: any) {
       console.error("Error saving commission:", error);
@@ -408,14 +463,24 @@ const CommissionManagement = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Commission Management</h1>
         {(() => {
-          const existingServices = commissions.map((c) => c.serviceType);
-          const allServicesAdded = [
-            "Bus",
-            "Hotel",
-            "Taxi",
-            "Bike",
-            // "Transfer",
-          ].every((service) => existingServices.includes(service));
+          const existingServices = commissions.map((c) =>
+            c.serviceType?.trim().toLowerCase()
+          );
+
+          const requiredServices = ["bus", "hotel", "taxi", "bike", "user"];
+
+          const allServicesAdded = requiredServices.every((service) =>
+            existingServices.includes(service)
+          );
+
+          // const existingServices = commissions.map((c) => c.serviceType);
+          // const allServicesAdded = [
+          //   "Bus",
+          //   "Hotel",
+          //   "Taxi",
+          //   "Bike",
+          //   "user",
+          // ].every((service) => existingServices.includes(service));
 
           return !allServicesAdded ? (
             <Button onClick={handleAddNew} className="flex items-center gap-2">
@@ -460,7 +525,7 @@ const CommissionManagement = () => {
                   <SelectItem value="Hotel">Hotel</SelectItem>
                   <SelectItem value="Taxi">Taxi</SelectItem>
                   <SelectItem value="Bike">Bike</SelectItem>
-                  <SelectItem value="Transfer">User Transfer</SelectItem>
+                  <SelectItem value="User">User Transfer</SelectItem>
                 </SelectContent>
               </Select>
             </div>

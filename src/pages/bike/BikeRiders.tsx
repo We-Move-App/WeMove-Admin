@@ -65,6 +65,7 @@ const BikeRiders = () => {
   const [pageSize] = useState(10);
   const [totalDrivers, setTotalDrivers] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
 
   useEffect(() => {
     const fetchRiders = async () => {
@@ -75,6 +76,7 @@ const BikeRiders = () => {
             page: currentPage,
             limit: pageSize,
             search: searchTerm,
+            filter: selectedStatus,
           },
         });
 
@@ -102,7 +104,7 @@ const BikeRiders = () => {
     };
 
     fetchRiders();
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, searchTerm, selectedStatus]);
 
   const handleRowClick = (rider: BikeRider) => {
     navigate(`/bike-management/riders/${rider.driverId}`);
@@ -203,6 +205,11 @@ const BikeRiders = () => {
           onPageChange={(page) => setCurrentPage(page)}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
+          filters={{ status: selectedStatus }}
+          onFilterChange={(filters) => {
+            setSelectedStatus(filters.status || "");
+            setCurrentPage(1);
+          }}
         />
       )}
     </>
