@@ -103,7 +103,7 @@ const HotelManagers = () => {
       render: (manager: HotelManager) => (
         <div className="flex items-center gap-2">
           <span>{manager.name}</span>
-          {manager.status === "approved" && (
+          {manager.batchVerified === true && (
             <BadgeCheck className="text-green-500 w-4 h-4" />
           )}
         </div>
@@ -151,6 +151,7 @@ const HotelManagers = () => {
       options: [
         { label: "Approved", value: "approved" },
         { label: "Pending", value: "pending" },
+        { label: "Processing", value: "processing" },
         { label: "Submitted", value: "submitted" },
         { label: "Rejected", value: "rejected" },
         { label: "Blocked", value: "blocked" },

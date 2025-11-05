@@ -35,6 +35,7 @@ const BikeRiderDetails = () => {
     email: "",
     status: "approved",
     vehicleType: "",
+    batchVerified: false,
   });
 
   const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
@@ -58,6 +59,7 @@ const BikeRiderDetails = () => {
             mobile: apiData.BikeDriverDetails?.mobile || "",
             branch: apiData.BikeDriverDetails?.branch?.name || "",
             status: apiData.BikeDriverDetails?.status || "",
+            batchVerified: apiData.BikeDriverDetails?.batchVerified || "",
             age: apiData.BikeDriverDetails?.age || null,
             profilePhoto: apiData.documents?.avatarPhotos || null,
             address: apiData.BikeDriverDetails?.address || "",
@@ -217,6 +219,8 @@ const BikeRiderDetails = () => {
         phoneNo: driver.mobile || "",
         email: driver.email || "",
         age: driver.age || null,
+        remarks: driver?.remark,
+        batchVerified: driver?.batchVerified,
         experience: driver.experience || 0,
         address: driver.address || "",
         branch: selectedBranch || "",
@@ -361,30 +365,6 @@ const BikeRiderDetails = () => {
           "/driver-management/bike-drivers/register",
           payload
         );
-        // } else if (mode === "edit") {
-        //   try {
-        //     // 1. Build payload for driver update
-        //     const payload = await buildPutDriverPayload(driver, selectedBranch);
-        //     console.log("PUT payload:", JSON.stringify(payload, null, 2));
-
-        //     // 2. First API call -> Update driver details
-        //     await axiosInstance.put(
-        //       `/driver-management/bike-drivers/${id}?vehicleType=bike`,
-        //       payload
-        //     );
-
-        //     // 3. Second API call -> Verify driver status
-        //     await axiosInstance.put(
-        //       `/driver-management/drivers/verify/${driver.driverId}`,
-        //       { status: driver.status }
-        //     );
-
-        //     // ✅ Success message / toast
-        //     console.log("Driver updated & verified successfully");
-        //   } catch (error) {
-        //     console.error("Error updating driver:", error);
-        //   }
-        // }
       } else if (mode === "edit") {
         let payload;
         // 1. Try updating driver details
@@ -407,7 +387,11 @@ const BikeRiderDetails = () => {
           if (driver.driverId) {
             await axiosInstance.put(
               `/driver-management/drivers/verify/${driver.driverId}`,
-              { status: driver.status }
+              {
+                status: driver.status,
+                remarks: driver?.remark,
+                batchVerified: driver?.batchVerified,
+              }
             );
             console.log("✅ Driver status updated");
           } else {
@@ -485,7 +469,7 @@ const BikeRiderDetails = () => {
                 variant="outline"
                 size="default"
                 className="bg-gray-300 text-gray-800 border-gray-300 hover:bg-gray-300 hover:text-gray-900"
-                onClick={() => navigate("/taxi-management/drivers")}
+                onClick={() => navigate("/bike-management/riders")}
               >
                 Cancel
               </Button>
@@ -627,28 +611,27 @@ const BikeRiderDetails = () => {
                       </Select>
                     )}
                   </div>
-
-                  {/* Remark Field (conditionally rendered) */}
-                  {(driver.status === "rejected" ||
-                    driver.status === "blocked") && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Remark
-                      </label>
-                      <textarea
-                        name="remark"
-                        value={driver.remark || ""}
-                        onChange={(e) =>
-                          setDriver({ ...driver, remark: e.target.value })
-                        }
-                        className="filter-input w-full h-24"
-                        placeholder="Enter reason for rejection or blocking"
-                        required
-                        disabled={mode === "view"}
-                      />
-                    </div>
-                  )}
                 </div>
+                {/* Remark Field (conditionally rendered) */}
+                {(driver.status === "rejected" ||
+                  driver.status === "blocked") && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Remark
+                    </label>
+                    <textarea
+                      name="remark"
+                      value={driver.remark || ""}
+                      onChange={(e) =>
+                        setDriver({ ...driver, remark: e.target.value })
+                      }
+                      className="filter-input w-full h-24"
+                      placeholder="Enter reason for rejection or blocking"
+                      required
+                      disabled={mode === "view"}
+                    />
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     Choose Branch
@@ -662,6 +645,33 @@ const BikeRiderDetails = () => {
                       value={selectedBranch}
                       onChange={setSelectedBranch}
                     />
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Verification Status
+                  </label>
+
+                  {mode === "view" ? (
+                    <p className="filter-input w-full bg-gray-100">
+                      {driver.batchVerified ? "Verified" : "Not Verified"}
+                    </p>
+                  ) : (
+                    <select
+                      name="batchVerified"
+                      value={driver.batchVerified ? "Verified" : "Not Verified"}
+                      onChange={(e) =>
+                        handleChange(
+                          "batchVerified",
+                          e.target.value === "Verified"
+                        )
+                      }
+                      className="filter-select w-full"
+                    >
+                      <option value="Verified">Verified</option>
+                      <option value="Not Verified">Not Verified</option>
+                    </select>
                   )}
                 </div>
               </div>

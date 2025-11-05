@@ -1,12 +1,19 @@
-import { useState, useRef, useEffect } from 'react';
-import { Upload, X, FileText } from 'lucide-react';
+import { useState, useRef, useEffect } from "react";
+import { Upload, X, FileText } from "lucide-react";
 
 interface UploadFieldProps {
   label: string;
   accept?: string;
   // onChange: (files: File[] | File | null) => void;
-  onChange: (file: File | File[]) => void;
-  value: string | string[] | { name?: string; fileUrl?: string } | { name?: string; fileUrl?: string }[] | File | File[] | null;
+  onChange: (file: File | File[] | null) => void;
+  value:
+    | string
+    | string[]
+    | { name?: string; fileUrl?: string }
+    | { name?: string; fileUrl?: string }[]
+    | File
+    | File[]
+    | null;
   multiple?: boolean;
   showCloseButton?: boolean;
   disabled?: boolean;
@@ -26,11 +33,9 @@ const UploadField = ({
     if (typeof value === "string") {
       return [value];
     } else if (Array.isArray(value)) {
-      return value.map(v =>
-        typeof v === "string"
-          ? v
-          : (v?.fileUrl ?? "")
-      ).filter(Boolean);
+      return value
+        .map((v) => (typeof v === "string" ? v : v?.fileUrl ?? ""))
+        .filter(Boolean);
     }
     return [];
   });
@@ -39,13 +44,15 @@ const UploadField = ({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log("handleFileChange triggered", event.target.files);
-    const selectedFiles = event.target.files ? Array.from(event.target.files) : [];
+    const selectedFiles = event.target.files
+      ? Array.from(event.target.files)
+      : [];
     if (selectedFiles.length === 0) return;
 
     setFiles(selectedFiles);
     onChange(multiple ? selectedFiles : selectedFiles[0]);
 
-    const previewUrls = selectedFiles.map(file => {
+    const previewUrls = selectedFiles.map((file) => {
       if (file.type.startsWith("image/")) {
         return URL.createObjectURL(file);
       } else if (file.type === "application/pdf") {
@@ -57,7 +64,6 @@ const UploadField = ({
 
     setPreviews(previewUrls);
   };
-
 
   const clearFile = (index?: number) => {
     if (multiple && typeof index === "number") {
@@ -89,7 +95,12 @@ const UploadField = ({
     }
 
     // Single object with URL (from API)
-    if (value && typeof value === "object" && !Array.isArray(value) && !(value instanceof File)) {
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      !(value instanceof File)
+    ) {
       const url = (value as any).url || (value as any).fileUrl || "";
       setPreviews(url ? [url] : []);
       setFiles([]);
@@ -98,16 +109,18 @@ const UploadField = ({
 
     // Array of objects or Files
     if (Array.isArray(value)) {
-      const urls = value.map(v => {
-        if (typeof v === "string") return v;
-        if (v instanceof File) return URL.createObjectURL(v);
-        if (v?.fileUrl) return v.fileUrl;
-        if (v?.url) return v.url;
-        return "";
-      }).filter(Boolean);
+      const urls = value
+        .map((v) => {
+          if (typeof v === "string") return v;
+          if (v instanceof File) return URL.createObjectURL(v);
+          if (v?.fileUrl) return v.fileUrl;
+          if (v?.url) return v.url;
+          return "";
+        })
+        .filter(Boolean);
 
       setPreviews(urls);
-      setFiles(value.filter(v => v instanceof File) as File[]);
+      setFiles(value.filter((v) => v instanceof File) as File[]);
       return;
     }
 
@@ -150,15 +163,19 @@ const UploadField = ({
     const mimeType =
       file?.type ||
       (Array.isArray(value) && value[idx] && (value[idx] as any).mimeType) ||
-      (typeof value === "object" && !Array.isArray(value) && (value as any).mimeType);
+      (typeof value === "object" &&
+        !Array.isArray(value) &&
+        (value as any).mimeType);
 
     const isPDF =
-      mimeType === "application/pdf" ||
-      fileName.toLowerCase().endsWith(".pdf");
+      mimeType === "application/pdf" || fileName.toLowerCase().endsWith(".pdf");
 
     if (isPDF) {
       return (
-        <div key={idx} className="flex items-center p-4 bg-gray-50 rounded-md border border-gray-200">
+        <div
+          key={idx}
+          className="flex items-center p-4 bg-gray-50 rounded-md border border-gray-200"
+        >
           <FileText className="text-red-500 mr-2" size={24} />
           <a
             href={src}
@@ -203,49 +220,56 @@ const UploadField = ({
     );
   };
 
-
   return (
     <div className="mb-4">
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
       {/* {previews.length > 0  */}
-      {(previews.length > 0 && !(previews.length === 1 && previews[0].startsWith("No ") && !disabled))
-        ? (
-          <div className="flex flex-wrap gap-2">{previews.map(renderPreview)}</div>
-        ) : (
-          !disabled && (
-            <div className="mt-1 relative">
-              <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex justify-center">
-                <div className="space-y-1 text-center">
-                  <div className="mx-auto h-12 w-12 text-gray-400 flex items-center justify-center">
-                    <Upload size={24} />
-                  </div>
-                  <div className="flex text-sm text-gray-600">
-                    <label
-                      htmlFor={`file-upload-${label.replace(/\s+/g, "-").toLowerCase()}`}
-                      className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500"
-                    >
-                      <span>{multiple ? "Upload files" : "Upload a file"}</span>
-                      <input
-                        ref={fileInputRef}
-                        id={`file-upload-${label.replace(/\s+/g, "-").toLowerCase()}`}
-                        name="file-upload"
-                        type="file"
-                        className="sr-only"
-                        accept={accept}
-                        onChange={handleFileChange}
-                        multiple={multiple}
-                      />
-                    </label>
-                    <p className="pl-1">or drag and drop</p>
-                  </div>
-                  <p className="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
+      {previews.length > 0 &&
+      !(previews.length === 1 && previews[0].startsWith("No ") && !disabled) ? (
+        <div className="flex flex-wrap gap-2">
+          {previews.map(renderPreview)}
+        </div>
+      ) : (
+        !disabled && (
+          <div className="mt-1 relative">
+            <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex justify-center">
+              <div className="space-y-1 text-center">
+                <div className="mx-auto h-12 w-12 text-gray-400 flex items-center justify-center">
+                  <Upload size={24} />
                 </div>
+                <div className="flex text-sm text-gray-600">
+                  <label
+                    htmlFor={`file-upload-${label
+                      .replace(/\s+/g, "-")
+                      .toLowerCase()}`}
+                    className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500"
+                  >
+                    <span>{multiple ? "Upload files" : "Upload a file"}</span>
+                    <input
+                      ref={fileInputRef}
+                      id={`file-upload-${label
+                        .replace(/\s+/g, "-")
+                        .toLowerCase()}`}
+                      name="file-upload"
+                      type="file"
+                      className="sr-only"
+                      accept={accept}
+                      onChange={handleFileChange}
+                      multiple={multiple}
+                    />
+                  </label>
+                  <p className="pl-1">or drag and drop</p>
+                </div>
+                <p className="text-xs text-gray-500">
+                  PNG, JPG, PDF up to 10MB
+                </p>
               </div>
             </div>
-          )
-        )}
+          </div>
+        )
+      )}
     </div>
   );
 };

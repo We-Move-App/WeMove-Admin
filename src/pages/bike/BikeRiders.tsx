@@ -117,7 +117,7 @@ const BikeRiders = () => {
       render: (rider: BikeRider) => (
         <div className="flex items-center gap-2">
           <span>{rider.name}</span>
-          {rider.status === "approved" && (
+          {rider.batchVerified === true && (
             <BadgeCheck className="text-green-500 w-4 h-4" />
           )}
         </div>

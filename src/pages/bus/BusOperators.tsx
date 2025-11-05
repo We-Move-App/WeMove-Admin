@@ -51,7 +51,7 @@ const BusOperators = () => {
       render: (operator: BusOperator) => (
         <div className="flex items-center gap-2">
           <span>{operator.name}</span>
-          {operator.status === "approved" && (
+          {operator.batchVerified === true && (
             <BadgeCheck className="text-green-500 w-4 h-4" />
           )}
         </div>

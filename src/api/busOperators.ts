@@ -34,6 +34,7 @@ export const fetchBusOperators = async (
       numberOfBuses: user.busCount || 0,
       balance: user.balance,
       companyName: user.companyName || "",
+      batchVerified: user.batchVerified ?? false,
     })),
   };
 };

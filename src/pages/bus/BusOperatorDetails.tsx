@@ -41,6 +41,9 @@ const BusOperatorDetails = () => {
     "rejected",
     "blocked",
   ];
+
+  const verificationOptions = ["Not Verified", "Verified"];
+
   const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
     undefined
   );
@@ -55,6 +58,7 @@ const BusOperatorDetails = () => {
           email: "",
           branch: "",
           status: "Pending",
+          remark: "",
           numberOfBuses: 0,
           profilePhoto: null,
           address: "",
@@ -65,6 +69,7 @@ const BusOperatorDetails = () => {
           bankAccountNumber: "",
           accountHolderName: "",
           bankAccountDetails: null,
+          batchVerified: false,
         });
         setLoading(false);
         return;
@@ -93,6 +98,7 @@ const BusOperatorDetails = () => {
             email: user.email || "",
             branch: user.branch?.name || "",
             status: user.verificationStatus || "Pending",
+            remark: user.remarks || "",
             numberOfBuses: 0,
             profilePhoto: user.avatar?.url || dummyProfile,
             address: user?.companyAddress || "",
@@ -103,6 +109,7 @@ const BusOperatorDetails = () => {
             bankAccountNumber: bank?.accountNumber || "",
             accountHolderName: bank?.accountHolderName || "",
             bankAccountDetails: bank?.bankDocs?.url || null,
+            batchVerified: user?.batchVerified ?? false,
           });
         } else {
           setOperator(null);
@@ -123,16 +130,21 @@ const BusOperatorDetails = () => {
   }, [id, isNewOperator]);
 
   const accessToken = localStorage.getItem("accessToken");
-  // console.log("Access Token:", accessToken);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+
     if (operator) {
       setOperator({
         ...operator,
-        [name]: name === "numberOfBuses" ? parseInt(value) : value,
+        [name]:
+          name === "numberOfBuses"
+            ? parseInt(value)
+            : name === "batchVerified"
+            ? value === "Verified"
+            : value,
       });
     }
   };
@@ -198,6 +210,8 @@ const BusOperatorDetails = () => {
             phoneNumber: operator?.mobile,
             avatar: avatarFile || {},
             branch: selectedBranch || "",
+            remarks: operator?.remark || false,
+            batchVerified: operator?.batchVerified || false,
           },
           bankDetails: {
             accountHolderName: operator?.accountHolderName,
@@ -239,6 +253,8 @@ const BusOperatorDetails = () => {
           accountNumber: operator?.bankAccountNumber,
           bankName: operator?.bankName,
           bankDocs: bankDocFile || {},
+          remarks: operator?.remark || false,
+          batchVerified: operator?.batchVerified || false,
           national_identity_card_front: {
             documentName: "National ID Front",
             file: idFrontFile || {},
@@ -261,7 +277,9 @@ const BusOperatorDetails = () => {
           await axiosInstance.put(
             `/bus-management/bus-operators/verify/${id}`,
             {
-              status: operator.status,
+              status: operator?.status,
+              remarks: operator?.remark,
+              batchVerified: operator?.batchVerified,
             }
           );
         }
@@ -341,7 +359,13 @@ const BusOperatorDetails = () => {
                 <UploadField
                   label="Profile Photo"
                   value={operator?.profilePhoto ?? null}
-                  onChange={(file) => handleFileChange("profilePhoto", file)}
+                  // onChange={(file) => handleFileChange("profilePhoto", file)}
+                  onChange={(file) =>
+                    handleFileChange(
+                      "profilePhoto",
+                      Array.isArray(file) ? file[0] ?? null : file
+                    )
+                  }
                   showCloseButton={mode === "edit" || mode === "add"}
                 />
 
@@ -467,6 +491,30 @@ const BusOperatorDetails = () => {
                     )}
                   </div>
 
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Verification Badge
+                    </label>
+
+                    {mode === "view" ? (
+                      <p className="filter-input w-full bg-gray-100">
+                        {operator.batchVerified ? "Verified" : "Not Verified"}
+                      </p>
+                    ) : (
+                      <select
+                        name="batchVerified"
+                        value={
+                          operator.batchVerified ? "Verified" : "Not Verified"
+                        }
+                        onChange={handleInputChange}
+                        className="filter-select w-full"
+                      >
+                        <option value="Verified">Verified</option>
+                        <option value="Not Verified">Not Verified</option>
+                      </select>
+                    )}
+                  </div>
+
                   {/* <div>
                     <label className="block text-sm font-medium mb-1">
                       Choose Branch
@@ -570,14 +618,26 @@ const BusOperatorDetails = () => {
                 <UploadField
                   label="ID Card Front"
                   value={operator.idCardFront}
-                  onChange={(file) => handleFileChange("idCardFront", file)}
+                  // onChange={(file) => handleFileChange("idCardFront", file)}
+                  onChange={(file) =>
+                    handleFileChange(
+                      "idCardFront",
+                      Array.isArray(file) ? file[0] ?? null : file
+                    )
+                  }
                   showCloseButton={mode === "edit" || mode === "add"}
                 />
 
                 <UploadField
                   label="ID Card Back"
                   value={operator.idCardBack}
-                  onChange={(file) => handleFileChange("idCardBack", file)}
+                  // onChange={(file) => handleFileChange("idCardBack", file)}
+                  onChange={(file) =>
+                    handleFileChange(
+                      "idCardBack",
+                      Array.isArray(file) ? file[0] ?? null : file
+                    )
+                  }
                   showCloseButton={mode === "edit" || mode === "add"}
                 />
               </div>
@@ -639,8 +699,14 @@ const BusOperatorDetails = () => {
                   <UploadField
                     label="Bank Account Details"
                     value={operator.bankAccountDetails}
+                    // onChange={(file) =>
+                    //   handleFileChange("bankAccountDetails", file)
+                    // }
                     onChange={(file) =>
-                      handleFileChange("bankAccountDetails", file)
+                      handleFileChange(
+                        "bankAccountDetails",
+                        Array.isArray(file) ? file[0] ?? null : file
+                      )
                     }
                     showCloseButton
                     disabled={false}
@@ -653,8 +719,14 @@ const BusOperatorDetails = () => {
                     <UploadField
                       label="ID Card Back"
                       value={operator.bankAccountDetails}
+                      // onChange={(file) =>
+                      //   handleFileChange("bankAccountDetails", file)
+                      // }
                       onChange={(file) =>
-                        handleFileChange("bankAccountDetails", file)
+                        handleFileChange(
+                          "bankAccountDetails",
+                          Array.isArray(file) ? file[0] ?? null : file
+                        )
                       }
                       showCloseButton={mode === "edit" || mode === "add"}
                     />

@@ -55,6 +55,7 @@ interface Transaction {
   _id: string;
   transactionId: string;
   description: string;
+  date?: string;
   serviceType: string;
   amount: number;
   currency: string;
@@ -181,6 +182,34 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
+  // useEffect(() => {
+  //   const fetchTransactions = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const accessToken = localStorage.getItem("accessToken");
+
+  //       const response = await axiosInstance.get(
+  //         `/wallet/transactions/admin?page=${currentPage}&limit=${pageSize}`,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${accessToken}`,
+  //           },
+  //         }
+  //       );
+
+  //       const { transactions, totalCount } = response.data.data;
+  //       setTransactions(transactions);
+  //       setTotalItems(totalCount);
+  //     } catch (error) {
+  //       console.error("Error fetching transactions:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchTransactions();
+  // }, [currentPage]);
+
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoading(true);
@@ -196,9 +225,9 @@ const Dashboard = () => {
           }
         );
 
-        const { transactions, totalCount } = response.data.data;
-        setTransactions(transactions);
-        setTotalItems(totalCount);
+        const { data, totalRecords } = response.data;
+        setTransactions(data);
+        setTotalItems(totalRecords);
       } catch (error) {
         console.error("Error fetching transactions:", error);
       } finally {
@@ -475,51 +504,30 @@ const Dashboard = () => {
                         <tr>
                           <th className="px-4 py-2">ID</th>
                           <th className="px-4 py-2">Service</th>
-                          <th className="px-4 py-2">Customer</th>
                           <th className="px-4 py-2">Date</th>
                           <th className="px-4 py-2">Amount</th>
                           <th className="px-4 py-2">Status</th>
+                          <th className="px-4 py-2">Description</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {/* {transactions.map((trx) => (
-                          <tr key={trx._id} className="border-t">
-                            <td className="px-4 py-2">{trx.transactionId}</td>
-                            <td className="px-4 py-2">{trx.description}</td>
-                            <td className="px-4 py-2">{trx.serviceType}</td>
-                            <td className="px-4 py-2">
-                              {formatDate(trx.createdAt)}
-                            </td>
-                            <td className="px-4 py-2">
-                              {trx.currency} {trx.amount}
-                            </td>
-                            <td className="px-4 py-2">
-                              <span
-                                className={`${
-                                  trx.status === "SUCCESS"
-                                    ? "status-approved"
-                                    : trx.status === "PENDING"
-                                    ? "status-pending"
-                                    : "status-rejected"
-                                }`}
-                              >
-                                {trx.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))} */}
                         {transactions && transactions.length > 0 ? (
                           transactions.map((trx) => (
-                            <tr key={trx._id} className="border-t">
+                            <tr key={trx.transactionId} className="border-t">
                               <td className="px-4 py-2">{trx.transactionId}</td>
-                              <td className="px-4 py-2">{trx.description}</td>
                               <td className="px-4 py-2">{trx.serviceType}</td>
                               <td className="px-4 py-2">
-                                {formatDate(trx.createdAt)}
+                                {new Date(trx.date).toLocaleDateString(
+                                  "en-GB",
+                                  {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  }
+                                )}
                               </td>
-                              <td className="px-4 py-2">
-                                {trx.currency} {trx.amount}
-                              </td>
+
+                              <td className="px-4 py-2">{trx.amount}</td>
                               <td className="px-4 py-2">
                                 <span
                                   className={
@@ -533,6 +541,7 @@ const Dashboard = () => {
                                   {trx.status}
                                 </span>
                               </td>
+                              <td className="px-4 py-2">{trx.description}</td>
                             </tr>
                           ))
                         ) : (
@@ -545,17 +554,6 @@ const Dashboard = () => {
                             </td>
                           </tr>
                         )}
-
-                        {/* {transactions.length === 0 && (
-                          <tr>
-                            <td
-                              colSpan={6}
-                              className="px-4 py-2 text-center text-gray-500"
-                            >
-                              No transactions found
-                            </td>
-                          </tr>
-                        )} */}
                       </tbody>
                     </table>
                     <div className="mt-4 mb-6 flex justify-center">

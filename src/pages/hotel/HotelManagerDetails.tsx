@@ -68,8 +68,10 @@ const HotelManagerDetails = () => {
           mobile: "",
           email: "",
           status: "Pending",
+          remark: "",
           bankAccountNumber: "",
           bankAccountDetails: "",
+          batchVerified: false,
         });
         setLoading(false);
         return;
@@ -105,6 +107,8 @@ const HotelManagerDetails = () => {
             companyName: managerData.companyName || "",
             companyAddress: managerData.companyAddress || "",
             status: toTitleCaseStatus(apiStatus),
+            remark: managerData.remarks || "",
+            batchVerified: managerData?.batchVerified ?? false,
             // Hotel Details
             hotelName: hotelData?.hotelName || "",
             businessLicense: hotelData?.businessLicense || "",
@@ -219,6 +223,21 @@ const HotelManagerDetails = () => {
     handleChange("policyDocuments", updatedDocs);
   };
 
+  const updateStatusApi = async (status: HotelManager["status"]) => {
+    // convert to server format (your old code used .toLowerCase())
+    const payload = {
+      status: status.toLowerCase(),
+      remarks: manager?.remark,
+      batchVerified: manager?.batchVerified,
+    };
+
+    // call the verify endpoint (adjust URL if different)
+    return axiosInstance.put(
+      `/hotel-management/hotel-managers/verify/${id}`,
+      payload
+    );
+  };
+
   const handleSubmit = async () => {
     try {
       const payload = {
@@ -294,6 +313,25 @@ const HotelManagerDetails = () => {
         );
       }
 
+      if (manager.status) {
+        try {
+          await updateStatusApi(manager.status);
+          toast({
+            title: "Status Updated",
+            description: `Hotel manager status changed to ${manager.status}`,
+          });
+        } catch (statusErr) {
+          // status update failed — notify user but do not throw away the main save
+          console.error("Status update failed", statusErr);
+          toast({
+            title: "Status update failed",
+            description:
+              "Manager saved, but failed to update status. Try again.",
+            variant: "destructive",
+          });
+        }
+      }
+
       toast({
         title: mode === "post" ? "Manager Created" : "Manager Updated",
         description:
@@ -313,25 +351,8 @@ const HotelManagerDetails = () => {
     }
   };
 
-  const handleStatusChange = async (value: HotelManager["status"]) => {
-    try {
-      setManager((prev) => ({ ...prev!, status: value }));
-
-      await axiosInstance.put(`/hotel-management/hotel-managers/verify/${id}`, {
-        status: value.toLowerCase(),
-      });
-
-      toast({
-        title: "Status Updated",
-        description: `Hotel manager status changed to ${value}`,
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update status",
-        variant: "destructive",
-      });
-    }
+  const handleStatusChange = (value: HotelManager["status"]) => {
+    setManager((prev) => ({ ...prev!, status: value }));
   };
 
   const statusOptions = [
@@ -341,6 +362,8 @@ const HotelManagerDetails = () => {
     "rejected",
     "blocked",
   ];
+
+  const verificationOptions = ["Not Verified", "Verified"];
 
   if (loading) return <Loader />;
   if (!manager) {
@@ -519,8 +542,7 @@ const HotelManagerDetails = () => {
                       name="status"
                       value={manager.status}
                       onChange={(e) =>
-                        handleChange(
-                          "status",
+                        handleStatusChange(
                           e.target.value as HotelManager["status"]
                         )
                       }
@@ -566,6 +588,35 @@ const HotelManagerDetails = () => {
                       value={selectedBranch}
                       onChange={setSelectedBranch}
                     />
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Verification Status
+                  </label>
+
+                  {mode === "view" ? (
+                    <p className="filter-input w-full bg-gray-100">
+                      {manager.batchVerified ? "Verified" : "Not Verified"}
+                    </p>
+                  ) : (
+                    <select
+                      name="batchVerified"
+                      value={
+                        manager.batchVerified ? "Verified" : "Not Verified"
+                      }
+                      onChange={(e) =>
+                        handleChange(
+                          "batchVerified",
+                          e.target.value === "Verified"
+                        )
+                      }
+                      className="filter-select w-full"
+                    >
+                      <option value="Verified">Verified</option>
+                      <option value="Not Verified">Not Verified</option>
+                    </select>
                   )}
                 </div>
               </div>
@@ -913,9 +964,7 @@ const HotelManagerDetails = () => {
                   /> */}
                   <AmenitiesMultiSelect
                     value={manager.amenities || []}
-                    onChange={
-                      (selected) => handleChange("amenities", selected) // ✅ just pass the array
-                    }
+                    onChange={(selected) => handleChange("amenities", selected)}
                     isReadOnly={isReadOnly}
                   />
                 </div>

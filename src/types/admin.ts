@@ -58,6 +58,7 @@ export interface BusOperator {
     | "Submitted"
     | "blocked"
     | "Pending";
+  batchVerified: boolean;
   numberOfBuses?: number;
   balance?: number;
   busCount?: number;
@@ -145,6 +146,7 @@ export interface HotelManager {
     | "Pending";
   roomCount?: number;
   joinDate?: string;
+  batchVerified: boolean;
   // Additional properties used in HotelManagerDetails.tsx
   profilePhoto?: string;
   hotelName?: string;
@@ -222,6 +224,7 @@ export interface TaxiDriver {
     | "blocked"
     | "pending";
   joinDate?: string;
+  batchVerified: boolean;
 
   // Extra details
   age?: number;
@@ -285,6 +288,7 @@ export interface BikeRider {
     | "Blocked"
     | "Pending";
   joinDate?: string;
+  batchVerified: boolean;
   age?: number;
   address?: string;
   experience?: number;

@@ -22,6 +22,7 @@ export const fetchHotelManagers = async (
       mobile: user.phoneNumber,
       status: user.verificationStatus,
       balance: user?.balance,
+      batchVerified: user.batchVerified ?? false,
     })),
     total,
   };

@@ -32,7 +32,7 @@ const TaxiDrivers = () => {
       render: (driver: TaxiDriver) => (
         <div className="flex items-center gap-2">
           <span>{driver.name}</span>
-          {driver.status === "approved" && (
+          {driver.batchVerified === true && (
             <BadgeCheck className="text-green-500 w-4 h-4" />
           )}
         </div>

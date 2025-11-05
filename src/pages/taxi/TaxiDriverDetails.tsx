@@ -36,6 +36,7 @@ const TaxiDriverDetails = () => {
     remark: "",
     status: "approved",
     vehicleType: "",
+    batchVerified: false,
   });
 
   const [selectedBranch, setSelectedBranch] = useState<string>(
@@ -57,6 +58,7 @@ const TaxiDriverDetails = () => {
             email: apiData.TaxiDriverDetails?.email || "",
             mobile: apiData.TaxiDriverDetails?.mobile || "",
             branch: apiData.TaxiDriverDetails?.branch?.name || "",
+            batchVerified: apiData.TaxiDriverDetails?.batchVerified || "",
             status: apiData.TaxiDriverDetails?.status || "",
             age: apiData.TaxiDriverDetails?.age || null,
             profilePhoto: apiData.documents?.avatarPhotos || null,
@@ -436,7 +438,11 @@ const TaxiDriverDetails = () => {
           if (driver.driverId) {
             await axiosInstance.put(
               `/driver-management/drivers/verify/${driver.driverId}`,
-              { status: driver.status }
+              {
+                status: driver.status,
+                remarks: driver?.remark,
+                batchVerified: driver?.batchVerified,
+              }
             );
             console.log("✅ Driver status updated");
           } else {
@@ -472,6 +478,8 @@ const TaxiDriverDetails = () => {
     "rejected",
     "blocked",
   ];
+
+  const verificationOptions = ["Not Verified", "Verified"];
 
   return (
     <>
@@ -654,28 +662,28 @@ const TaxiDriverDetails = () => {
                       </Select>
                     )}
                   </div>
-
-                  {/* Remark Field (conditionally rendered) */}
-                  {(driver.status === "rejected" ||
-                    driver.status === "blocked") && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Remark
-                      </label>
-                      <textarea
-                        name="remark"
-                        value={driver.remark || ""}
-                        onChange={(e) =>
-                          setDriver({ ...driver, remark: e.target.value })
-                        }
-                        className="filter-input w-full h-24"
-                        placeholder="Enter reason for rejection or blocking"
-                        required
-                        disabled={mode === "view"}
-                      />
-                    </div>
-                  )}
                 </div>
+
+                {/* Remark Field (conditionally rendered) */}
+                {(driver.status === "rejected" ||
+                  driver.status === "blocked") && (
+                  <div className="col-span-full">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Remark
+                    </label>
+                    <textarea
+                      name="remark"
+                      value={driver.remark || ""}
+                      onChange={(e) =>
+                        setDriver({ ...driver, remark: e.target.value })
+                      }
+                      className="filter-input w-full h-24"
+                      placeholder="Enter reason for rejection or blocking"
+                      required
+                      disabled={mode === "view"}
+                    />
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
@@ -690,6 +698,33 @@ const TaxiDriverDetails = () => {
                       value={selectedBranch}
                       onChange={setSelectedBranch}
                     />
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Verification Status
+                  </label>
+
+                  {mode === "view" ? (
+                    <p className="filter-input w-full bg-gray-100">
+                      {driver.batchVerified ? "Verified" : "Not Verified"}
+                    </p>
+                  ) : (
+                    <select
+                      name="batchVerified"
+                      value={driver.batchVerified ? "Verified" : "Not Verified"}
+                      onChange={(e) =>
+                        handleChange(
+                          "batchVerified",
+                          e.target.value === "Verified"
+                        )
+                      }
+                      className="filter-select w-full"
+                    >
+                      <option value="Verified">Verified</option>
+                      <option value="Not Verified">Not Verified</option>
+                    </select>
                   )}
                 </div>
               </div>
