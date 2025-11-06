@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { fetchBusOperators } from "@/api/busOperators";
 import { FadeLoader } from "react-spinners";
 import Loader from "@/components/ui/loader";
+import { useTranslation } from "react-i18next";
 
 const BusOperators = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const BusOperators = () => {
   const [totalBusOperators, setTotalBusOperators] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const { i18n, t } = useTranslation();
 
   useEffect(() => {
     const loadBusOperators = async () => {
@@ -44,24 +46,88 @@ const BusOperators = () => {
     loadBusOperators();
   }, [currentPage, pageSize, searchTerm, selectedStatus]);
 
+  // const columns = [
+  //   {
+  //     key: "name" as keyof BusOperator,
+  //     header: "Name",
+  //     render: (operator: BusOperator) => (
+  //       <div className="flex items-center gap-2">
+  //         <span>{operator.name}</span>
+  //         {operator.batchVerified === true && (
+  //           <BadgeCheck className="text-green-500 w-4 h-4" />
+  //         )}
+  //       </div>
+  //     ),
+  //   },
+  //   { key: "mobile" as keyof BusOperator, header: "Mobile" },
+  //   { key: "email" as keyof BusOperator, header: "Email ID" },
+  //   {
+  //     key: "numberOfBuses" as keyof BusOperator,
+  //     header: "Number of Buses",
+  //     render: (operator: BusOperator) => (
+  //       <span
+  //         className="cursor-pointer text-blue-600 hover:underline"
+  //         onClick={(e) => {
+  //           e.stopPropagation();
+  //           navigate(`/bus-management/operators/${operator.id}/buses`);
+  //         }}
+  //       >
+  //         {operator.numberOfBuses}
+  //       </span>
+  //     ),
+  //   },
+  //   {
+  //     key: "balance" as keyof BusOperator,
+  //     header: "Wallet Balance",
+  //     render: (operator: BusOperator) => (
+  //       <span className="text-gray-800 font-medium">
+  //         ₹{operator.balance?.toLocaleString() ?? 0}
+  //       </span>
+  //     ),
+  //   },
+  //   {
+  //     key: "status" as keyof BusOperator,
+  //     header: "Status",
+  //     render: (operator: BusOperator) => (
+  //       <StatusBadge status={operator.status} />
+  //     ),
+  //   },
+  //   {
+  //     key: "actions" as "actions",
+  //     header: "Actions",
+  //     render: (operator: BusOperator) => (
+  //       <button
+  //         onClick={(e) => {
+  //           e.stopPropagation();
+  //           navigate(`/bus-management/operators/${operator.id}`);
+  //         }}
+  //         className="action-button flex items-center"
+  //       >
+  //         <Eye size={16} className="mr-1" />
+  //         View Details
+  //       </button>
+  //     ),
+  //   },
+  // ];
+
   const columns = [
     {
       key: "name" as keyof BusOperator,
-      header: "Name",
+      header: t("busOperators.tableHeaders.name"),
       render: (operator: BusOperator) => (
         <div className="flex items-center gap-2">
           <span>{operator.name}</span>
-          {operator.batchVerified === true && (
+          {operator.batchVerified && (
             <BadgeCheck className="text-green-500 w-4 h-4" />
           )}
         </div>
       ),
     },
-    { key: "mobile" as keyof BusOperator, header: "Mobile" },
-    { key: "email" as keyof BusOperator, header: "Email ID" },
+    { key: "mobile", header: t("busOperators.tableHeaders.mobile") },
+    { key: "email", header: t("busOperators.tableHeaders.email") },
     {
-      key: "numberOfBuses" as keyof BusOperator,
-      header: "Number of Buses",
+      key: "numberOfBuses",
+      header: t("busOperators.tableHeaders.numberOfBuses"),
       render: (operator: BusOperator) => (
         <span
           className="cursor-pointer text-blue-600 hover:underline"
@@ -75,8 +141,8 @@ const BusOperators = () => {
       ),
     },
     {
-      key: "balance" as keyof BusOperator,
-      header: "Wallet Balance",
+      key: "balance",
+      header: t("busOperators.tableHeaders.walletBalance"),
       render: (operator: BusOperator) => (
         <span className="text-gray-800 font-medium">
           ₹{operator.balance?.toLocaleString() ?? 0}
@@ -84,15 +150,15 @@ const BusOperators = () => {
       ),
     },
     {
-      key: "status" as keyof BusOperator,
-      header: "Status",
+      key: "status",
+      header: t("busOperators.tableHeaders.status"),
       render: (operator: BusOperator) => (
         <StatusBadge status={operator.status} />
       ),
     },
     {
       key: "actions" as "actions",
-      header: "Actions",
+      header: t("busOperators.tableHeaders.actions"),
       render: (operator: BusOperator) => (
         <button
           onClick={(e) => {
@@ -102,7 +168,7 @@ const BusOperators = () => {
           className="action-button flex items-center"
         >
           <Eye size={16} className="mr-1" />
-          View Details
+          {t("busOperators.actions.viewDetails")}
         </button>
       ),
     },
@@ -135,18 +201,18 @@ const BusOperators = () => {
     <>
       <div className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Bus Operators</h1>
-          <p className="text-gray-600">Manage all bus operators</p>
+          <h1 className="text-2xl font-bold">{t("busOperators.pageTitle")}</h1>
+          <p className="text-gray-600">{t("busOperators.pageSubtitle")}</p>
         </div>
+
         <Button
           onClick={() => navigate("/bus-management/operators/new")}
           className="flex items-center gap-2"
         >
           <Plus size={18} />
-          Add Bus Operator
+          {t("busOperators.addOperatorButton")}
         </Button>
       </div>
-
       <DataTable
         columns={columns}
         data={operators}

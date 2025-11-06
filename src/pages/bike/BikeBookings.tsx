@@ -189,8 +189,8 @@ const BikeBookings = () => {
           columns={columns}
           data={bookings}
           keyExtractor={(item) => item.bookingId}
-          filterable
-          filterOptions={filterOptions}
+          // filterable
+          // filterOptions={filterOptions}
           paginate
           pageSize={pageSize}
           currentPage={currentPage}

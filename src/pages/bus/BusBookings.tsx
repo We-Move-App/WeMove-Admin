@@ -8,6 +8,7 @@ import { BusBooking } from "@/types/admin";
 import { Eye } from "lucide-react";
 import axiosInstance from "@/api/axiosInstance";
 import Loader from "@/components/ui/loader";
+import { useTranslation } from "react-i18next";
 
 const BusBookings = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const BusBookings = () => {
   const [pageSize] = useState(10);
   const [totalBusOperators, setTotalBusOperators] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const { i18n, t } = useTranslation();
   // const [fromOptions, setFromOptions] = useState<
   //   { label: string; value: string }[]
   // >([]);
@@ -120,40 +122,49 @@ const BusBookings = () => {
   }, [currentPage, pageSize, searchTerm]);
 
   const columns = [
-    { key: "id" as keyof BusBooking, header: "ID" },
+    { key: "id" as keyof BusBooking, header: t("busBookings.columns.id") },
     {
       key: "busRegistrationNumber" as keyof BusBooking,
-      header: "Bus Reg. No.",
+      header: t("busBookings.columns.busRegistrationNumber"),
     },
-    { key: "customerName" as keyof BusBooking, header: "Customer Name" },
-    { key: "customerPhone" as keyof BusBooking, header: "Phone" },
-    { key: "customerEmail" as keyof BusBooking, header: "Email" },
-    { key: "from" as keyof BusBooking, header: "From" },
-    { key: "to" as keyof BusBooking, header: "To" },
-    { key: "journeyDate" as keyof BusBooking, header: "Journey Date" },
+    {
+      key: "customerName" as keyof BusBooking,
+      header: t("busBookings.columns.customerName"),
+    },
+    {
+      key: "customerPhone" as keyof BusBooking,
+      header: t("busBookings.columns.customerPhone"),
+    },
+    {
+      key: "customerEmail" as keyof BusBooking,
+      header: t("busBookings.columns.customerEmail"),
+    },
+    { key: "from" as keyof BusBooking, header: t("busBookings.columns.from") },
+    { key: "to" as keyof BusBooking, header: t("busBookings.columns.to") },
+    {
+      key: "journeyDate" as keyof BusBooking,
+      header: t("busBookings.columns.journeyDate"),
+    },
     {
       key: "amount" as keyof BusBooking,
-      header: "Amount",
-      render: (booking: BusBooking) => <span>₹{booking.amount}</span>,
+      header: t("busBookings.columns.amount"),
+      render: (booking: BusBooking) => (
+        <span>
+          {t("busBookings.currencySymbol")}
+          {booking.amount}
+        </span>
+      ),
     },
-    // {
-    //   key: "status" as keyof BusBooking,
-    //   header: "Status",
-    //   render: (booking: BusBooking) => (
-    //     <StatusBadge status={booking.paymentStatus} />
-    //   ),
-    // },
     {
       key: "paymentStatus" as keyof BusBooking,
-      header: "Payment",
+      header: t("busBookings.columns.paymentStatus"),
       render: (booking: BusBooking) => (
         <StatusBadge status={booking.paymentStatus} />
       ),
     },
-
     {
       key: "actions" as "actions",
-      header: "Actions",
+      header: t("busBookings.columns.actions"),
       render: (booking: BusBooking) => (
         <button
           onClick={(e) => {
@@ -163,7 +174,7 @@ const BusBookings = () => {
           className="action-button flex items-center"
         >
           <Eye size={16} className="mr-1" />
-          View Details
+          {t("busBookings.actions.viewDetails")}
         </button>
       ),
     },
@@ -215,8 +226,8 @@ const BusBookings = () => {
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Bus Bookings</h1>
-        <p className="text-gray-600">View and manage all bus bookings</p>
+        <h1 className="text-2xl font-bold">{t("busBookings.title")}</h1>
+        <p className="text-gray-600">{t("busBookings.subtitle")}</p>
       </div>
 
       <DataTable

@@ -8,6 +8,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { fetchHotelManagers } from "@/api/hotelOperators";
 import Loader from "@/components/ui/loader";
+import { useTranslation } from "react-i18next";
 
 // Mock data for hotel managers
 // const mockHotelManagers: HotelManager[] = [
@@ -68,6 +69,7 @@ const HotelManagers = () => {
   const [totalHotelManagers, setTotalHotelManagers] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const { i18n, t } = useTranslation();
 
   useEffect(() => {
     const getManagers = async () => {
@@ -99,7 +101,7 @@ const HotelManagers = () => {
   const columns = [
     {
       key: "name" as keyof HotelManager,
-      header: "Name",
+      header: t("hotelManagers.tableHeaders.name"),
       render: (manager: HotelManager) => (
         <div className="flex items-center gap-2">
           <span>{manager.name}</span>
@@ -109,11 +111,17 @@ const HotelManagers = () => {
         </div>
       ),
     },
-    { key: "mobile" as keyof HotelManager, header: "Mobile" },
-    { key: "email" as keyof HotelManager, header: "Email" },
+    {
+      key: "mobile" as keyof HotelManager,
+      header: t("hotelManagers.tableHeaders.mobile"),
+    },
+    {
+      key: "email" as keyof HotelManager,
+      header: t("hotelManagers.tableHeaders.email"),
+    },
     {
       key: "balance" as keyof HotelManager,
-      header: "Wallet Balance",
+      header: t("hotelManagers.tableHeaders.balance"),
       render: (manager: HotelManager) => (
         <span className="text-gray-800 font-medium">
           ₹{manager.balance?.toLocaleString() ?? 0}
@@ -122,14 +130,14 @@ const HotelManagers = () => {
     },
     {
       key: "status" as keyof HotelManager,
-      header: "Status",
+      header: t("hotelManagers.tableHeaders.status"),
       render: (manager: HotelManager) => (
         <StatusBadge status={manager.status} />
       ),
     },
     {
       key: "actions" as "actions",
-      header: "Actions",
+      header: t("hotelManagers.tableHeaders.actions"),
       render: (manager: HotelManager) => (
         <button
           className="action-button flex items-center"
@@ -138,7 +146,8 @@ const HotelManagers = () => {
             navigate(`/hotel-management/managers/${manager.id}?mode=view`);
           }}
         >
-          <Eye size={16} className="mr-1" /> View Details
+          <Eye size={16} className="mr-1" />{" "}
+          {t("hotelManagers.labels.viewDetails")}
         </button>
       ),
     },
@@ -163,14 +172,14 @@ const HotelManagers = () => {
     <>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Hotel Managers</h1>
-          <p className="text-gray-600">Manage all hotel managers</p>
+          <h1 className="text-2xl font-bold">{t("hotelManagers.pageTitle")}</h1>
+          <p className="text-gray-600">{t("hotelManagers.pageSubtitle")}</p>
         </div>
         <Button
           onClick={() => navigate(`/hotel-management/managers/new?mode=post`)}
           className="flex items-center gap-2"
         >
-          <Plus size={16} /> Add Hotel Manager
+          <Plus size={16} /> {t("hotelManagers.addButton")}
         </Button>
       </div>
 

@@ -59,6 +59,7 @@ const BikeRiderDetails = () => {
             mobile: apiData.BikeDriverDetails?.mobile || "",
             branch: apiData.BikeDriverDetails?.branch?.name || "",
             status: apiData.BikeDriverDetails?.status || "",
+            remark: apiData.BikeDriverDetails?.remarks || "",
             batchVerified: apiData.BikeDriverDetails?.batchVerified || "",
             age: apiData.BikeDriverDetails?.age || null,
             profilePhoto: apiData.documents?.avatarPhotos || null,

@@ -20,6 +20,7 @@ import {
 import axiosInstance from "@/api/axiosInstance";
 import StatusBadge from "@/components/ui/StatusBadge";
 import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
+import { useTranslation } from "react-i18next";
 
 const CustomerManagement = () => {
   const navigate = useNavigate();
@@ -35,6 +36,8 @@ const CustomerManagement = () => {
   const [totalUsers, setTotalUsers] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -77,18 +80,17 @@ const CustomerManagement = () => {
   };
 
   const columns = [
-    { key: "name" as keyof Customer, header: "Name" },
-    { key: "mobile" as keyof Customer, header: "Mobile" },
-    { key: "email" as keyof Customer, header: "Email ID" },
-    // { key: 'status' as keyof Customer, header: 'Status' },
+    { key: "name", header: t("customerManagement.tableHeaders.name") },
+    { key: "mobile", header: t("customerManagement.tableHeaders.mobile") },
+    { key: "email", header: t("customerManagement.tableHeaders.email") },
     {
-      key: "status" as keyof Customer,
-      header: "Status",
-      render: (driver: Customer) => <StatusBadge status={driver.status} />,
+      key: "status",
+      header: t("customerManagement.tableHeaders.status"),
+      render: (customer: Customer) => <StatusBadge status={customer.status} />,
     },
     {
-      key: "actions" as string,
-      header: "Actions",
+      key: "actions",
+      header: t("customerManagement.tableHeaders.actions"),
       render: (customer: Customer) => (
         <button
           onClick={(e) => {
@@ -98,7 +100,7 @@ const CustomerManagement = () => {
           className="action-button flex items-center"
         >
           <Eye size={16} className="mr-1" />
-          View Details
+          {t("customerManagement.labels.viewDetails")}
         </button>
       ),
     },
@@ -124,8 +126,10 @@ const CustomerManagement = () => {
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">User Management</h1>
-        <p className="text-gray-600">View and manage all Users</p>
+        <h1 className="text-2xl font-bold">
+          {t("customerManagement.pageTitle")}
+        </h1>
+        <p className="text-gray-600">{t("customerManagement.pageSubtitle")}</p>
       </div>
 
       {loading ? (
@@ -143,10 +147,11 @@ const CustomerManagement = () => {
           currentPage={currentPage}
           totalItems={totalUsers}
           onPageChange={setCurrentPage}
-          filterable
-          filterOptions={filterOptions}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
+          filterable
+          filterOptions={filterOptions}
+          filters={{ status: status }}
           onFilterChange={(filters) => {
             setStatus(filters.status || "");
             setCurrentPage(1);

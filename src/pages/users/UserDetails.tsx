@@ -26,6 +26,7 @@ import { ChevronLeft } from "lucide-react";
 import axiosInstance from "@/api/axiosInstance";
 import fileUploadInstance from "@/api/fileUploadInstance";
 import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
+import { useTranslation } from "react-i18next";
 
 // Available permissions
 const availablePermissions = [
@@ -62,6 +63,7 @@ const UserDetails = () => {
   const [activityLoading, setActivityLoading] = useState(false);
   const [branches, setBranches] = useState<any[]>([]);
   const [searchAddress, setSearchAddress] = useState("");
+  const { i18n, t } = useTranslation();
 
   useEffect(() => {
     if (!userId) return;
@@ -234,7 +236,9 @@ const UserDetails = () => {
     return (
       <>
         <div className="p-6">
-          <h1 className="text-2xl font-bold text-red-500">Admin not found</h1>
+          <h1 className="text-2xl font-bold text-red-500">
+            {t("adminManagement.notFound")}
+          </h1>
         </div>
       </>
     );
@@ -247,40 +251,54 @@ const UserDetails = () => {
         className="mb-4"
         onClick={() => navigate("/admin-management")}
       >
-        <ChevronLeft className="mr-2 h-4 w-4" /> Back to All Admins / Sub-admins
+        <ChevronLeft className="mr-2 h-4 w-4" />{" "}
+        {t("adminManagement.backButton")}
       </Button>
 
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Admin / Sub-admin Details</h1>
+          <h1 className="text-2xl font-bold">
+            {" "}
+            {t("adminManagement.pageTitle")}
+          </h1>
           {!isEditing && (
             <Button onClick={() => setIsEditing(true)}>
-              Edit Admin / Sub-admin
+              {t("adminManagement.buttons.edit")}
             </Button>
           )}
         </div>
 
         <Tabs defaultValue="details" className="w-full">
           <TabsList className="mb-4">
-            <TabsTrigger value="details">Admin / Sub-admin Details</TabsTrigger>
-            <TabsTrigger value="permissions">Permissions</TabsTrigger>
-            <TabsTrigger value="activity">Activity Log</TabsTrigger>
+            <TabsTrigger value="details">
+              {t("adminManagement.tabs.details")}
+            </TabsTrigger>
+            <TabsTrigger value="permissions">
+              {t("adminManagement.tabs.permissions")}
+            </TabsTrigger>
+            <TabsTrigger value="activity">
+              {t("adminManagement.tabs.activity")}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="details">
             <Card>
               <CardHeader>
-                <CardTitle>Admin / Sub-admin Information</CardTitle>
+                <CardTitle>
+                  {t("adminManagement.detailsSection.title")}
+                </CardTitle>
                 <CardDescription>
                   {isEditing
-                    ? "Edit Admin / Sub-admin details"
-                    : "View Admin / Sub-admin details"}
+                    ? t("adminManagement.detailsSection.editDescription")
+                    : t("adminManagement.detailsSection.viewDescription")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Name</label>
+                    <label className="text-sm font-medium">
+                      {t("adminManagement.detailsSection.fields.name")}
+                    </label>
                     {isEditing ? (
                       <Input
                         value={editedUser.userName}
@@ -290,7 +308,9 @@ const UserDetails = () => {
                             userName: e.target.value,
                           })
                         }
-                        placeholder="Enter full name"
+                        placeholder={t(
+                          "adminManagement.detailsSection.fields.placeholder.name"
+                        )}
                       />
                     ) : (
                       <p className="text-gray-700">{user.userName}</p>
@@ -298,7 +318,9 @@ const UserDetails = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Email</label>
+                    <label className="text-sm font-medium">
+                      {t("adminManagement.detailsSection.fields.email")}
+                    </label>
                     {isEditing ? (
                       <Input
                         type="email"
@@ -309,7 +331,9 @@ const UserDetails = () => {
                             email: e.target.value,
                           })
                         }
-                        placeholder="Enter email address"
+                        placeholder={t(
+                          "adminManagement.detailsSection.fields.placeholder.email"
+                        )}
                       />
                     ) : (
                       <p className="text-gray-700">{user.email}</p>
@@ -317,7 +341,9 @@ const UserDetails = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Mobile Number</label>
+                    <label className="text-sm font-medium">
+                      {t("adminManagement.detailsSection.fields.mobileNumber")}
+                    </label>
                     {isEditing ? (
                       <Input
                         type="tel"
@@ -328,7 +354,9 @@ const UserDetails = () => {
                             phoneNumber: e.target.value,
                           })
                         }
-                        placeholder="Enter mobile number"
+                        placeholder={t(
+                          "adminManagement.detailsSection.fields.placeholder.mobileNumber"
+                        )}
                       />
                     ) : (
                       <p className="text-gray-700">{user.phoneNumber}</p>
@@ -336,7 +364,9 @@ const UserDetails = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Role</label>
+                    <label className="text-sm font-medium">
+                      {t("adminManagement.detailsSection.fields.role")}
+                    </label>
                     {isEditing ? (
                       <Select
                         value={editedUser.role}
@@ -346,8 +376,16 @@ const UserDetails = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Admin">Admin</SelectItem>
-                          <SelectItem value="Subadmin">Subadmin</SelectItem>
+                          <SelectItem value="Admin">
+                            {t(
+                              "adminManagement.detailsSection.fields.roleOptions.admin"
+                            )}
+                          </SelectItem>
+                          <SelectItem value="Subadmin">
+                            {t(
+                              "adminManagement.detailsSection.fields.roleOptions.subadmin"
+                            )}
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     ) : (
@@ -411,10 +449,10 @@ const UserDetails = () => {
                       setEditedUser({ ...user });
                     }}
                   >
-                    Cancel
+                    {t("adminManagement.buttons.cancel")}
                   </Button>
                   <Button type="button" onClick={handleSave}>
-                    Save Changes
+                    {t("adminManagement.buttons.save")}
                   </Button>
                 </CardFooter>
               )}
@@ -424,11 +462,15 @@ const UserDetails = () => {
           <TabsContent value="permissions">
             <Card>
               <CardHeader>
-                <CardTitle>User Permissions</CardTitle>
+                <CardTitle>
+                  {t("adminManagement.permissionsSection.title")}
+                </CardTitle>
                 <CardDescription>
                   {user.role === "Admin"
-                    ? "Admin users have full access to all features"
-                    : "Manage what this user can access and modify"}
+                    ? t("adminManagement.permissionsSection.description.admin")
+                    : t(
+                        "adminManagement.permissionsSection.description.subadmin"
+                      )}
                 </CardDescription>
               </CardHeader>
 
@@ -470,9 +512,11 @@ const UserDetails = () => {
                       setEditedUser({ ...user });
                     }}
                   >
-                    Cancel
+                    {t("adminManagement.buttons.cancel")}
                   </Button>
-                  <Button onClick={handleSave}>Save Changes</Button>
+                  <Button onClick={handleSave}>
+                    {t("adminManagement.buttons.save")}
+                  </Button>
                 </CardFooter>
               )}
             </Card>
@@ -481,16 +525,22 @@ const UserDetails = () => {
           <TabsContent value="activity">
             <Card>
               <CardHeader>
-                <CardTitle>Activity Log</CardTitle>
+                <CardTitle>
+                  {t("adminManagement.activitySection.title")}
+                </CardTitle>
                 <CardDescription>
-                  Recent activities performed by this user
+                  {t("adminManagement.activitySection.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {activityLoading ? (
-                  <p className="text-sm text-gray-500">Loading activity...</p>
+                  <p className="text-sm text-gray-500">
+                    {t("adminManagement.activitySection.loading")}
+                  </p>
                 ) : activity.length === 0 ? (
-                  <p className="text-sm text-gray-500">No activity found.</p>
+                  <p className="text-sm text-gray-500">
+                    {t("adminManagement.activitySection.noActivity")}
+                  </p>
                 ) : (
                   <div className="space-y-4">
                     {activity.map((act, index) => {

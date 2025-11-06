@@ -17,6 +17,7 @@ import { StatusDropdown } from "@/components/ui/StatusDropdown";
 import PaginationComponent from "@/components/pagination/PaginationComponent";
 import axiosInstance from "@/api/axiosInstance";
 import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
+import { useTranslation } from "react-i18next";
 
 // Mock Customer Data
 interface NormalizedBooking {
@@ -277,18 +278,68 @@ const CustomerBookingDetails = () => {
     balance: "",
     cardNumber: "",
   });
+  const { i18n, t } = useTranslation();
+
+  // const filterData = (data: any[], searchTerm: string) => {
+  //   return data.filter((item) => {
+  //     const id = item.id?.toLowerCase() || "";
+  //     const type = item.type?.toLowerCase() || "";
+  //     const status = item.status?.toLowerCase() || "";
+  //     return (
+  //       id.includes(searchTerm.toLowerCase()) ||
+  //       type.includes(searchTerm.toLowerCase()) ||
+  //       status.includes(searchTerm.toLowerCase())
+  //     );
+  //   });
+  // };
 
   const filterData = (data: any[], searchTerm: string) => {
+    if (!searchTerm) return data;
+    const q = searchTerm.toLowerCase();
     return data.filter((item) => {
-      const id = item.id?.toLowerCase() || "";
-      const type = item.type?.toLowerCase() || "";
-      const status = item.status?.toLowerCase() || "";
+      // check several candidate fields
+      const bookingId = String(
+        item.bookingId ?? item.booking_id ?? item._id ?? ""
+      ).toLowerCase();
+      const id = String(item.id ?? "").toLowerCase();
+      const type = String(
+        item.type ?? item.vehicleType ?? item.source ?? ""
+      ).toLowerCase();
+      const status = String(
+        item.status ?? item.paymentStatus ?? item.rideStatus ?? ""
+      ).toLowerCase();
+      const amount = String(
+        item.finalAmount ?? item.fare ?? item.price ?? item.amount ?? ""
+      ).toLowerCase();
+      const userName = String(
+        item.user?.name ?? item.userName ?? ""
+      ).toLowerCase();
+
       return (
-        id.includes(searchTerm.toLowerCase()) ||
-        type.includes(searchTerm.toLowerCase()) ||
-        status.includes(searchTerm.toLowerCase())
+        bookingId.includes(q) ||
+        id.includes(q) ||
+        type.includes(q) ||
+        status.includes(q) ||
+        amount.includes(q) ||
+        userName.includes(q)
       );
     });
+  };
+
+  const getActiveSearch = () => {
+    switch (activeTab) {
+      case "all":
+        return searchAll?.trim() || "";
+      case "transactions":
+        return searchPayment?.trim() || "";
+      // bus / hotel / ride currently share the same search input in your UI
+      case "bus":
+      case "hotel":
+      case "ride":
+        return searchRide?.trim() || "";
+      default:
+        return "";
+    }
   };
 
   // useEffect(() => {
@@ -300,29 +351,70 @@ const CustomerBookingDetails = () => {
     const fetchCustomerDetails = async () => {
       setLoading(true);
       try {
-        const response = await axiosInstance.get(
-          `/user-management/bookings/${id}?filter=${activeTab}`
-        );
-        console.log("API response:", response.data);
-        const apiData = response.data?.data || {};
+        const search = getActiveSearch();
 
-        // Same data parsing logic...
-        const bookings = apiData.bookings || [];
-        const userInfo = bookings?.[0]?.user?.[0] || {};
+        const response = await axiosInstance.get(
+          `/user-management/bookings/${id}`,
+          {
+            params: {
+              filter: activeTab,
+              ...(search ? { search } : {}),
+            },
+          }
+        );
+
+        const apiData = response.data?.data || {};
+        const bookingsRaw = apiData.bookings || [];
+
+        // Normalize bookings to a shape the UI expects
+        const normalized = bookingsRaw.map((b: any) => {
+          const idFrom = b._id ?? b.bookingId ?? b.id ?? "";
+          const type = b.vehicleType ?? b.source ?? b.type ?? "";
+          const status = b.paymentStatus ?? b.rideStatus ?? b.status ?? "";
+          const amount = b.finalAmount ?? b.fare ?? b.price ?? b.amount ?? 0;
+          const createdAt =
+            b.createdAt ?? b.timestamps?.requestedAt ?? b.createdAt;
+
+          return {
+            // canonical fields your UI uses
+            id: String(idFrom),
+            bookingId: b.bookingId ?? b._id ?? b.id ?? "",
+            type,
+            status,
+            finalAmount: amount,
+            createdAt,
+            // keep the raw object if you need other nested properties later
+            raw: b,
+            // copy common display fields so individual tables don't need to read raw
+            vehicleType: b.vehicleType,
+            source: b.source,
+            fare: b.fare,
+            price: b.price,
+            paymentStatus: b.paymentStatus,
+            rideStatus: b.rideStatus,
+            transactionId: b.transactionId,
+            amount: b.amount,
+            // user info if present
+            user: b.user && b.user[0] ? b.user[0] : b.user ?? null,
+          };
+        });
+
+        const userInfo = normalized?.[0]?.user || {};
 
         setCustomerData({
           id: userInfo._id || "",
           name: userInfo.name || "",
           email: userInfo.email || "",
-          mobile: userInfo.phoneNumber || "",
+          mobile: userInfo.phoneNumber || userInfo.phone || "",
           status: "Active",
-          allBookings: activeTab === "all" ? bookings : [],
-          busBookings: activeTab === "bus" ? bookings : [],
-          hotelBookings: activeTab === "hotel" ? bookings : [],
-          rideBookings: activeTab === "ride" ? bookings : [],
-          paymentTransactions: activeTab === "transactions" ? bookings : [],
+          allBookings: activeTab === "all" ? normalized : [],
+          busBookings: activeTab === "bus" ? normalized : [],
+          hotelBookings: activeTab === "hotel" ? normalized : [],
+          rideBookings: activeTab === "ride" ? normalized : [],
+          paymentTransactions: activeTab === "transactions" ? normalized : [],
         });
       } catch (err) {
+        console.error(err);
         setError("Failed to fetch customer data");
       } finally {
         setLoading(false);
@@ -330,7 +422,7 @@ const CustomerBookingDetails = () => {
     };
 
     if (id) fetchCustomerDetails();
-  }, [id, activeTab]);
+  }, [id, activeTab, searchAll, searchRide, searchPayment]);
 
   useEffect(() => {
     const userBalance = async () => {
@@ -359,6 +451,11 @@ const CustomerBookingDetails = () => {
     };
     bookingSummary();
   }, []);
+
+  useEffect(() => {
+    // when any tab search changes, go back to first page
+    setCurrentPageAll(1);
+  }, [searchAll, searchRide, searchPayment]);
 
   const personalInfo = customerData
     ? {
@@ -408,17 +505,22 @@ const CustomerBookingDetails = () => {
         className="mb-4"
         onClick={() => navigate("/customer-management/bookings")}
       >
-        <ChevronLeft className="mr-2 h-4 w-4" /> Back to All User Bookings
+        <ChevronLeft className="mr-2 h-4 w-4" />
+        {t("customerBookingsDetails.backButton")}
       </Button>
 
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">User Details</h1>
+        <h1 className="text-2xl font-bold mb-6">
+          {t("customerBookingsDetails.pageTitle")}
+        </h1>
 
         {/* Personal Info & Booking Summary */}
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Booking Summary</CardTitle>
+              <CardTitle>
+                {t("customerBookingsDetails.summary.title")}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-3 gap-4">
@@ -426,19 +528,25 @@ const CustomerBookingDetails = () => {
                   <p className="text-lg font-medium text-blue-700">
                     {bookingSummary.bus}
                   </p>
-                  <p className="text-sm text-blue-600">Bus Bookings</p>
+                  <p className="text-sm text-blue-600">
+                    {t("customerBookingsDetails.summary.bus")}
+                  </p>
                 </div>
                 <div className="bg-green-50 rounded-lg p-4 text-center">
                   <p className="text-lg font-medium text-green-700">
                     {bookingSummary.hotel}
                   </p>
-                  <p className="text-sm text-green-600">Hotel Bookings</p>
+                  <p className="text-sm text-green-600">
+                    {t("customerBookingsDetails.summary.hotel")}
+                  </p>
                 </div>
                 <div className="bg-purple-50 rounded-lg p-4 text-center">
                   <p className="text-lg font-medium text-purple-700">
                     {bookingSummary.ride}
                   </p>
-                  <p className="text-sm text-purple-600">Ride Bookings</p>
+                  <p className="text-sm text-purple-600">
+                    {t("customerBookingsDetails.summary.ride")}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -459,54 +567,56 @@ const CustomerBookingDetails = () => {
                 value="all"
                 className="data-[state=active]:!bg-[#3E7C68] data-[state=active]:text-white data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
               >
-                All Bookings
+                {t("customerBookingsDetails.tabs.all")}
               </TabsTrigger>
               <TabsTrigger
                 value="bus"
                 className="data-[state=active]:!bg-[#3E7C68] data-[state=active]:text-white
                  data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
               >
-                Bus Bookings
+                {t("customerBookingsDetails.summary.bus")}
               </TabsTrigger>
               <TabsTrigger
                 value="hotel"
                 className="data-[state=active]:!bg-[#3E7C68] data-[state=active]:text-white
                  data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
               >
-                Hotel Bookings
+                {t("customerBookingsDetails.summary.hotel")}
               </TabsTrigger>
               <TabsTrigger
                 value="ride"
                 className="data-[state=active]:!bg-[#3E7C68] data-[state=active]:text-white
                  data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
               >
-                Ride Bookings
+                {t("customerBookingsDetails.summary.ride")}
               </TabsTrigger>
               <TabsTrigger
                 value="transactions"
                 className="data-[state=active]:!bg-[#3E7C68] data-[state=active]:text-white
                  data-[state=active]:shadow-sm text-gray-700 px-4 py-2 rounded-md transition-all"
               >
-                Payment Transactions
+                {t("customerBookingsDetails.tabs.transactions")}
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="all">
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <CardTitle>All Bookings</CardTitle>
+                  <CardTitle>{t("customerBookingsDetails.tabs.all")}</CardTitle>
                   <input
                     type="text"
-                    placeholder="Search bookings..."
+                    placeholder={t("customerBookingsDetails.search.bookings")}
                     value={searchAll}
                     onChange={(e) => setSearchAll(e.target.value)}
-                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
                   />
                 </CardHeader>
                 <CardContent>
                   {filterData(customerData.allBookings, searchAll).length ===
                   0 ? (
-                    <p className="text-center py-4">No booking history found</p>
+                    <p className="text-center py-4">
+                      {t("customerBookingsDetails.tables.all.noData")}
+                    </p>
                   ) : (
                     <>
                       <Table>
@@ -559,18 +669,20 @@ const CustomerBookingDetails = () => {
             <TabsContent value="bus">
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <CardTitle>Bus Bookings</CardTitle>
+                  <CardTitle>{t("customerBookingsDetails.tabs.bus")}</CardTitle>
                   <input
                     type="text"
-                    placeholder="Search bookings..."
+                    placeholder={t("customerBookingsDetails.search.bookings")}
                     value={searchRide}
                     onChange={(e) => setSearchRide(e.target.value)}
-                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
                   />
                 </CardHeader>
                 <CardContent>
                   {customerData.busBookings.length === 0 ? (
-                    <p className="text-center py-4">No bus bookings found</p>
+                    <p className="text-center py-4">
+                      {t("customerBookingsDetails.tables.bus.noData")}
+                    </p>
                   ) : (
                     <>
                       <Table>
@@ -617,18 +729,22 @@ const CustomerBookingDetails = () => {
             <TabsContent value="hotel">
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <CardTitle>Hotel Bookings</CardTitle>
+                  <CardTitle>
+                    {t("customerBookingsDetails.tabs.hotel")}
+                  </CardTitle>
                   <input
                     type="text"
-                    placeholder="Search bookings..."
+                    placeholder={t("customerBookingsDetails.search.bookings")}
                     value={searchRide}
                     onChange={(e) => setSearchRide(e.target.value)}
-                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
                   />
                 </CardHeader>
                 <CardContent>
                   {customerData.hotelBookings.length === 0 ? (
-                    <p className="text-center py-4">No hotel bookings found</p>
+                    <p className="text-center py-4">
+                      {t("customerBookingsDetails.tables.hotel.noData")}
+                    </p>
                   ) : (
                     <>
                       <Table>
@@ -675,19 +791,23 @@ const CustomerBookingDetails = () => {
             <TabsContent value="ride">
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <CardTitle>Ride Bookings</CardTitle>
+                  <CardTitle>
+                    {t("customerBookingsDetails.tabs.ride")}
+                  </CardTitle>
                   <input
                     type="text"
-                    placeholder="Search bookings..."
+                    placeholder={t("customerBookingsDetails.search.bookings")}
                     value={searchRide}
                     onChange={(e) => setSearchRide(e.target.value)}
-                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
                   />
                 </CardHeader>
                 <CardContent>
                   {filterData(customerData.rideBookings, searchRide).length ===
                   0 ? (
-                    <p className="text-center py-4">No ride bookings found</p>
+                    <p className="text-center py-4">
+                      {t("customerBookingsDetails.tables.ride.noData")}
+                    </p>
                   ) : (
                     <>
                       <Table>
@@ -735,13 +855,17 @@ const CustomerBookingDetails = () => {
             <TabsContent value="transactions">
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <CardTitle>Payment Transactions</CardTitle>
+                  <CardTitle>
+                    {t("customerBookingsDetails.tabs.transactions")}
+                  </CardTitle>
                   <input
                     type="text"
-                    placeholder="Search transactions..."
+                    placeholder={t(
+                      "customerBookingsDetails.search.transactions"
+                    )}
                     value={searchPayment}
                     onChange={(e) => setSearchPayment(e.target.value)}
-                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
                   />
                 </CardHeader>
 
@@ -752,7 +876,7 @@ const CustomerBookingDetails = () => {
                       <div className="absolute -top-8 -right-8 w-28 h-28 bg-[#F7B24A] rounded-full opacity-90"></div>
                       <div className="relative z-10">
                         <p className="text-sm font-medium mb-2">
-                          Digital Debit Card
+                          {t("customerBookingsDetails.wallet.digitalCard")}
                         </p>
                         <p className="tracking-widest mb-3">
                           {userBalance.cardNumber || "***** ***** ***** ****"}
@@ -764,7 +888,9 @@ const CustomerBookingDetails = () => {
                               : "0"} */}
                             {userBalance.balance}
                           </p>
-                          <span className="text-sm font-semibold">XAF</span>
+                          <span className="text-sm font-semibold">
+                            {t("customerBookingsDetails.wallet.currency")}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -773,7 +899,7 @@ const CustomerBookingDetails = () => {
                   {filterData(customerData.paymentTransactions, searchPayment)
                     .length === 0 ? (
                     <p className="text-center py-4">
-                      No payment transaction found
+                      {t("customerBookingsDetails.tables.transactions.noData")}
                     </p>
                   ) : (
                     <>
@@ -797,7 +923,7 @@ const CustomerBookingDetails = () => {
                             pageSize
                           ).map((b) => (
                             <TableRow key={b.id}>
-                              <TableCell>{b.userId}</TableCell>
+                              <TableCell>{b.transactionId}</TableCell>
                               <TableCell>
                                 {new Date(b.createdAt).toLocaleDateString()}
                               </TableCell>

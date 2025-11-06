@@ -10,6 +10,7 @@ import dummyBankDetails from "@/assets/dummy-data/hdfc.jpg";
 import axiosInstance from "@/api/axiosInstance";
 import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 const CustomerDetails = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const CustomerDetails = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { t, i18n } = useTranslation();
 
   const [operator, setOperator] = useState({
     id: "",
@@ -175,7 +177,7 @@ const CustomerDetails = () => {
             className="flex items-center text-green-700 hover:text-green-900 mb-4"
           >
             <ArrowLeft size={18} className="mr-1" />
-            Back to Users
+            {t("customerDetails.backButton")}
           </button>
         </div>
         <CustomerDetailsSkeleton />
@@ -191,7 +193,7 @@ const CustomerDetails = () => {
           className="flex items-center text-green-700 hover:text-green-900 mb-4"
         >
           <ArrowLeft size={18} className="mr-1" />
-          Back to Users
+          {t("customerDetails.backButton")}
         </button>
       </div>
 
@@ -200,13 +202,15 @@ const CustomerDetails = () => {
           <div className="grid grid-cols-1 gap-6">
             {/* Basic Information */}
             <div className="form-section col-span-full">
-              <h2 className="form-section-title">Personal Information</h2>
+              <h2 className="form-section-title">
+                {t("customerDetails.sections.personalInformation")}
+              </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Profile Picture */}
                 <div className="md:col-span-2">
                   <UploadField
-                    label="Profile Picture"
+                    label={t("customerDetails.fields.profilePicture")}
                     value={operator.profilePicture}
                     onChange={(file) =>
                       handleFileChange("profilePicture", file)
@@ -218,7 +222,7 @@ const CustomerDetails = () => {
                 {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Full Name
+                    {t("customerDetails.fields.fullName")}
                   </label>
                   <input
                     type="text"
@@ -235,7 +239,7 @@ const CustomerDetails = () => {
                 {/* Phone Number */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number
+                    {t("customerDetails.fields.phoneNumber")}
                   </label>
                   <input
                     type="text"
@@ -252,7 +256,7 @@ const CustomerDetails = () => {
                 {/* Email */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Address
+                    {t("customerDetails.fields.emailAddress")}
                   </label>
                   <input
                     type="email"
@@ -269,7 +273,7 @@ const CustomerDetails = () => {
                 {/* Date of Birth */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Date of Birth
+                    {t("customerDetails.fields.dateOfBirth")}
                   </label>
                   <input
                     type="date"
@@ -285,7 +289,7 @@ const CustomerDetails = () => {
                 {/* Gender */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Gender
+                    {t("customerDetails.fields.gender")}
                   </label>
                   <select
                     name="gender"
@@ -295,7 +299,9 @@ const CustomerDetails = () => {
                     // disabled={!isEditMode}
                     disabled={true}
                   >
-                    <option value="">Select Gender</option>
+                    <option value="">
+                      {t("customerDetails.placeholders.selectGender")}
+                    </option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="other">Other</option>
@@ -304,7 +310,7 @@ const CustomerDetails = () => {
                 {/* Status */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
+                    {t("customerDetails.fields.status")}
                   </label>
                   <select
                     name="status"
@@ -325,7 +331,7 @@ const CustomerDetails = () => {
                   operator.status === "blocked") && (
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Remarks
+                      {t("customerDetails.fields.remarks")}
                     </label>
                     <textarea
                       value={remarks}
@@ -360,7 +366,7 @@ const CustomerDetails = () => {
                   {/* Zone Code */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Zone Code
+                      {t("customerDetails.fields.zoneCode")}
                     </label>
                     <input
                       type="text"
@@ -377,7 +383,7 @@ const CustomerDetails = () => {
                   {/* Area */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Area
+                      {t("customerDetails.fields.area")}
                     </label>
                     <input
                       type="text"
@@ -394,7 +400,7 @@ const CustomerDetails = () => {
                   {/* City */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      City
+                      {t("customerDetails.fields.city")}
                     </label>
                     <input
                       type="text"
@@ -412,7 +418,7 @@ const CustomerDetails = () => {
                 {/* Nationality */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nationality
+                    {t("customerDetails.fields.nationality")}
                   </label>
                   <input
                     type="text"
@@ -428,7 +434,7 @@ const CustomerDetails = () => {
                 {/* National ID Expiry Date */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    National ID Expiry Date
+                    {t("customerDetails.fields.nationalIdExpiry")}
                   </label>
                   <input
                     type="date"
@@ -443,7 +449,7 @@ const CustomerDetails = () => {
                 </div>
                 {/* ID Card Front */}
                 <UploadField
-                  label="National ID Card Front"
+                  label={t("customerDetails.fields.nationalIdFront")}
                   value={operator.idCardFront}
                   onChange={(file) => handleFileChange("idCardFront", file)}
                   // showCloseButton={isEditMode}
@@ -451,7 +457,7 @@ const CustomerDetails = () => {
                 />
                 {/* ID Card Back */}
                 <UploadField
-                  label="National ID Card Back"
+                  label={t("customerDetails.fields.nationalIdBack")}
                   value={operator.idCardBack}
                   onChange={(file) => handleFileChange("idCardBack", file)}
                   // showCloseButton={isEditMode}
@@ -495,20 +501,20 @@ const CustomerDetails = () => {
                 onClick={() => navigate("/customer-management")}
                 className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 mr-3"
               >
-                Cancel
+                {t("customerDetails.buttons.cancel")}
               </button>
 
               {!isEditMode ? (
                 <button
                   type="button"
                   onClick={(e) => {
-                    e.preventDefault(); // prevent form submit
+                    e.preventDefault();
                     setIsEditMode(true);
                   }}
                   className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
                 >
                   <SquarePen size={18} className="mr-2" />
-                  Edit Status
+                  {t("customerDetails.buttons.editStatus")}
                 </button>
               ) : (
                 <button
@@ -516,7 +522,7 @@ const CustomerDetails = () => {
                   className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
                 >
                   <Save size={18} className="mr-2" />
-                  Save Status
+                  {t("customerDetails.buttons.saveStatus")}
                 </button>
               )}
             </div>

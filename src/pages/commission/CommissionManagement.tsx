@@ -24,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import axiosInstance from "@/api/axiosInstance";
+import { useTranslation } from "react-i18next";
 
 // Modified mock data to include commission type
 const mockCommissions: Commission[] = [
@@ -89,6 +90,7 @@ const CommissionManagement = () => {
 
   const [commissions, setCommissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const { t, i18n } = useTranslation();
 
   // useEffect(() => {
   //   const fetchCommissions = async () => {
@@ -369,10 +371,13 @@ const CommissionManagement = () => {
   };
 
   const columns = [
-    { key: "serviceType" as keyof Commission, header: "Service Type" },
+    {
+      key: "serviceType" as keyof Commission,
+      header: t("commissionManagement.tableHeaders.serviceType"),
+    },
     {
       key: "commissionValue" as string,
-      header: "Commission",
+      header: t("commissionManagement.tableHeaders.commission"),
       render: (commission: Commission) => (
         <div className="flex items-center">
           {commission.commissionType === "percentage" ? (
@@ -389,37 +394,9 @@ const CommissionManagement = () => {
         </div>
       ),
     },
-    // {
-    //   key: "effectiveFrom",
-    //   header: "Effective From",
-    //   render: (commission: Commission) => (
-    //     <span>
-    //       {new Date(commission.effectiveFrom).toLocaleDateString("en-GB", {
-    //         day: "2-digit",
-    //         month: "short",
-    //         year: "numeric",
-    //       })}
-    //     </span>
-    //   ),
-    // },
-    // {
-    //   key: "effectiveTo",
-    //   header: "Effective To",
-    //   render: (commission: Commission) => (
-    //     <span>
-    //       {commission.effectiveTo
-    //         ? new Date(commission.effectiveTo).toLocaleDateString("en-GB", {
-    //             day: "2-digit",
-    //             month: "short",
-    //             year: "numeric",
-    //           })
-    //         : "No End Date"}
-    //     </span>
-    //   ),
-    // },
     {
       key: "isActive" as keyof Commission,
-      header: "Status",
+      header: t("commissionManagement.tableHeaders.status"),
       render: (commission: Commission) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -428,20 +405,22 @@ const CommissionManagement = () => {
               : "bg-red-100 text-red-800"
           }`}
         >
-          {commission.isActive ? "Active" : "Inactive"}
+          {commission.isActive
+            ? t("commissionManagement.statusLabels.active")
+            : t("commissionManagement.statusLabels.inactive")}
         </span>
       ),
     },
     {
       key: "actions" as string,
-      header: "Actions",
+      header: t("commissionManagement.tableHeaders.actions"),
       render: (commission: Commission) => (
         <div className="flex items-center space-x-2">
           <button
             className="action-button"
             onClick={() => handleEditCommission(commission)}
           >
-            Edit
+            {t("commissionManagement.editAction")}
           </button>
           <button
             className={`action-button ${
@@ -451,7 +430,9 @@ const CommissionManagement = () => {
             }`}
             onClick={() => toggleCommissionStatus(commission.id)}
           >
-            {commission.isActive ? "Deactivate" : "Activate"}
+            {commission.isActive
+              ? t("commissionManagement.deactivate")
+              : t("commissionManagement.activate")}
           </button>
         </div>
       ),
@@ -461,7 +442,9 @@ const CommissionManagement = () => {
   return (
     <>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Commission Management</h1>
+        <h1 className="text-2xl font-bold">
+          {t("commissionManagement.title")}
+        </h1>
         {(() => {
           const existingServices = commissions.map((c) =>
             c.serviceType?.trim().toLowerCase()
@@ -485,7 +468,7 @@ const CommissionManagement = () => {
           return !allServicesAdded ? (
             <Button onClick={handleAddNew} className="flex items-center gap-2">
               <Plus size={16} />
-              Add New Commission
+              {t("commissionManagement.addNew")}
             </Button>
           ) : null;
         })()}
@@ -503,13 +486,17 @@ const CommissionManagement = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? "Edit Commission" : "Add New Commission"}
+              {isEditing
+                ? t("commissionManagement.edit")
+                : t("commissionManagement.addNew")}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Service Type</label>
+              <label className="text-sm font-medium">
+                {t("commissionManagement.serviceType")}
+              </label>
               <Select
                 value={currentCommission.serviceType}
                 onValueChange={(value: any) =>
@@ -521,17 +508,29 @@ const CommissionManagement = () => {
                   <SelectValue placeholder="Select service type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Bus">Bus</SelectItem>
-                  <SelectItem value="Hotel">Hotel</SelectItem>
-                  <SelectItem value="Taxi">Taxi</SelectItem>
-                  <SelectItem value="Bike">Bike</SelectItem>
-                  <SelectItem value="User">User Transfer</SelectItem>
+                  <SelectItem value="Bus">
+                    {t("commissionManagement.serviceTypes.bus")}
+                  </SelectItem>
+                  <SelectItem value="Hotel">
+                    {t("commissionManagement.serviceTypes.hotel")}
+                  </SelectItem>
+                  <SelectItem value="Taxi">
+                    {t("commissionManagement.serviceTypes.taxi")}
+                  </SelectItem>
+                  <SelectItem value="Bike">
+                    {t("commissionManagement.serviceTypes.bike")}
+                  </SelectItem>
+                  <SelectItem value="User">
+                    {t("commissionManagement.serviceTypes.user")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Commission Type</label>
+              <label className="text-sm font-medium">
+                {t("commissionManagement.commissionType")}
+              </label>
               <RadioGroup
                 value={currentCommission.commissionType}
                 onValueChange={(value) =>
@@ -542,13 +541,15 @@ const CommissionManagement = () => {
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="percentage" id="percentage" />
                   <Label htmlFor="percentage" className="flex items-center">
-                    <Percent size={16} className="mr-1" /> Percentage
+                    <Percent size={16} className="mr-1" />{" "}
+                    {t("commissionManagement.percentage")}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="fixed" id="fixed" />
                   <Label htmlFor="fixed" className="flex items-center">
-                    <DollarSign size={16} className="mr-1" /> Fixed Rate
+                    <DollarSign size={16} className="mr-1" />{" "}
+                    {t("commissionManagement.fixedRate")}
                   </Label>
                 </div>
               </RadioGroup>
@@ -557,7 +558,7 @@ const CommissionManagement = () => {
             {currentCommission.commissionType === "percentage" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  Commission Percentage
+                  {t("commissionManagement.commissionPercentage")}
                 </label>
                 <div className="relative">
                   <Input
@@ -587,7 +588,9 @@ const CommissionManagement = () => {
 
             {currentCommission.commissionType === "fixed" && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Fixed Rate (₹)</label>
+                <label className="text-sm font-medium">
+                  {t("commissionManagement.fixedRateCurrency")}
+                </label>
                 <div className="relative">
                   <Input
                     type="number"
@@ -636,7 +639,9 @@ const CommissionManagement = () => {
             </div> */}
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
+              <label className="text-sm font-medium">
+                {t("commissionManagement.status")}
+              </label>
               <Select
                 value={currentCommission.isActive ? "active" : "inactive"}
                 onValueChange={(value) =>
@@ -647,8 +652,12 @@ const CommissionManagement = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="active">
+                    {t("commissionManagement.active")}
+                  </SelectItem>
+                  <SelectItem value="inactive">
+                    {t("commissionManagement.inactive")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -656,9 +665,11 @@ const CommissionManagement = () => {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Cancel
+              {t("commissionManagement.cancel")}
             </Button>
-            <Button onClick={handleSaveCommission}>Save</Button>
+            <Button onClick={handleSaveCommission}>
+              {t("commissionManagement.save")}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

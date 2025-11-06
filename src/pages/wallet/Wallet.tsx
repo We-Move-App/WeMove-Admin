@@ -8,6 +8,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import axiosInstance from "@/api/axiosInstance";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { useTranslation } from "react-i18next";
 
 // Mock data for wallet transactions
 // const mockWalletTransactions: WalletTransaction[] = [
@@ -86,6 +87,8 @@ const Wallet = () => {
   const [pendingWithdrawals, setPendingWithdrawals] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  const { i18n, t } = useTranslation();
 
   // Calculate summary stats
   // const totalTransactions = transactions.length;
@@ -100,18 +103,24 @@ const Wallet = () => {
   //   .reduce((sum, t) => sum + t.amount, 0);
 
   const columns = [
-    { key: "id" as keyof WalletTransaction, header: "Transaction ID" },
-    { key: "userName" as keyof WalletTransaction, header: "User" },
+    {
+      key: "id" as keyof WalletTransaction,
+      header: t("wallet.tableHeaders.transactionId"),
+    },
+    {
+      key: "userName" as keyof WalletTransaction,
+      header: t("wallet.tableHeaders.user"),
+    },
     {
       key: "role" as keyof WalletTransaction,
-      header: "Role",
+      header: t("wallet.tableHeaders.role"),
       render: (transaction: WalletTransaction) => (
         <span>{transaction.role}</span>
       ),
     },
     {
       key: "type" as keyof WalletTransaction,
-      header: "Type",
+      header: t("wallet.tableHeaders.type"),
       render: (transaction: WalletTransaction) => (
         <span
           className={`
@@ -126,27 +135,42 @@ const Wallet = () => {
           }
         `}
         >
-          {transaction.type}
+          {/* Map type strings to translation keys; fall back to raw value if unknown */}
+          {transaction.type === "Credit"
+            ? t("wallet.types.credit")
+            : transaction.type === "Debit"
+            ? t("wallet.types.debit")
+            : transaction.type === "Transfer"
+            ? t("wallet.types.transfer")
+            : transaction.type === "Withdrawal"
+            ? t("wallet.types.withdrawal")
+            : transaction.type}
         </span>
       ),
     },
 
     {
       key: "amount" as keyof WalletTransaction,
-      header: "Amount",
+      header: t("wallet.tableHeaders.amount"),
       render: (transaction: WalletTransaction) => (
         <span>${transaction.amount.toFixed(2)}</span>
       ),
     },
-    { key: "date" as keyof WalletTransaction, header: "Date" },
+    {
+      key: "date" as keyof WalletTransaction,
+      header: t("wallet.tableHeaders.date"),
+    },
     {
       key: "status" as keyof WalletTransaction,
-      header: "Status",
+      header: t("wallet.tableHeaders.status"),
       render: (transaction: WalletTransaction) => (
         <StatusBadge status={transaction.status} />
       ),
     },
-    { key: "description" as keyof WalletTransaction, header: "Description" },
+    {
+      key: "description" as keyof WalletTransaction,
+      header: t("wallet.tableHeaders.description"),
+    },
   ];
 
   // const filterOptions = [
@@ -246,27 +270,20 @@ const Wallet = () => {
           params: {
             page: currentPage,
             limit: pageSize,
+            search: searchTerm,
           },
         });
 
         const apiTransactions = res.data?.data || [];
-
-        // ✅ Use totalRecords & totals from backend
         setTotalTransactions(res.data?.totalRecords || 0);
         setTotalCredits(res.data?.creditTotal || 0);
         setTotalDebits(res.data?.debitTotal || 0);
-
-        // pending withdrawals not provided, so stay 0
         setPendingWithdrawals(0);
-
-        // ✅ Currency parser
         const parseCurrency = (val: string | number | undefined | null) => {
           if (!val) return 0;
           if (typeof val === "number") return val;
           return parseFloat(val.toString().replace(/[^0-9.-]+/g, "")) || 0;
         };
-
-        // ✅ Format transactions for DataTable
         const formattedTransactions: WalletTransaction[] = apiTransactions.map(
           (txn: any) => ({
             id: txn.transactionId,
@@ -293,12 +310,12 @@ const Wallet = () => {
     };
 
     fetchTransactions();
-  }, [currentPage, pageSize]);
+  }, [currentPage, searchTerm, pageSize]);
 
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Wallet Management</h1>
+        <h1 className="text-2xl font-bold">{t("wallet.title")}</h1>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -320,7 +337,7 @@ const Wallet = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-gray-500">
-                  Total Transactions
+                  {t("wallet.cards.totalTransactions")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -334,7 +351,7 @@ const Wallet = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-gray-500">
-                  Total Credits
+                  {t("wallet.cards.totalCredits")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -352,7 +369,7 @@ const Wallet = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-gray-500">
-                  Total Debits
+                  {t("wallet.cards.totalDebits")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -370,7 +387,7 @@ const Wallet = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-gray-500">
-                  Pending Withdrawals
+                  {t("wallet.cards.pendingWithdrawals")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -389,7 +406,9 @@ const Wallet = () => {
       </div>
 
       <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-4">Transaction History</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          {t("wallet.transactionHistory.title")}
+        </h2>
         {loading ? (
           <div>
             {Array(5)
@@ -412,6 +431,8 @@ const Wallet = () => {
             exportable
             // filterable
             // filterOptions={filterOptions}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
             paginate
             pageSize={pageSize}
             currentPage={currentPage}

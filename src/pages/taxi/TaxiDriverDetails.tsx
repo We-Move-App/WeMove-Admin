@@ -60,6 +60,7 @@ const TaxiDriverDetails = () => {
             branch: apiData.TaxiDriverDetails?.branch?.name || "",
             batchVerified: apiData.TaxiDriverDetails?.batchVerified || "",
             status: apiData.TaxiDriverDetails?.status || "",
+            remark: apiData.TaxiDriverDetails?.remarks || "",
             age: apiData.TaxiDriverDetails?.age || null,
             profilePhoto: apiData.documents?.avatarPhotos || null,
             address: apiData.TaxiDriverDetails?.address || "",

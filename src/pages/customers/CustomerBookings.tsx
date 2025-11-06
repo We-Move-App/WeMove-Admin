@@ -5,6 +5,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { Eye, Loader } from "lucide-react";
 import axiosInstance from "@/api/axiosInstance";
 import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
+import { useTranslation } from "react-i18next";
 
 // Mock Data Type
 interface CustomerBooking {
@@ -69,6 +70,7 @@ const CustomerBookings = () => {
   const [pageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [totalItems, setTotalItems] = useState(0);
+  const { t, i18n } = useTranslation();
 
   // Mock Data
   // useEffect(() => {
@@ -143,28 +145,43 @@ const CustomerBookings = () => {
   };
 
   const columns = [
-    { key: "userId" as keyof CustomerBooking, header: "ID" },
-    { key: "bookingId" as keyof CustomerBooking, header: "Booking ID" },
-    { key: "customerName" as keyof CustomerBooking, header: "Customer Name" },
-    { key: "customerEmail" as keyof CustomerBooking, header: "Email" },
-    { key: "customerPhone" as keyof CustomerBooking, header: "Phone" },
-    { key: "serviceType" as keyof CustomerBooking, header: "Service Type" },
-    { key: "bookingDate" as keyof CustomerBooking, header: "Booking Date" },
+    { key: "userId", header: t("customerBookings.tableHeaders.userId") },
+    { key: "bookingId", header: t("customerBookings.tableHeaders.bookingId") },
     {
-      key: "amount" as keyof CustomerBooking,
-      header: "Amount",
+      key: "customerName",
+      header: t("customerBookings.tableHeaders.customerName"),
+    },
+    {
+      key: "customerEmail",
+      header: t("customerBookings.tableHeaders.customerEmail"),
+    },
+    {
+      key: "customerPhone",
+      header: t("customerBookings.tableHeaders.customerPhone"),
+    },
+    {
+      key: "serviceType",
+      header: t("customerBookings.tableHeaders.serviceType"),
+    },
+    {
+      key: "bookingDate",
+      header: t("customerBookings.tableHeaders.bookingDate"),
+    },
+    {
+      key: "amount",
+      header: t("customerBookings.tableHeaders.amount"),
       render: (booking: CustomerBooking) => <span>₹{booking.amount}</span>,
     },
     {
-      key: "paymentStatus" as keyof CustomerBooking,
-      header: "Payment",
+      key: "paymentStatus",
+      header: t("customerBookings.tableHeaders.paymentStatus"),
       render: (booking: CustomerBooking) => (
         <StatusBadge status={booking.paymentStatus} />
       ),
     },
     {
-      key: "actions" as "actions",
-      header: "Actions",
+      key: "actions",
+      header: t("customerBookings.tableHeaders.actions"),
       render: (booking: CustomerBooking) => (
         <button
           onClick={(e) => {
@@ -174,7 +191,7 @@ const CustomerBookings = () => {
           className="action-button flex items-center"
         >
           <Eye size={16} className="mr-1" />
-          View Details
+          {t("customerBookings.labels.viewDetails")}
         </button>
       ),
     },
@@ -183,8 +200,10 @@ const CustomerBookings = () => {
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">User Bookings</h1>
-        <p className="text-gray-600">View and manage all user bookings</p>
+        <h1 className="text-2xl font-bold">
+          {t("customerBookings.pageTitle")}
+        </h1>
+        <p className="text-gray-600">{t("customerBookings.pageSubtitle")}</p>
       </div>
 
       {loading ? (

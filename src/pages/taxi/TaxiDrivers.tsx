@@ -83,6 +83,8 @@ const TaxiDrivers = () => {
         { label: "Approved", value: "approved" },
         // { label: "Rejected", value: "Rejected" },
         { label: "Pending", value: "pending" },
+        { label: "Blocked", value: "blocked" },
+        { label: "Rejected", value: "rejected" },
       ],
     },
   ];
@@ -100,7 +102,7 @@ const TaxiDrivers = () => {
             page: currentPage,
             limit: pageSize,
             search: searchTerm,
-            filter: selectedStatus,
+            verificationStatus: selectedStatus,
           },
         });
         setDrivers(response.data?.data || []);

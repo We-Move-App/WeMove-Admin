@@ -76,7 +76,7 @@ const BikeRiders = () => {
             page: currentPage,
             limit: pageSize,
             search: searchTerm,
-            filter: selectedStatus,
+            verificationStatus: selectedStatus,
           },
         });
 
@@ -90,6 +90,7 @@ const BikeRiders = () => {
           mobile: rider.mobile || "-",
           balance: rider.balance,
           status: rider.status,
+          batchVerified: rider.batchVerified,
           vehicleType: rider.vehicleType,
           registrationNumber: rider.registrationNumber,
         }));
@@ -168,6 +169,7 @@ const BikeRiders = () => {
       options: [
         { label: "Approved", value: "approved" },
         { label: "Pending", value: "pending" },
+        { label: "Blocked", value: "blocked" },
         { label: "Rejected", value: "rejected" },
       ],
     },

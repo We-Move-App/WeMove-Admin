@@ -32,6 +32,7 @@ import {
 import fileUploadInstance from "@/api/fileUploadInstance";
 import axiosInstance from "@/api/axiosInstance";
 import { permission } from "process";
+import { useTranslation } from "react-i18next";
 
 // Mock user data
 // const mockUsers: User[] = [
@@ -128,6 +129,7 @@ const UserManagement = () => {
   const [pageSize] = useState(10);
   const [role, setRole] = useState<string | null>(null);
   const [adminProfile, setAdminProfile] = useState<any>(null);
+  const { i18n, t } = useTranslation();
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -220,31 +222,34 @@ const UserManagement = () => {
   };
 
   const columns = [
-    { key: "name" as keyof User, header: "Name" },
-    { key: "email" as keyof User, header: "Email" },
-    { key: "role" as keyof User, header: "Role" },
+    { key: "name" as keyof User, header: t("admins.tableHeaders.name") },
+    { key: "email" as keyof User, header: t("admins.tableHeaders.email") },
+    { key: "role" as keyof User, header: t("admins.tableHeaders.role") },
     {
       key: "permissions" as keyof User,
-      header: "Permissions",
+      header: t("admins.tableHeaders.permissions"),
       render: (user: any) => (
         <span className="text-sm">
           {user.role === "SuperAdmin"
-            ? "Full Access"
-            : `${user.permissionsCount} permissions`}
+            ? t("admins.tableValues.fullAccess")
+            : t("admins.tableValues.permissionsCount", {
+                count: user.permissionsCount,
+              })}
         </span>
       ),
     },
-    // { key: 'createdAt' as keyof User, header: 'Created At' },
     {
       key: "branch" as keyof User,
-      header: "Branch",
+      header: t("admins.tableHeaders.branch"),
       render: (user: any) => (
-        <span className="text-sm">{user.branch?.location || "N/A"}</span>
+        <span className="text-sm">
+          {user.branch?.location || t("admins.tableValues.notAvailable")}
+        </span>
       ),
     },
     {
       key: "actions" as "actions",
-      header: "Actions",
+      header: t("admins.tableHeaders.actions"),
       render: (user: User) => (
         <button
           onClick={(e) => {
@@ -253,12 +258,12 @@ const UserManagement = () => {
           }}
           className="action-button flex items-center"
         >
-          <Eye size={16} className="mr-1" />
-          View Details
+          <Eye size={16} className="mr-1" /> {t("admins.tableHeaders.view")}
         </button>
       ),
     },
   ];
+
   const fetchBranches = async (address: string) => {
     setLoading(true);
     try {
@@ -512,13 +517,13 @@ const UserManagement = () => {
     <>
       <div className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Role Management</h1>
+          <h1 className="text-2xl font-bold">{t("admins.pageTitle")}</h1>
           {/* <p className="text-gray-600">
             Manage admin, sub-admin roles and their permissions
           </p> */}
           {role === "Admin"
-            ? "Manage sub-admin roles and their permissions"
-            : "Manage admin, sub-admin roles and their permissions"}
+            ? t("admins.subTitleAdmin")
+            : t("admins.subTitleDefault")}
         </div>
 
         <Button
@@ -527,7 +532,9 @@ const UserManagement = () => {
         >
           <Plus size={16} />
           {/* Add Admin / Sub-admin */}
-          {role === "Admin" ? "Add Sub-Admin" : "Add Admin / Sub-admin"}
+          {role === "Admin"
+            ? t("admins.buttons.addSubAdmin")
+            : t("admins.buttons.addAdminSubAdmin")}
         </Button>
       </div>
 
@@ -551,47 +558,55 @@ const UserManagement = () => {
           <DialogHeader>
             <DialogTitle>
               {role === "Admin"
-                ? "Add New Sub-Admin"
-                : "Add New Admin / Sub-admin"}
+                ? t("admins.dialog.titleAddSubAdmin")
+                : t("admins.dialog.titleAddAdmin")}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Name</label>
+              <label className="text-sm font-medium">
+                {t("admins.fields.name")}
+              </label>
               <Input
                 value={newUser.name}
                 onChange={(e) =>
                   setNewUser({ ...newUser, name: e.target.value })
                 }
-                placeholder="Enter full name"
+                placeholder={t("admins.dialog.placeholders.enterName")}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Mobile Number</label>
+              <label className="text-sm font-medium">
+                {t("admins.fields.mobileNumber")}
+              </label>
               <Input
                 value={newUser.phoneNumber}
                 onChange={(e) =>
                   setNewUser({ ...newUser, phoneNumber: e.target.value })
                 }
-                placeholder="Enter mobile number"
+                placeholder={t("admins.dialog.placeholders.enterPhone")}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Email</label>
+              <label className="text-sm font-medium">
+                {t("admins.fields.email")}
+              </label>
               <Input
                 type="email"
                 value={newUser.email}
                 onChange={(e) =>
                   setNewUser({ ...newUser, email: e.target.value })
                 }
-                placeholder="Enter email address"
+                placeholder={t("admins.dialog.placeholders.enterEmail")}
               />
             </div>
             {role !== "Admin" && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Role</label>
+                <label className="text-sm font-medium">
+                  {t("admins.fields.role")}
+                </label>
                 <Select
                   value={newUser.role}
                   onValueChange={(value: "Admin" | "SubAdmin") =>
@@ -602,8 +617,12 @@ const UserManagement = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Admin">Admin</SelectItem>
-                    <SelectItem value="SubAdmin">Sub-Admin</SelectItem>
+                    <SelectItem value="Admin">
+                      {t("admins.roleOptions.admin")}
+                    </SelectItem>
+                    <SelectItem value="SubAdmin">
+                      {t("admins.roleOptions.subAdmin")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -651,7 +670,9 @@ const UserManagement = () => {
             )} */}
             {role !== "Admin" && newUser.role === "SubAdmin" && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Assign Admin</label>
+                <label className="text-sm font-medium">
+                  {t("admins.fields.assignAdmin")}
+                </label>
                 <Select
                   value={newUser.adminId || ""}
                   onValueChange={(value) => {
@@ -675,9 +696,13 @@ const UserManagement = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {loadingAdmins ? (
-                      <div className="p-2 text-sm">Loading admins...</div>
+                      <div className="p-2 text-sm">
+                        {t("admins.dialog.loadingAdmins")}
+                      </div>
                     ) : admins.length === 0 ? (
-                      <div className="p-2 text-sm">No admins found</div>
+                      <div className="p-2 text-sm">
+                        {t("admins.dialog.noAdminsFound")}
+                      </div>
                     ) : (
                       admins.map((admin) => (
                         <SelectItem key={admin._id} value={admin._id}>
@@ -732,17 +757,25 @@ const UserManagement = () => {
 
             {role !== "Admin" && newUser.role === "Admin" && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Choose Branch</label>
+                <label className="text-sm font-medium">
+                  {t("admins.fields.chooseBranch")}
+                </label>
                 <Command className="border rounded-md">
                   <CommandInput
-                    placeholder="Type city name..."
+                    placeholder={t("admins.dialog.placeholders.typeCity")}
                     value={query}
                     onValueChange={(val) => setQuery(val)}
                   />
                   <CommandList>
-                    {loading && <div className="p-2 text-sm">Loading...</div>}
+                    {loading && (
+                      <div className="p-2 text-sm">
+                        {t("admins.dialog.loadingAdmins")}
+                      </div>
+                    )}
                     {!loading && branches.length === 0 && query.length > 2 && (
-                      <div className="p-2 text-sm">No results found</div>
+                      <div className="p-2 text-sm">
+                        {t("admins.dialog.noAdminsFound")}
+                      </div>
                     )}
                     <CommandGroup>
                       {branches.map((branch) => (
@@ -764,7 +797,9 @@ const UserManagement = () => {
                 </Command>
                 {newUser.branchName && (
                   <p className="text-xs text-gray-400">
-                    Selected: {newUser.branchName}
+                    {t("admins.dialog.selected", {
+                      branch: newUser.branchName,
+                    })}
                   </p>
                 )}
               </div>
@@ -806,7 +841,9 @@ const UserManagement = () => {
             </div> */}
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Permissions</label>
+              <label className="text-sm font-medium">
+                {t("admins.fields.permissions")}
+              </label>
               <div className="border rounded-md p-4 max-h-48 overflow-y-auto">
                 <div className="space-y-2">
                   {filteredPermissions.map((permission) => {
@@ -842,10 +879,12 @@ const UserManagement = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Cancel
+              {t("admins.buttons.cancel")}
             </Button>
             <Button onClick={handleAddUser}>
-              {role === "Admin" ? "Add Sub-admin" : "Add Admin / Sub-admin"}
+              {role === "Admin"
+                ? t("admins.buttons.addSubAdmin")
+                : t("admins.buttons.addAdminSubAdmin")}
             </Button>
           </DialogFooter>
         </DialogContent>

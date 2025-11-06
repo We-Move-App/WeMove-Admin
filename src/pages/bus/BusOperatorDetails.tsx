@@ -17,6 +17,7 @@ import Loader from "@/components/ui/loader";
 import axios from "axios";
 import BranchSelect from "@/components/branch-select/BranchSelect";
 import fileUploadInstance from "@/api/fileUploadInstance";
+import { useTranslation } from "react-i18next";
 
 const BusOperatorDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,6 +25,7 @@ const BusOperatorDetails = () => {
   const { toast } = useToast();
   const [operator, setOperator] = useState<BusOperator | null>(null);
   const [loading, setLoading] = useState(true);
+  const { i18n, t } = useTranslation();
 
   const isNewOperator = id === "new";
   const pageTitle = isNewOperator ? "Add Bus Operator" : "Edit Bus Operator";
@@ -325,12 +327,15 @@ const BusOperatorDetails = () => {
     return (
       <>
         <div className="flex flex-col items-center justify-center h-64">
-          <p className="text-xl text-gray-600 mb-4">Bus Operator not found</p>
+          <p className="text-xl text-gray-600 mb-4">
+            {" "}
+            {t("busOperatorDetails.busNotFound")}
+          </p>
           <button
             onClick={() => navigate("/bus-management/operators")}
             className="action-button"
           >
-            Back to Bus Operators
+            {t("busOperatorDetails.backButton")}
           </button>
         </div>
       </>
@@ -345,7 +350,7 @@ const BusOperatorDetails = () => {
           className="flex items-center text-green-700 hover:text-green-900 mb-4"
         >
           <ArrowLeft size={18} className="mr-1" />
-          Back to Bus Operators
+          {t("busOperatorDetails.backButton")}
         </button>
       </div>
 
@@ -354,10 +359,12 @@ const BusOperatorDetails = () => {
           <div className="grid grid-cols-1 gap-6">
             {/* Basic Information */}
             <div className="form-section col-span-full">
-              <h2 className="form-section-title">Basic Information</h2>
+              <h2 className="form-section-title">
+                {t("busOperatorDetails.basicInfo.title")}
+              </h2>
               <div className="grid grid-cols-1 gap-4">
                 <UploadField
-                  label="Profile Photo"
+                  label={t("busOperatorDetails.basicInfo.profilePhoto")}
                   value={operator?.profilePhoto ?? null}
                   // onChange={(file) => handleFileChange("profilePhoto", file)}
                   onChange={(file) =>
@@ -372,7 +379,7 @@ const BusOperatorDetails = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Full Name
+                      {t("busOperatorDetails.basicInfo.fullNameLabel")}
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
@@ -392,7 +399,7 @@ const BusOperatorDetails = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Mobile
+                      {t("busOperatorDetails.basicInfo.mobileLabel")}
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
@@ -413,7 +420,7 @@ const BusOperatorDetails = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email ID
+                      {t("busOperatorDetails.basicInfo.emailLabel")}
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
@@ -434,7 +441,7 @@ const BusOperatorDetails = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Status
+                      {t("busOperatorDetails.basicInfo.statusLabel")}
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
@@ -460,7 +467,7 @@ const BusOperatorDetails = () => {
                     operator.status === "blocked") && (
                     <div className="col-span-full">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Remark
+                        {t("busOperatorDetails.basicInfo.remarkLabel")}
                       </label>
                       <textarea
                         name="remark"
@@ -469,7 +476,9 @@ const BusOperatorDetails = () => {
                           setOperator({ ...operator, remark: e.target.value })
                         }
                         className="filter-input w-full h-24"
-                        placeholder="Enter reason for rejection or blocking"
+                        placeholder={t(
+                          "busOperatorDetails.basicInfo.remarkPlaceholder"
+                        )}
                         required
                       />
                     </div>
@@ -477,7 +486,7 @@ const BusOperatorDetails = () => {
 
                   <div className="">
                     <label className="block text-sm font-medium mb-1">
-                      Choose Branch
+                      {t("busOperatorDetails.basicInfo.chooseBranchLabel")}
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
@@ -493,7 +502,7 @@ const BusOperatorDetails = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Verification Badge
+                      {t("busOperatorDetails.basicInfo.verificationBadgeLabel")}
                     </label>
 
                     {mode === "view" ? (
@@ -509,8 +518,12 @@ const BusOperatorDetails = () => {
                         onChange={handleInputChange}
                         className="filter-select w-full"
                       >
-                        <option value="Verified">Verified</option>
-                        <option value="Not Verified">Not Verified</option>
+                        <option value="Verified">
+                          {t("busOperatorDetails.basicInfo.verified")}
+                        </option>
+                        <option value="Not Verified">
+                          {t("busOperatorDetails.basicInfo.notVerified")}
+                        </option>
                       </select>
                     )}
                   </div>
@@ -536,12 +549,14 @@ const BusOperatorDetails = () => {
 
             {/* Company Information */}
             <div className="form-section col-span-full">
-              <h2 className="form-section-title">Company Information</h2>
+              <h2 className="form-section-title">
+                {t("busOperatorDetails.companyInfo.title")}
+              </h2>
               <div className="grid grid-cols-1 gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Company Name
+                      {t("busOperatorDetails.companyInfo.companyNameLabel")}
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
@@ -564,7 +579,9 @@ const BusOperatorDetails = () => {
                     {/* <h2 className="form-section-title">Address</h2> */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Company Address
+                        {t(
+                          "busOperatorDetails.companyInfo.companyAddressLabel"
+                        )}
                       </label>
                       {mode === "view" ? (
                         <p className="filter-input w-full bg-gray-100 whitespace-pre-wrap">
@@ -613,10 +630,14 @@ const BusOperatorDetails = () => {
 
             {/* Identity Verification */}
             <div className="form-section col-span-full">
-              <h2 className="form-section-title">Identity Verification</h2>
+              <h2 className="form-section-title">
+                {t("busOperatorDetails.identityVerification.title")}
+              </h2>
               <div className="grid grid-cols-1 gap-4">
                 <UploadField
-                  label="ID Card Front"
+                  label={t(
+                    "busOperatorDetails.identityVerification.idCardFront"
+                  )}
                   value={operator.idCardFront}
                   // onChange={(file) => handleFileChange("idCardFront", file)}
                   onChange={(file) =>
@@ -629,7 +650,9 @@ const BusOperatorDetails = () => {
                 />
 
                 <UploadField
-                  label="ID Card Back"
+                  label={t(
+                    "busOperatorDetails.identityVerification.idCardBack"
+                  )}
                   value={operator.idCardBack}
                   // onChange={(file) => handleFileChange("idCardBack", file)}
                   onChange={(file) =>
@@ -644,14 +667,16 @@ const BusOperatorDetails = () => {
             </div>
             {/* Bank Details */}
             <div className="form-section col-span-full">
-              <h2 className="form-section-title">Bank Details</h2>
+              <h2 className="form-section-title">
+                {t("busOperatorDetails.bankDetails.title")}
+              </h2>
 
               <div className="flex flex-col flex-col-reverse gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Bank Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Bank Name
+                      {t("busOperatorDetails.bankDetails.bankNameLabel")}
                     </label>
                     <input
                       type="text"
@@ -666,7 +691,7 @@ const BusOperatorDetails = () => {
                   {/* Account Number */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Account Number
+                      {t("busOperatorDetails.bankDetails.accountNumberLabel")}
                     </label>
                     <input
                       type="text"
@@ -681,7 +706,7 @@ const BusOperatorDetails = () => {
                   {/* Account Holder Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Account Holder Name
+                      {t("busOperatorDetails.bankDetails.accountHolderLabel")}
                     </label>
                     <input
                       type="text"
@@ -697,7 +722,9 @@ const BusOperatorDetails = () => {
                 {/* Upload Field */}
                 {isEditMode ? (
                   <UploadField
-                    label="Bank Account Details"
+                    label={t(
+                      "busOperatorDetails.bankDetails.bankAccountDetailsLabel"
+                    )}
                     value={operator.bankAccountDetails}
                     // onChange={(file) =>
                     //   handleFileChange("bankAccountDetails", file)
@@ -714,7 +741,9 @@ const BusOperatorDetails = () => {
                 ) : operator.bankAccountDetails ? (
                   <div className="text-sm text-gray-800">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Bank Account Details
+                      {t(
+                        "busOperatorDetails.bankDetails.bankAccountDetailsLabel"
+                      )}
                     </label>
                     <UploadField
                       label="ID Card Back"
@@ -733,7 +762,7 @@ const BusOperatorDetails = () => {
                   </div>
                 ) : (
                   <div className="text-sm text-gray-500 italic">
-                    No bank document uploaded.
+                    {t("busOperatorDetails.bankDetails.noBankDocument")}
                   </div>
                 )}
               </div>
@@ -746,7 +775,7 @@ const BusOperatorDetails = () => {
                 onClick={() => navigate("/bus-management/operators")}
                 className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 mr-3"
               >
-                Cancel
+                {t("busOperatorDetails.actions.cancel")}
               </button>
 
               {mode === "view" && (
@@ -756,7 +785,7 @@ const BusOperatorDetails = () => {
                   className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
                 >
                   <SquarePen size={18} className="mr-2" />
-                  Edit
+                  {t("busOperatorDetails.actions.edit")}
                 </button>
               )}
 
@@ -766,7 +795,7 @@ const BusOperatorDetails = () => {
                   className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
                 >
                   <Save size={18} className="mr-2" />
-                  Save
+                  {t("busOperatorDetails.actions.save")}
                 </button>
               )}
             </div>

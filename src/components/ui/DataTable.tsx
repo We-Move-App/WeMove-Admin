@@ -193,7 +193,21 @@ function DataTable<T>({
     <div className="space-y-4">
       {/* Search and filters */}
       <div className="flex flex-wrap gap-4 justify-between">
-        {filterable && (
+        {/* {filterable && (
+          <div className="relative w-full sm:w-64 flex items-center gap-20">
+            <Search className="absolute top-2.5 left-3 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Search..."
+              className="pl-10"
+              value={searchTerm || ""}
+              onChange={(e) => {
+                onSearchChange?.(e.target.value);
+                onPageChange?.(1);
+              }}
+            />
+          </div>
+        )} */}
+        {searchable && ( // <-- changed from `filterable` to `searchable`
           <div className="relative w-full sm:w-64 flex items-center gap-20">
             <Search className="absolute top-2.5 left-3 h-4 w-4 text-gray-500" />
             <Input

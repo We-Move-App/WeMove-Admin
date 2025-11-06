@@ -601,6 +601,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useTranslation } from "react-i18next";
 
 // Mock data for hotel bookings
 // const mockHotelBookings: HotelBooking[] = [
@@ -660,6 +661,7 @@ const HotelBookings = () => {
   const [pageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [totalHotelBookings, setTotalHotelBookings] = useState(0);
+  const { i18n, t } = useTranslation();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -707,31 +709,39 @@ const HotelBookings = () => {
   };
 
   const columns = [
-    { key: "id" as keyof HotelBooking, header: "Booking ID" },
-    { key: "hotelId" as keyof HotelBooking, header: "Hotel ID" },
-    { key: "customerName" as keyof HotelBooking, header: "Customer Name" },
-    { key: "customerPhone" as keyof HotelBooking, header: "Phone" },
-    { key: "customerEmail" as keyof HotelBooking, header: "Email" },
-    { key: "checkInDate" as keyof HotelBooking, header: "Check-in Date" },
-    { key: "checkOutDate" as keyof HotelBooking, header: "Check-out Date" },
+    { key: "id", header: t("hotelBookings.tableHeaders.bookingId") },
+    { key: "hotelId", header: t("hotelBookings.tableHeaders.hotelId") },
     {
-      key: "amount" as keyof HotelBooking,
-      header: "Amount",
-      render: (booking: HotelBooking) => (
-        <span>${booking.amount.toFixed(2)}</span>
-      ),
+      key: "customerName",
+      header: t("hotelBookings.tableHeaders.customerName"),
     },
     {
-      key: "status" as keyof HotelBooking,
-      header: "Status",
-      render: (booking: HotelBooking) => (
-        <StatusBadge status={booking.status} />
-      ),
+      key: "customerPhone",
+      header: t("hotelBookings.tableHeaders.customerPhone"),
     },
     {
-      key: "actions" as "actions",
-      header: "Actions",
-      render: (booking: HotelBooking) => (
+      key: "customerEmail",
+      header: t("hotelBookings.tableHeaders.customerEmail"),
+    },
+    { key: "checkInDate", header: t("hotelBookings.tableHeaders.checkInDate") },
+    {
+      key: "checkOutDate",
+      header: t("hotelBookings.tableHeaders.checkOutDate"),
+    },
+    {
+      key: "amount",
+      header: t("hotelBookings.tableHeaders.amount"),
+      render: (booking) => <span>${booking.amount.toFixed(2)}</span>,
+    },
+    {
+      key: "status",
+      header: t("hotelBookings.tableHeaders.status"),
+      render: (booking) => <StatusBadge status={booking.status} />,
+    },
+    {
+      key: "actions",
+      header: t("hotelBookings.tableHeaders.actions"),
+      render: (booking) => (
         <button
           className="action-button flex items-center"
           onClick={(e) => {
@@ -739,7 +749,8 @@ const HotelBookings = () => {
             viewBookingDetails(booking);
           }}
         >
-          <Eye size={16} className="mr-1" /> View Details
+          <Eye size={16} className="mr-1" />{" "}
+          {t("hotelBookings.labels.viewDetails")}
         </button>
       ),
     },
@@ -760,8 +771,8 @@ const HotelBookings = () => {
     <>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Hotel Bookings</h1>
-          <p className="text-gray-600">View and manage all hotel bookings</p>
+          <h1 className="text-2xl font-bold">{t("hotelBookings.pageTitle")}</h1>
+          <p className="text-gray-600">{t("hotelBookings.pageSubtitle")}</p>
         </div>
       </div>
 
@@ -786,25 +797,39 @@ const HotelBookings = () => {
       <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>Booking Details</SheetTitle>
+            <SheetTitle>{t("hotelBookings.detailsSheet.title")}</SheetTitle>
           </SheetHeader>
           {selectedBooking && (
             <div className="mt-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="text-sm text-gray-500">Booking ID</h4>
+                  <h4 className="text-sm text-gray-500">
+                    {t("hotelBookings.detailsSheet.bookingId")}
+                  </h4>
                   <p className="font-medium">{selectedBooking.id}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm text-gray-500">Status</h4>
+                  <h4 className="text-sm text-gray-500">
+                    {t("hotelBookings.detailsSheet.status")}
+                  </h4>
                   <StatusBadge status={selectedBooking.status} />
                 </div>
                 <div>
-                  <h4 className="text-sm text-gray-500">Hotel ID</h4>
-                  <p className="font-medium">{selectedBooking.hotelId}</p>
+                  <h4 className="text-sm text-gray-500">
+                    {t("hotelBookings.detailsSheet.hotelId")}
+                  </h4>
+                  {/* <p className="font-medium">{selectedBooking.hotelId}</p> */}
+                  <p
+                    className="font-medium truncate"
+                    title={selectedBooking.hotelId}
+                  >
+                    {selectedBooking.hotelId}
+                  </p>
                 </div>
                 <div>
-                  <h4 className="text-sm text-gray-500">Amount</h4>
+                  <h4 className="text-sm text-gray-500">
+                    {t("hotelBookings.detailsSheet.amount")}
+                  </h4>
                   <p className="font-medium">
                     ${selectedBooking.amount.toFixed(2)}
                   </p>
@@ -812,22 +837,30 @@ const HotelBookings = () => {
               </div>
 
               <div className="pt-4 border-t">
-                <h3 className="font-semibold mb-2">Customer Information</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("hotelBookings.detailsSheet.customerInfo.title")}
+                </h3>
                 <div className="grid grid-cols-1 gap-2">
                   <div>
-                    <h4 className="text-sm text-gray-500">Name</h4>
+                    <h4 className="text-sm text-gray-500">
+                      {t("hotelBookings.detailsSheet.customerInfo.name")}
+                    </h4>
                     <p className="font-medium">
                       {selectedBooking.customerName}
                     </p>
                   </div>
                   <div>
-                    <h4 className="text-sm text-gray-500">Phone</h4>
+                    <h4 className="text-sm text-gray-500">
+                      {t("hotelBookings.detailsSheet.customerInfo.phone")}
+                    </h4>
                     <p className="font-medium">
                       {selectedBooking.customerPhone}
                     </p>
                   </div>
                   <div>
-                    <h4 className="text-sm text-gray-500">Email</h4>
+                    <h4 className="text-sm text-gray-500">
+                      {t("hotelBookings.detailsSheet.customerInfo.email")}
+                    </h4>
                     <p className="font-medium">
                       {selectedBooking.customerEmail}
                     </p>
@@ -836,14 +869,20 @@ const HotelBookings = () => {
               </div>
 
               <div className="pt-4 border-t">
-                <h3 className="font-semibold mb-2">Stay Details</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("hotelBookings.detailsSheet.stayDetails.title")}
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h4 className="text-sm text-gray-500">Check-in Date</h4>
+                    <h4 className="text-sm text-gray-500">
+                      {t("hotelBookings.detailsSheet.stayDetails.checkInDate")}
+                    </h4>
                     <p className="font-medium">{selectedBooking.checkInDate}</p>
                   </div>
                   <div>
-                    <h4 className="text-sm text-gray-500">Check-out Date</h4>
+                    <h4 className="text-sm text-gray-500">
+                      {t("hotelBookings.detailsSheet.stayDetails.checkOutDate")}
+                    </h4>
                     <p className="font-medium">
                       {selectedBooking.checkOutDate}
                     </p>
@@ -852,10 +891,13 @@ const HotelBookings = () => {
               </div>
 
               <div className="pt-4 border-t">
-                <h3 className="font-semibold mb-2">Customer Journey</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("hotelBookings.detailsSheet.journey.title")}
+                </h3>
                 <p className="text-sm text-gray-600">
-                  Booking was made on {new Date().toLocaleDateString()}.
-                  Customer ID proof verification complete.
+                  {t("hotelBookings.detailsSheet.journey.message", {
+                    date: new Date().toLocaleDateString(),
+                  })}
                 </p>
               </div>
             </div>

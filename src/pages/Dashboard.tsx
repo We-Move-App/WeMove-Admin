@@ -25,6 +25,7 @@ import DashboardSkeleton from "@/components/ui/DashboardSkeleton";
 import Loader from "@/components/ui/loader";
 import { Pagination } from "@/components/ui/pagination";
 import PaginationComponent from "@/components/pagination/PaginationComponent";
+import { useTranslation } from "react-i18next";
 
 type BookingStats = {
   filter: string;
@@ -99,6 +100,7 @@ const Dashboard = () => {
     hotelManagers: 0,
     drivers: 0,
   });
+  const { i18n, t } = useTranslation();
   // const [totalCounts, setTotalCounts] = useState();
 
   useEffect(() => {
@@ -287,14 +289,14 @@ const Dashboard = () => {
       ) : (
         <>
           <div className="mb-6">
-            <h1 className="text-2xl font-bold">Dashboard</h1>
-            <p className="text-gray-600">Welcome to your admin dashboard</p>
+            <h1 className="text-2xl font-bold">{t("dashboard.title")}</h1>
+            <p className="text-gray-600">{t("dashboard.welcome")}</p>
           </div>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatsCard
-              title="Total Bookings"
+              title={t("dashboard.stats.totalBookings")}
               value={
                 bookingSummary.totalBookings?.bookings?.toLocaleString() ?? "0"
               }
@@ -306,7 +308,7 @@ const Dashboard = () => {
             {/* Hotel Bookings → check API key + permission */}
             {permissions.hotelManagement && bookingSummary?.hotelBookings && (
               <StatsCard
-                title="Hotel Bookings"
+                title={t("dashboard.stats.hotelBookings")}
                 value={
                   bookingSummary.hotelBookings?.bookings?.toLocaleString() ??
                   "0"
@@ -321,7 +323,7 @@ const Dashboard = () => {
             {/* Bus Bookings → check API key + permission */}
             {permissions.busManagement && bookingSummary?.busBookings && (
               <StatsCard
-                title="Bus Bookings"
+                title={t("dashboard.stats.busBookings")}
                 value={
                   bookingSummary.busBookings?.bookings?.toLocaleString() ?? "0"
                 }
@@ -335,7 +337,7 @@ const Dashboard = () => {
             {/* Taxi Bookings → check API key + permission */}
             {permissions.taxiManagement && bookingSummary?.taxiBookings && (
               <StatsCard
-                title="Taxi Bookings"
+                title={t("dashboard.stats.taxiBookings")}
                 value={
                   bookingSummary.taxiBookings?.bookings?.toLocaleString() ?? "0"
                 }
@@ -348,7 +350,7 @@ const Dashboard = () => {
             {/* Bike Bookings → check API key + permission */}
             {permissions.bikeManagement && bookingSummary?.bikeBookings && (
               <StatsCard
-                title="Bike Bookings"
+                title={t("dashboard.stats.bikeBookings")}
                 value={
                   bookingSummary.bikeBookings?.bookings?.toLocaleString() ?? "0"
                 }
@@ -362,7 +364,7 @@ const Dashboard = () => {
             {/* Completed Bookings */}
             {bookingSummary?.completedBookings && (
               <StatsCard
-                title="Completed Bookings"
+                title={t("dashboard.stats.completedBookings")}
                 value={
                   bookingSummary.completedBookings?.bookings?.toLocaleString() ??
                   "0"
@@ -377,7 +379,7 @@ const Dashboard = () => {
             {/* Cancelled Bookings */}
             {bookingSummary?.cancelledBookings && (
               <StatsCard
-                title="Cancelled Bookings"
+                title={t("dashboard.stats.cancelledBookings")}
                 value={
                   bookingSummary.cancelledBookings?.bookings?.toLocaleString() ??
                   "0"
@@ -392,7 +394,7 @@ const Dashboard = () => {
             {/* Revenue → only SuperAdmin + API key present */}
             {role === "SuperAdmin" && bookingSummary?.revenue && (
               <StatsCard
-                title="Revenue"
+                title={t("dashboard.stats.revenue")}
                 value={`₹${
                   bookingSummary.revenue?.amount?.toLocaleString() ?? "0"
                 }`}
@@ -405,28 +407,28 @@ const Dashboard = () => {
 
             {/* --- USER SUMMARY --- */}
             <StatsCard
-              title="Total Users"
+              title={t("dashboard.stats.totalUsers")}
               value={userSummary.users?.toLocaleString() ?? "0"}
               icon={<CreditCard size={20} />}
               iconBgColor="bg-sky-500"
             />
 
             <StatsCard
-              title="Bus Users"
+              title={t("dashboard.stats.busUsers")}
               value={userSummary.busOperators?.toLocaleString() ?? "0"}
               icon={<Bus size={20} />}
               iconBgColor="bg-yellow-500"
             />
 
             <StatsCard
-              title="Hotel Users"
+              title={t("dashboard.stats.hotelUsers")}
               value={userSummary.hotelManagers?.toLocaleString() ?? "0"}
               icon={<Hotel size={20} />}
               iconBgColor="bg-purple-500"
             />
 
             <StatsCard
-              title="Ride Users"
+              title={t("dashboard.stats.rideUsers")}
               value={userSummary.drivers?.toLocaleString() ?? "0"}
               icon={<Car size={20} />}
               iconBgColor="bg-orange-500"
@@ -436,44 +438,9 @@ const Dashboard = () => {
           {/* Charts */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-medium">Analytics Overview</h2>
-              {/* <div className="relative">
-            <button
-              className="flex items-center bg-green-600 text-white px-4 py-2 rounded hover:bg-green-900 transition-colors"
-              onClick={() => setShowExportOptions(!showExportOptions)}
-            >
-              <Download size={18} className="mr-2" />
-              Export Report
-            </button>
-
-            {showExportOptions && (
-              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
-                <div className="py-1" role="menu">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                  >
-                    Export as PDF
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                  >
-                    Export as Excel
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                  >
-                    Export as CSV
-                  </a>
-                </div>
-              </div>
-            )}
-          </div> */}
+              <h2 className="text-xl font-medium">
+                {t("dashboard.charts.analyticsOverview")}
+              </h2>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -491,7 +458,9 @@ const Dashboard = () => {
           {/* Recent Transactions - only for SuperAdmin */}
           {role === "SuperAdmin" && (
             <div>
-              <h2 className="text-xl font-medium mb-4">Recent Transactions</h2>
+              <h2 className="text-xl font-medium mb-4">
+                {t("dashboard.transactions.recentTransactions")}
+              </h2>
 
               {loading ? (
                 <Loader />
@@ -502,12 +471,24 @@ const Dashboard = () => {
                     <table className="admin-table w-full text-left">
                       <thead className="sticky top-0 bg-white z-10">
                         <tr>
-                          <th className="px-4 py-2">ID</th>
-                          <th className="px-4 py-2">Service</th>
-                          <th className="px-4 py-2">Date</th>
-                          <th className="px-4 py-2">Amount</th>
-                          <th className="px-4 py-2">Status</th>
-                          <th className="px-4 py-2">Description</th>
+                          <th className="px-4 py-2">
+                            {t("dashboard.transactions.table.id")}
+                          </th>
+                          <th className="px-4 py-2">
+                            {t("dashboard.transactions.table.service")}
+                          </th>
+                          <th className="px-4 py-2">
+                            {t("dashboard.transactions.table.date")}
+                          </th>
+                          <th className="px-4 py-2">
+                            {t("dashboard.transactions.table.amount")}
+                          </th>
+                          <th className="px-4 py-2">
+                            {t("dashboard.transactions.table.status")}
+                          </th>
+                          <th className="px-4 py-2">
+                            {t("dashboard.transactions.table.description")}
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -550,7 +531,7 @@ const Dashboard = () => {
                               colSpan={6}
                               className="text-center py-4 text-gray-500"
                             >
-                              No transactions found
+                              {t("dashboard.transactions.noTransactions")}
                             </td>
                           </tr>
                         )}

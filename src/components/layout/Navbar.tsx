@@ -6,12 +6,20 @@ import NotificationDropdown from "@/pages/notifications/NotificationDropdown";
 import { getSocket } from "@/utils/socket";
 import { Notification } from "@/types/admin";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../language-select/LanguageSwitcher";
 
-const Navbar = ({ adminProfile, adminAvatar }) => {
+type Props = {
+  adminProfile?: any;
+  adminAvatar?: string | null;
+};
+
+const Navbar = ({ adminProfile, adminAvatar }: Props) => {
   const navigate = useNavigate();
   const { isOpen, toggleSidebar } = useSidebar();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const currentAdminId = localStorage.getItem("adminProfile")
@@ -120,11 +128,11 @@ const Navbar = ({ adminProfile, adminAvatar }) => {
     }
   };
 
-  // 🔹 Clear all (API + local state)
+  // 🔹 Clear all
   const handleClearAll = async () => {
     try {
       await axios.delete(
-        "http://139.59.20.155:8000/api/v1/notification/admin-clear-all",
+        "http://139.59.20.155:8000/api/v1/notification/admin-delete-all",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -133,7 +141,7 @@ const Navbar = ({ adminProfile, adminAvatar }) => {
       );
       setNotifications([]);
     } catch (error) {
-      console.error("❌ Failed to clear notifications:", error);
+      console.error("Failed to clear notifications:", error);
     }
   };
 
@@ -146,6 +154,18 @@ const Navbar = ({ adminProfile, adminAvatar }) => {
     localStorage.removeItem("adminAvatar");
     navigate("/");
   };
+
+  // Language switcher handler
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem("appLanguage", lng);
+  };
+
+  // read stored language (optional)
+  useEffect(() => {
+    const stored = localStorage.getItem("appLanguage");
+    if (stored && stored !== i18n.language) i18n.changeLanguage(stored);
+  }, []);
 
   return (
     <header
@@ -164,21 +184,13 @@ const Navbar = ({ adminProfile, adminAvatar }) => {
           >
             <Menu size={24} />
           </button>
-
-          {/* <div className="relative md:w-64">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Search className="text-gray-500" size={18} />
-            </div>
-            <input
-              type="text"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2"
-              placeholder="Search"
-            />
-          </div> */}
         </div>
 
         {/* Right Side */}
         <div className="flex items-center gap-4">
+          {/* Language switcher */}
+          <LanguageSwitcher />
+
           <NotificationDropdown
             notifications={notifications}
             onMarkAsRead={handleMarkAsRead}
@@ -217,7 +229,7 @@ const Navbar = ({ adminProfile, adminAvatar }) => {
                     role="menuitem"
                   >
                     <User className="mr-2" size={16} />
-                    <span>Your Profile</span>
+                    <span>{t("navbar.yourProfile") ?? "Your Profile"}</span>
                   </Link>
                   <button
                     type="button"
@@ -226,7 +238,7 @@ const Navbar = ({ adminProfile, adminAvatar }) => {
                     role="menuitem"
                   >
                     <LogOut className="mr-2" size={16} />
-                    <span>Sign out</span>
+                    <span>{t("navbar.signOut") ?? "Sign out"}</span>
                   </button>
                 </div>
               </div>

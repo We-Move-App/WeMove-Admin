@@ -1,0 +1,788 @@
+{
+  "navbar": {
+    "yourProfile": "Votre profil",
+    "signOut": "Se déconnecter",
+    "languageSelectLabel": "Choisir la langue",
+    "language_en": "EN",
+    "language_fr": "FR"
+  },
+  "sidebar": {
+    "dashboard": "Tableau de bord",
+    "busManagement": "Gestion des bus",
+    "busOperators": "Opérateurs de bus",
+    "busBookings": "Réservations de bus",
+    "hotelManagement": "Gestion des hôtels",
+    "hotelManagers": "Gestionnaires d’hôtel",
+    "hotelBookings": "Réservations d’hôtel",
+    "taxiManagement": "Gestion des taxis",
+    "taxiDrivers": "Chauffeurs de taxi",
+    "taxiBookings": "Réservations de taxi",
+    "bikeManagement": "Gestion des motos",
+    "bikeRiders": "Motards",
+    "bikeBookings": "Réservations de moto",
+    "userManagement": "Gestion des utilisateurs",
+    "users": "Utilisateurs",
+    "userBookings": "Réservations des utilisateurs",
+    "adminManagement": "Gestion des administrateurs",
+    "commissionManagement": "Gestion des commissions",
+    "coupons": "Coupons",
+    "wallet": "Portefeuille"
+  },
+  "profile": {
+    "personalInfoTitle": "Informations personnelles",
+    "editProfile": "Modifier le profil",
+    "cancel": "Annuler",
+    "fullNameLabel": "Nom complet",
+    "emailLabel": "Adresse e-mail",
+    "phoneLabel": "Numéro de téléphone",
+    "administratorRole": "Administrateur",
+    "saveChanges": "Enregistrer les modifications",
+
+    "securitySettingsTitle": "Paramètres de sécurité",
+    "updatePasswordTitle": "Mettre à jour le mot de passe",
+    "updatePasswordDesc": "Modifiez votre mot de passe actuel",
+    "forgotPasswordTitle": "Mot de passe oublié",
+    "forgotPasswordDesc": "Envoyer le lien de réinitialisation du mot de passe à l’adresse e-mail",
+
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "confirmNewPassword": "Confirmer le nouveau mot de passe",
+    "updating": "Mise à jour...",
+    "updatePasswordButton": "Mettre à jour le mot de passe",
+    "sendResetLink": "Envoyer le lien de réinitialisation",
+
+    "successProfileUpdated": "Profil mis à jour avec succès.",
+    "errorProfileUpdate": "Échec de la mise à jour du profil. Veuillez réessayer."
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "welcome": "Bienvenue sur votre tableau de bord administrateur",
+
+    "stats": {
+      "totalBookings": "Réservations totales",
+      "hotelBookings": "Réservations d’hôtel",
+      "busBookings": "Réservations de bus",
+      "taxiBookings": "Réservations de taxi",
+      "bikeBookings": "Réservations de moto",
+      "completedBookings": "Réservations terminées",
+      "cancelledBookings": "Réservations annulées",
+      "revenue": "Revenu",
+      "totalUsers": "Utilisateurs totaux",
+      "busUsers": "Opérateurs de bus",
+      "hotelUsers": "Gestionnaires d’hôtel",
+      "rideUsers": "Chauffeurs"
+    },
+
+    "charts": {
+      "analyticsOverview": "Aperçu analytique"
+    },
+
+    "transactions": {
+      "recentTransactions": "Transactions récentes",
+      "table": {
+        "id": "ID",
+        "service": "Service",
+        "date": "Date",
+        "amount": "Montant",
+        "status": "Statut",
+        "description": "Description"
+      },
+      "noTransactions": "Aucune transaction trouvée"
+    },
+
+    "statuses": {
+      "success": "SUCCÈS",
+      "pending": "EN ATTENTE",
+      "rejected": "REJETÉ"
+    }
+  },
+  "busOperators": {
+    "pageTitle": "Opérateurs de bus",
+    "pageSubtitle": "Gérez tous les opérateurs de bus",
+    "addOperatorButton": "Ajouter un opérateur de bus",
+
+    "tableHeaders": {
+      "name": "Nom",
+      "mobile": "Téléphone",
+      "email": "Adresse e-mail",
+      "numberOfBuses": "Nombre de bus",
+      "walletBalance": "Solde du portefeuille",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+
+    "actions": {
+      "viewDetails": "Voir les détails"
+    },
+
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "pending": "En attente",
+      "suspended": "Suspendu"
+    }
+  },
+  "busOperatorDetails": {
+    "backButton": "Retour aux opérateurs de bus",
+    "busNotFound": "Opérateur de bus introuvable",
+
+    "basicInfo": {
+      "title": "Informations de base",
+      "profilePhoto": "Photo de profil",
+      "fullNameLabel": "Nom complet",
+      "mobileLabel": "Téléphone",
+      "emailLabel": "Adresse e-mail",
+      "statusLabel": "Statut",
+      "remarkLabel": "Remarque",
+      "remarkPlaceholder": "Entrez la raison du rejet ou du blocage",
+      "chooseBranchLabel": "Choisir la succursale",
+      "verificationBadgeLabel": "Badge de vérification",
+      "verified": "Vérifié",
+      "notVerified": "Non vérifié"
+    },
+
+    "companyInfo": {
+      "title": "Informations sur l'entreprise",
+      "companyNameLabel": "Nom de l'entreprise",
+      "companyAddressLabel": "Adresse de l'entreprise",
+      "companyAddressNA": "N/D"
+    },
+
+    "identityVerification": {
+      "title": "Vérification d'identité",
+      "idCardFront": "Recto de la carte d'identité",
+      "idCardBack": "Verso de la carte d'identité"
+    },
+
+    "bankDetails": {
+      "title": "Détails bancaires",
+      "bankNameLabel": "Nom de la banque",
+      "accountNumberLabel": "Numéro de compte",
+      "accountHolderLabel": "Nom du titulaire du compte",
+      "bankAccountDetailsLabel": "Détails du compte bancaire",
+      "noBankDocument": "Aucun document bancaire téléchargé."
+    },
+
+    "actions": {
+      "cancel": "Annuler",
+      "edit": "Modifier",
+      "save": "Enregistrer"
+    },
+
+    "statusOptions": {
+      "rejected": "rejeté",
+      "blocked": "bloqué",
+      "pending": "en attente",
+      "approved": "approuvé"
+    }
+  },
+  "busBookings": {
+    "title": "Réservations de bus",
+    "subtitle": "Consultez et gérez toutes les réservations de bus",
+    "columns": {
+      "id": "ID",
+      "busRegistrationNumber": "N° d’immatriculation du bus",
+      "customerName": "Nom du client",
+      "customerPhone": "Téléphone",
+      "customerEmail": "E-mail",
+      "from": "De",
+      "to": "À",
+      "journeyDate": "Date du voyage",
+      "amount": "Montant",
+      "paymentStatus": "Paiement",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "Voir les détails"
+    },
+    "currencySymbol": "€"
+  },
+  "busBookingDetails": {
+    "backButton": "Retour aux réservations",
+    "title": "Détails de la réservation",
+    "bookingIdLabel": "ID de réservation",
+    "status": "Statut",
+
+    "journeyDetails": {
+      "title": "Détails du voyage",
+      "busRegistration": "Immatriculation du bus",
+      "from": "De",
+      "to": "À",
+      "journeyDate": "Date du voyage"
+    },
+
+    "customerInformation": {
+      "title": "Informations du client",
+      "name": "Nom",
+      "phone": "Téléphone",
+      "email": "E-mail"
+    },
+
+    "paymentDetails": {
+      "title": "Détails du paiement",
+      "amount": "Montant",
+      "paymentStatus": "Statut du paiement",
+      "paymentMethod": "Méthode de paiement",
+      "paid": "Payé",
+      "currencySymbol": "€"
+    }
+  },
+  "hotelManagers": {
+    "pageTitle": "Gestionnaires d'hôtel",
+    "pageSubtitle": "Gérer tous les gestionnaires d'hôtel",
+    "addButton": "Ajouter un gestionnaire d'hôtel",
+    "tableHeaders": {
+      "name": "Nom",
+      "mobile": "Téléphone portable",
+      "email": "E-mail",
+      "balance": "Solde du portefeuille",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "labels": {
+      "verified": "Vérifié",
+      "viewDetails": "Voir les détails"
+    },
+    "messages": {
+      "noData": "Aucun gestionnaire d'hôtel trouvé",
+      "loading": "Chargement des gestionnaires d'hôtel..."
+    }
+  },
+  "hotelManagerDetails": {
+    "backButton": "Retour aux gestionnaires d'hôtel",
+    "addNewTitle": "Ajouter un nouveau gestionnaire d'hôtel",
+    "viewTitle": "Gestionnaire d'hôtel : {{name}}",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "create": "Créer un gestionnaire",
+    "saveChanges": "Enregistrer les modifications",
+
+    "tabs": {
+      "personal": "Informations personnelles",
+      "hotel": "Détails de l'hôtel",
+      "rooms": "Chambres",
+      "banking": "Informations bancaires"
+    },
+
+    "personalInfo": {
+      "sectionTitle": "Informations personnelles",
+      "profilePhoto": "Photo de profil",
+      "name": "Nom",
+      "mobile": "Téléphone portable",
+      "email": "E-mail",
+      "status": "Statut",
+      "remark": "Remarque",
+      "remarkPlaceholder": "Saisissez la raison du rejet ou du blocage",
+      "chooseBranch": "Choisir une agence",
+      "verificationStatus": "Statut de vérification",
+      "verified": "Vérifié",
+      "notVerified": "Non vérifié"
+    },
+
+    "companyInfo": {
+      "sectionTitle": "Informations sur l'entreprise",
+      "companyName": "Nom de l'entreprise",
+      "companyAddress": "Adresse de l'entreprise"
+    },
+
+    "hotelDetails": {
+      "hotelName": "Nom de l'hôtel",
+      "businessLicense": "Licence commerciale",
+      "hotelPhotos": "Photos de l'hôtel",
+      "city": "Ville",
+      "locality": "Localité",
+      "landmark": "Point de repère",
+      "pinCode": "Code postal",
+      "totalRooms": "Nombre total de chambres"
+    },
+
+    "rooms": {
+      "standardRooms": "Chambres standard",
+      "luxuryRooms": "Chambres de luxe",
+      "pricePerNight": "Prix (par nuit)",
+      "numberOfRooms": "Nombre de chambres",
+      "amenities": "Équipements",
+      "roomPhotos": "Photos de la chambre",
+      "checkInTime": "Heure d'arrivée",
+      "checkOutTime": "Heure de départ",
+      "hotelAmenities": "Équipements de l'hôtel",
+      "policyDocument": "Document de politique",
+      "policyDocuments": "Documents de politique"
+    },
+
+    "banking": {
+      "bankName": "Nom de la banque",
+      "bankAccountNumber": "Numéro de compte bancaire",
+      "accountHolderName": "Nom du titulaire du compte",
+      "bankAccountDocument": "Document de compte bancaire",
+      "bankAccountDetails": "Détails du compte bancaire"
+    }
+  },
+  "hotelBookings": {
+    "pageTitle": "Réservations d'hôtel",
+    "pageSubtitle": "Afficher et gérer toutes les réservations d'hôtel",
+
+    "tableHeaders": {
+      "bookingId": "ID de réservation",
+      "hotelId": "ID de l'hôtel",
+      "customerName": "Nom du client",
+      "customerPhone": "Téléphone",
+      "customerEmail": "E-mail",
+      "checkInDate": "Date d'arrivée",
+      "checkOutDate": "Date de départ",
+      "amount": "Montant",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+
+    "labels": {
+      "viewDetails": "Voir les détails"
+    },
+
+    "detailsSheet": {
+      "title": "Détails de la réservation",
+      "bookingId": "ID de réservation",
+      "hotelId": "ID de l'hôtel",
+      "status": "Statut",
+      "amount": "Montant",
+
+      "customerInfo": {
+        "title": "Informations du client",
+        "name": "Nom",
+        "phone": "Téléphone",
+        "email": "E-mail"
+      },
+
+      "stayDetails": {
+        "title": "Détails du séjour",
+        "checkInDate": "Date d'arrivée",
+        "checkOutDate": "Date de départ"
+      },
+
+      "journey": {
+        "title": "Parcours du client",
+        "message": "La réservation a été effectuée le {{date}}. Vérification de la pièce d'identité du client terminée."
+      }
+    },
+
+    "messages": {
+      "noData": "Aucune réservation trouvée",
+      "loading": "Chargement des réservations d'hôtel..."
+    }
+  },
+  "customerManagement": {
+    "pageTitle": "Gestion des utilisateurs",
+    "pageSubtitle": "Afficher et gérer tous les utilisateurs",
+
+    "tableHeaders": {
+      "name": "Nom",
+      "mobile": "Téléphone portable",
+      "email": "E-mail",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+
+    "labels": {
+      "viewDetails": "Voir les détails"
+    },
+
+    "messages": {
+      "noData": "Aucun utilisateur trouvé",
+      "loading": "Chargement des utilisateurs..."
+    }
+  },
+  "customerDetails": {
+    "backButton": "Retour aux utilisateurs",
+
+    "page": {
+      "title": "Détails du client"
+    },
+
+    "sections": {
+      "personalInformation": "Informations personnelles",
+      "address": "Adresse"
+    },
+
+    "fields": {
+      "profilePicture": "Photo de profil",
+      "fullName": "Nom complet",
+      "phoneNumber": "Numéro de téléphone",
+      "emailAddress": "Adresse e-mail",
+      "dateOfBirth": "Date de naissance",
+      "gender": "Genre",
+      "status": "Statut",
+      "remarks": "Remarques",
+      "remarksPlaceholder": "Saisissez les remarques pour le rejet ou le blocage...",
+      "zoneCode": "Code de zone",
+      "area": "Quartier",
+      "city": "Ville",
+      "nationality": "Nationalité",
+      "nationalIdExpiry": "Date d'expiration de la carte d'identité nationale",
+      "nationalIdFront": "Face avant de la carte d'identité nationale",
+      "nationalIdBack": "Face arrière de la carte d'identité nationale"
+    },
+
+    "placeholders": {
+      "selectGender": "Sélectionner le genre",
+      "enterZoneCode": "Saisissez le code de zone",
+      "enterArea": "Saisissez le quartier",
+      "enterCity": "Saisissez la ville"
+    },
+
+    "statusOptions": {
+      "select": "Sélectionner le statut",
+      "active": "Actif",
+      "pending": "En attente",
+      "rejected": "Rejeté",
+      "blocked": "Bloqué"
+    },
+
+    "buttons": {
+      "cancel": "Annuler",
+      "editStatus": "Modifier le statut",
+      "saveStatus": "Enregistrer le statut"
+    },
+
+    "messages": {
+      "noData": "Aucune donnée client",
+      "loading": "Chargement du client..."
+    }
+  },
+  "customerBookings": {
+    "pageTitle": "Réservations des utilisateurs",
+    "pageSubtitle": "Afficher et gérer toutes les réservations des utilisateurs",
+
+    "tableHeaders": {
+      "userId": "ID",
+      "bookingId": "ID de réservation",
+      "customerName": "Nom du client",
+      "customerEmail": "E-mail",
+      "customerPhone": "Téléphone",
+      "serviceType": "Type de service",
+      "bookingDate": "Date de réservation",
+      "amount": "Montant",
+      "paymentStatus": "Paiement",
+      "actions": "Actions"
+    },
+
+    "labels": {
+      "viewDetails": "Voir les détails"
+    },
+
+    "messages": {
+      "noData": "Aucune réservation trouvée",
+      "loading": "Chargement des réservations..."
+    }
+  },
+  "customerBookingsDetails": {
+    "backButton": "Retour à toutes les réservations des utilisateurs",
+    "pageTitle": "Détails de l'utilisateur",
+
+    "summary": {
+      "title": "Résumé des réservations",
+      "bus": "Réservations de bus",
+      "hotel": "Réservations d'hôtel",
+      "ride": "Réservations de trajets"
+    },
+
+    "tabs": {
+      "all": "Toutes les réservations",
+      "bus": "Réservations de bus",
+      "hotel": "Réservations d'hôtel",
+      "ride": "Réservations de trajets",
+      "transactions": "Transactions de paiement"
+    },
+
+    "search": {
+      "bookings": "Rechercher des réservations...",
+      "transactions": "Rechercher des transactions..."
+    },
+
+    "tables": {
+      "common": {
+        "id": "ID",
+        "date": "Date",
+        "amount": "Montant",
+        "status": "Statut"
+      },
+      "all": {
+        "type": "Type",
+        "noData": "Aucun historique de réservation trouvé"
+      },
+      "bus": {
+        "noData": "Aucune réservation de bus trouvée"
+      },
+      "hotel": {
+        "noData": "Aucune réservation d'hôtel trouvée"
+      },
+      "ride": {
+        "type": "Type",
+        "noData": "Aucune réservation de trajet trouvée"
+      },
+      "transactions": {
+        "type": "Type",
+        "noData": "Aucune transaction de paiement trouvée"
+      }
+    },
+
+    "wallet": {
+      "digitalCard": "Carte de débit numérique",
+      "balanceLabel": "Solde",
+      "currency": "XAF"
+    }
+  },
+  "admins": {
+    "pageTitle": "Gestion des rôles",
+    "subTitleAdmin": "Gérer les rôles de sous-administrateur et leurs autorisations",
+    "subTitleDefault": "Gérer les rôles d'administrateur et de sous-administrateur et leurs autorisations",
+
+    "buttons": {
+      "addSubAdmin": "Ajouter un sous-administrateur",
+      "addAdminSubAdmin": "Ajouter un administrateur / sous-administrateur",
+      "cancel": "Annuler",
+      "add": "Ajouter"
+    },
+
+    "dialog": {
+      "titleAddSubAdmin": "Ajouter un nouveau sous-administrateur",
+      "titleAddAdmin": "Ajouter un nouvel administrateur / sous-administrateur",
+      "placeholders": {
+        "enterName": "Saisissez le nom complet",
+        "enterPhone": "Saisissez le numéro de téléphone",
+        "enterEmail": "Saisissez l'adresse e-mail",
+        "selectAdmin": "Sélectionnez un administrateur",
+        "typeCity": "Tapez le nom de la ville..."
+      },
+      "loadingAdmins": "Chargement des administrateurs...",
+      "noAdminsFound": "Aucun administrateur trouvé",
+      "selected": "Sélectionné : {{branch}}"
+    },
+
+    "fields": {
+      "name": "Nom",
+      "mobileNumber": "Numéro de téléphone",
+      "email": "E-mail",
+      "role": "Rôle",
+      "assignAdmin": "Assigner un administrateur",
+      "chooseBranch": "Choisir une succursale",
+      "permissions": "Autorisations"
+    },
+
+    "roleOptions": {
+      "admin": "Administrateur",
+      "subAdmin": "Sous-administrateur"
+    },
+
+    "permissions": {
+      "noPermissions": "Aucune autorisation disponible"
+    },
+    "tableHeaders": {
+      "name": "Nom",
+      "email": "E-mail",
+      "role": "Rôle",
+      "permissions": "Autorisations",
+      "branch": "Succursale",
+      "actions": "Actions",
+      "view": "Voir les détails"
+    },
+    "tableValues": {
+      "fullAccess": "Accès complet",
+      "permissionsCount": "{{count}} autorisations",
+      "notAvailable": "N/D"
+    }
+  },
+  "adminManagement": {
+    "notFound": "Administrateur introuvable",
+
+    "backButton": "Retour à tous les administrateurs / sous-administrateurs",
+    "pageTitle": "Détails de l'administrateur / sous-administrateur",
+
+    "buttons": {
+      "edit": "Modifier l'administrateur / sous-administrateur",
+      "cancel": "Annuler",
+      "save": "Enregistrer les modifications"
+    },
+
+    "tabs": {
+      "details": "Détails de l'administrateur / sous-administrateur",
+      "permissions": "Autorisations",
+      "activity": "Journal d'activité"
+    },
+
+    "detailsSection": {
+      "title": "Informations de l'administrateur / sous-administrateur",
+      "viewDescription": "Afficher les détails de l'administrateur / sous-administrateur",
+      "editDescription": "Modifier les détails de l'administrateur / sous-administrateur",
+      "fields": {
+        "name": "Nom",
+        "email": "E-mail",
+        "mobileNumber": "Numéro de téléphone",
+        "role": "Rôle",
+        "roleOptions": {
+          "admin": "Administrateur",
+          "subadmin": "Sous-administrateur"
+        },
+        "placeholder": {
+          "name": "Saisissez le nom complet",
+          "email": "Saisissez l'adresse e-mail",
+          "mobileNumber": "Saisissez le numéro de téléphone"
+        }
+      }
+    },
+
+    "permissionsSection": {
+      "title": "Autorisations de l'utilisateur",
+      "description": {
+        "admin": "Les administrateurs ont un accès complet à toutes les fonctionnalités",
+        "subadmin": "Gérez ce à quoi cet utilisateur peut accéder et modifier"
+      },
+      "noPermissions": "Aucune autorisation disponible"
+    },
+
+    "activitySection": {
+      "title": "Journal d'activité",
+      "description": "Activités récentes effectuées par cet utilisateur",
+      "loading": "Chargement des activités...",
+      "noActivity": "Aucune activité trouvée."
+    }
+  },
+  "commissionManagement": {
+    "title": "Gestion des commissions",
+    "addNew": "Ajouter une nouvelle commission",
+    "edit": "Modifier la commission",
+    "serviceType": "Type de service",
+    "commission": "Commission",
+    "commissionType": "Type de commission",
+    "percentage": "Pourcentage",
+    "fixedRate": "Taux fixe",
+    "commissionPercentage": "Pourcentage de commission",
+    "fixedRateCurrency": "Taux fixe (₹)",
+    "status": "Statut",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "actions": "Actions",
+    "editAction": "Modifier",
+    "activate": "Activer",
+    "deactivate": "Désactiver",
+    "selectServiceType": "Sélectionnez le type de service",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "serviceTypes": {
+      "bus": "Bus",
+      "hotel": "Hôtel",
+      "taxi": "Taxi",
+      "bike": "Moto",
+      "user": "Transfert utilisateur"
+    },
+    "tableHeaders": {
+      "serviceType": "Type de service",
+      "commission": "Commission",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "statusLabels": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    }
+  },
+  "coupons": {
+    "title": "Coupons",
+    "addNew": "Ajouter un nouveau coupon",
+    "edit": "Modifier le coupon",
+    "tableHeaders": {
+      "name": "Nom du coupon",
+      "code": "Code du coupon",
+      "serviceType": "Type de service",
+      "discount": "Remise",
+      "startDate": "Date de début",
+      "expiryDate": "Date d'expiration",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "discountTypes": {
+      "percentage": "Pourcentage",
+      "fixed": "Montant fixe"
+    },
+    "labels": {
+      "name": "Nom du coupon",
+      "code": "Code du coupon",
+      "serviceType": "Type de service",
+      "discountType": "Type de remise",
+      "discountPercentage": "Pourcentage de remise",
+      "discountAmount": "Montant de la remise (₹)",
+      "startDate": "Date et heure de début",
+      "expiryDate": "Date et heure d'expiration",
+      "status": "Statut",
+      "placeholder": {
+        "name": "ex. SUMMER20",
+        "code": "ex. SUMMER20",
+        "selectServiceType": "Sélectionnez le type de service"
+      },
+      "description": "Ceci est le code que les utilisateurs entreront pour appliquer le coupon"
+    },
+    "statusLabels": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "filters": {
+      "serviceType": "Type de service",
+      "status": "Statut",
+      "options": {
+        "allServices": "Tous les services",
+        "bus": "Bus",
+        "hotel": "Hôtel",
+        "taxi": "Taxi",
+        "bike": "Moto"
+      }
+    },
+    "actions": {
+      "edit": "Modifier",
+      "activate": "Activer",
+      "deactivate": "Désactiver"
+    },
+    "buttons": {
+      "cancel": "Annuler",
+      "save": "Enregistrer"
+    }
+  },
+  "wallet": {
+    "title": "Gestion du portefeuille",
+
+    "cards": {
+      "totalTransactions": "Total des transactions",
+      "totalCredits": "Total des crédits",
+      "totalDebits": "Total des débits",
+      "pendingWithdrawals": "Retraits en attente"
+    },
+
+    "transactionHistory": {
+      "title": "Historique des transactions",
+      "noData": "Aucune transaction trouvée",
+      "loading": "Chargement des transactions..."
+    },
+
+    "tableHeaders": {
+      "transactionId": "ID de transaction",
+      "user": "Utilisateur",
+      "role": "Rôle",
+      "type": "Type",
+      "amount": "Montant",
+      "date": "Date",
+      "status": "Statut",
+      "description": "Description"
+    },
+
+    "types": {
+      "credit": "Crédit",
+      "debit": "Débit",
+      "transfer": "Transfert",
+      "withdrawal": "Retrait"
+    },
+
+    "statusLabels": {
+      "pending": "En attente",
+      "completed": "Terminé",
+      "failed": "Échoué"
+    }
+  }
+}

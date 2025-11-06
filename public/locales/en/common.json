@@ -1,0 +1,790 @@
+{
+  "app_name": "WeMove Admin",
+  "navbar": {
+    "yourProfile": "Your Profile",
+    "signOut": "Sign out",
+    "languageSelectLabel": "Select language",
+    "language_en": "EN",
+    "language_fr": "FR"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "busManagement": "Bus Management",
+    "busOperators": "Bus Operators",
+    "busBookings": "Bus Bookings",
+    "hotelManagement": "Hotel Management",
+    "hotelManagers": "Hotel Managers",
+    "hotelBookings": "Hotel Bookings",
+    "taxiManagement": "Taxi Management",
+    "taxiDrivers": "Taxi Drivers",
+    "taxiBookings": "Taxi Bookings",
+    "bikeManagement": "Bike Management",
+    "bikeRiders": "Bike Riders",
+    "bikeBookings": "Bike Bookings",
+    "userManagement": "User Management",
+    "users": "Users",
+    "userBookings": "User Bookings",
+    "adminManagement": "Admin Management",
+    "commissionManagement": "Commission Management",
+    "coupons": "Coupons",
+    "wallet": "Wallet"
+  },
+  "profile": {
+    "personalInfoTitle": "Personal Information",
+    "editProfile": "Edit Profile",
+    "cancel": "Cancel",
+    "fullNameLabel": "Full Name",
+    "emailLabel": "Email Address",
+    "phoneLabel": "Phone Number",
+    "administratorRole": "Administrator",
+    "saveChanges": "Save Changes",
+
+    "securitySettingsTitle": "Security Settings",
+    "updatePasswordTitle": "Update Password",
+    "updatePasswordDesc": "Change your current password",
+    "forgotPasswordTitle": "Forgot Password",
+    "forgotPasswordDesc": "Send password reset link to email",
+
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "updating": "Updating...",
+    "updatePasswordButton": "Update Password",
+    "sendResetLink": "Send Reset Link",
+
+    "successProfileUpdated": "Profile updated successfully.",
+    "errorProfileUpdate": "Failed to update profile. Please try again."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to your admin dashboard",
+
+    "stats": {
+      "totalBookings": "Total Bookings",
+      "hotelBookings": "Hotel Bookings",
+      "busBookings": "Bus Bookings",
+      "taxiBookings": "Taxi Bookings",
+      "bikeBookings": "Bike Bookings",
+      "completedBookings": "Completed Bookings",
+      "cancelledBookings": "Cancelled Bookings",
+      "revenue": "Revenue",
+      "totalUsers": "Total Users",
+      "busUsers": "Bus Users",
+      "hotelUsers": "Hotel Users",
+      "rideUsers": "Ride Users"
+    },
+
+    "charts": {
+      "analyticsOverview": "Analytics Overview"
+    },
+
+    "transactions": {
+      "recentTransactions": "Recent Transactions",
+      "table": {
+        "id": "ID",
+        "service": "Service",
+        "date": "Date",
+        "amount": "Amount",
+        "status": "Status",
+        "description": "Description"
+      },
+      "noTransactions": "No transactions found"
+    },
+
+    "statuses": {
+      "success": "SUCCESS",
+      "pending": "PENDING",
+      "rejected": "REJECTED"
+    }
+  },
+  "busOperators": {
+    "pageTitle": "Bus Operators",
+    "pageSubtitle": "Manage all bus operators",
+    "addOperatorButton": "Add Bus Operator",
+
+    "tableHeaders": {
+      "name": "Name",
+      "mobile": "Mobile",
+      "email": "Email ID",
+      "numberOfBuses": "Number of Buses",
+      "walletBalance": "Wallet Balance",
+      "status": "Status",
+      "actions": "Actions"
+    },
+
+    "actions": {
+      "viewDetails": "View Details"
+    },
+
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "suspended": "Suspended"
+    }
+  },
+
+  "busOperatorDetails": {
+    "backButton": "Back to Bus Operators",
+    "busNotFound": "Bus Operator not found",
+
+    "basicInfo": {
+      "title": "Basic Information",
+      "profilePhoto": "Profile Photo",
+      "fullNameLabel": "Full Name",
+      "mobileLabel": "Mobile",
+      "emailLabel": "Email ID",
+      "statusLabel": "Status",
+      "remarkLabel": "Remark",
+      "remarkPlaceholder": "Enter reason for rejection or blocking",
+      "chooseBranchLabel": "Choose Branch",
+      "verificationBadgeLabel": "Verification Badge",
+      "verified": "Verified",
+      "notVerified": "Not Verified"
+    },
+
+    "companyInfo": {
+      "title": "Company Information",
+      "companyNameLabel": "Company Name",
+      "companyAddressLabel": "Company Address",
+      "companyAddressNA": "N/A"
+    },
+
+    "identityVerification": {
+      "title": "Identity Verification",
+      "idCardFront": "ID Card Front",
+      "idCardBack": "ID Card Back"
+    },
+
+    "bankDetails": {
+      "title": "Bank Details",
+      "bankNameLabel": "Bank Name",
+      "accountNumberLabel": "Account Number",
+      "accountHolderLabel": "Account Holder Name",
+      "bankAccountDetailsLabel": "Bank Account Details",
+      "noBankDocument": "No bank document uploaded."
+    },
+
+    "actions": {
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "save": "Save"
+    },
+
+    "statusOptions": {
+      "rejected": "rejected",
+      "blocked": "blocked",
+      "pending": "pending",
+      "approved": "approved"
+    }
+  },
+  "busBookings": {
+    "title": "Bus Bookings",
+    "subtitle": "View and manage all bus bookings",
+    "columns": {
+      "id": "ID",
+      "busRegistrationNumber": "Bus Reg. No.",
+      "customerName": "Customer Name",
+      "customerPhone": "Phone",
+      "customerEmail": "Email",
+      "from": "From",
+      "to": "To",
+      "journeyDate": "Journey Date",
+      "amount": "Amount",
+      "paymentStatus": "Payment",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "View Details"
+    },
+    "currencySymbol": "₹"
+  },
+  "busBookingDetails": {
+    "backButton": "Back to Bookings",
+    "title": "Booking Details",
+    "bookingIdLabel": "Booking ID",
+    "status": "Status",
+
+    "journeyDetails": {
+      "title": "Journey Details",
+      "busRegistration": "Bus Registration",
+      "from": "From",
+      "to": "To",
+      "journeyDate": "Journey Date"
+    },
+
+    "customerInformation": {
+      "title": "Customer Information",
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email"
+    },
+
+    "paymentDetails": {
+      "title": "Payment Details",
+      "amount": "Amount",
+      "paymentStatus": "Payment Status",
+      "paymentMethod": "Payment Method",
+      "paid": "Paid",
+      "currencySymbol": "₹"
+    }
+  },
+  "hotelManagers": {
+    "pageTitle": "Hotel Managers",
+    "pageSubtitle": "Manage all hotel managers",
+    "addButton": "Add Hotel Manager",
+    "tableHeaders": {
+      "name": "Name",
+      "mobile": "Mobile",
+      "email": "Email",
+      "balance": "Wallet Balance",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "labels": {
+      "verified": "Verified",
+      "viewDetails": "View Details"
+    },
+    "messages": {
+      "noData": "No hotel managers found",
+      "loading": "Loading hotel managers..."
+    }
+  },
+  "hotelManagerDetails": {
+    "backButton": "Back to Hotel Managers",
+    "addNewTitle": "Add New Hotel Manager",
+    "viewTitle": "Hotel Manager: {{name}}",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "create": "Create Manager",
+    "saveChanges": "Save Changes",
+
+    "tabs": {
+      "personal": "Personal Info",
+      "hotel": "Hotel Details",
+      "rooms": "Rooms",
+      "banking": "Banking"
+    },
+
+    "personalInfo": {
+      "sectionTitle": "Personal Info",
+      "profilePhoto": "Profile Photo",
+      "name": "Name",
+      "mobile": "Mobile",
+      "email": "Email",
+      "status": "Status",
+      "remark": "Remark",
+      "remarkPlaceholder": "Enter reason for rejection or blocking",
+      "chooseBranch": "Choose Branch",
+      "verificationStatus": "Verification Status",
+      "verified": "Verified",
+      "notVerified": "Not Verified"
+    },
+
+    "companyInfo": {
+      "sectionTitle": "Company Info",
+      "companyName": "Company Name",
+      "companyAddress": "Company Address"
+    },
+
+    "hotelDetails": {
+      "hotelName": "Hotel Name",
+      "businessLicense": "Business License",
+      "hotelPhotos": "Hotel Photos",
+      "city": "City",
+      "locality": "Locality",
+      "landmark": "Landmark",
+      "pinCode": "Pin Code",
+      "totalRooms": "Total Rooms"
+    },
+
+    "rooms": {
+      "standardRooms": "Standard Rooms",
+      "luxuryRooms": "Luxury Rooms",
+      "pricePerNight": "Price (per night)",
+      "numberOfRooms": "Number of Rooms",
+      "amenities": "Amenities",
+      "roomPhotos": "Room Photos",
+      "checkInTime": "Check-in Time",
+      "checkOutTime": "Check-out Time",
+      "hotelAmenities": "Hotel Amenities",
+      "policyDocument": "Policy Document",
+      "policyDocuments": "Policy Documents"
+    },
+
+    "banking": {
+      "bankName": "Bank Name",
+      "bankAccountNumber": "Bank Account Number",
+      "accountHolderName": "Account Holder Name",
+      "bankAccountDocument": "Bank Account Document",
+      "bankAccountDetails": "Bank Account Details"
+    }
+  },
+  "hotelBookings": {
+    "pageTitle": "Hotel Bookings",
+    "pageSubtitle": "View and manage all hotel bookings",
+
+    "tableHeaders": {
+      "bookingId": "Booking ID",
+      "hotelId": "Hotel ID",
+      "customerName": "Customer Name",
+      "customerPhone": "Phone",
+      "customerEmail": "Email",
+      "checkInDate": "Check-in Date",
+      "checkOutDate": "Check-out Date",
+      "amount": "Amount",
+      "status": "Status",
+      "actions": "Actions"
+    },
+
+    "labels": {
+      "viewDetails": "View Details"
+    },
+
+    "detailsSheet": {
+      "title": "Booking Details",
+      "bookingId": "Booking ID",
+      "hotelId": "Hotel ID",
+      "status": "Status",
+      "amount": "Amount",
+
+      "customerInfo": {
+        "title": "Customer Information",
+        "name": "Name",
+        "phone": "Phone",
+        "email": "Email"
+      },
+
+      "stayDetails": {
+        "title": "Stay Details",
+        "checkInDate": "Check-in Date",
+        "checkOutDate": "Check-out Date"
+      },
+
+      "journey": {
+        "title": "Customer Journey",
+        "message": "Booking was made on {{date}}. Customer ID proof verification complete."
+      }
+    },
+
+    "messages": {
+      "noData": "No bookings found",
+      "loading": "Loading hotel bookings..."
+    }
+  },
+  "customerManagement": {
+    "pageTitle": "User Management",
+    "pageSubtitle": "View and manage all users",
+
+    "tableHeaders": {
+      "name": "Name",
+      "mobile": "Mobile",
+      "email": "Email ID",
+      "status": "Status",
+      "actions": "Actions"
+    },
+
+    "labels": {
+      "viewDetails": "View Details"
+    },
+
+    "messages": {
+      "noData": "No users found",
+      "loading": "Loading users..."
+    }
+  },
+  "customerDetails": {
+    "backButton": "Back to Users",
+
+    "page": {
+      "title": "Customer Details"
+    },
+
+    "sections": {
+      "personalInformation": "Personal Information",
+      "address": "Address"
+    },
+
+    "fields": {
+      "profilePicture": "Profile Picture",
+      "fullName": "Full Name",
+      "phoneNumber": "Phone Number",
+      "emailAddress": "Email Address",
+      "dateOfBirth": "Date of Birth",
+      "gender": "Gender",
+      "status": "Status",
+      "remarks": "Remarks",
+      "remarksPlaceholder": "Enter remarks for rejection or blocking...",
+      "zoneCode": "Zone Code",
+      "area": "Area",
+      "city": "City",
+      "nationality": "Nationality",
+      "nationalIdExpiry": "National ID Expiry Date",
+      "nationalIdFront": "National ID Card Front",
+      "nationalIdBack": "National ID Card Back"
+    },
+
+    "placeholders": {
+      "selectGender": "Select Gender",
+      "enterZoneCode": "Enter zone code",
+      "enterArea": "Enter area",
+      "enterCity": "Enter city"
+    },
+
+    "statusOptions": {
+      "select": "Select status",
+      "active": "Active",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "blocked": "Blocked"
+    },
+
+    "buttons": {
+      "cancel": "Cancel",
+      "editStatus": "Edit Status",
+      "saveStatus": "Save Status"
+    },
+
+    "messages": {
+      "noData": "No customer data",
+      "loading": "Loading customer..."
+    }
+  },
+  "customerBookings": {
+    "pageTitle": "User Bookings",
+    "pageSubtitle": "View and manage all user bookings",
+
+    "tableHeaders": {
+      "userId": "ID",
+      "bookingId": "Booking ID",
+      "customerName": "Customer Name",
+      "customerEmail": "Email",
+      "customerPhone": "Phone",
+      "serviceType": "Service Type",
+      "bookingDate": "Booking Date",
+      "amount": "Amount",
+      "paymentStatus": "Payment",
+      "actions": "Actions"
+    },
+
+    "labels": {
+      "viewDetails": "View Details"
+    },
+
+    "messages": {
+      "noData": "No user bookings found",
+      "loading": "Loading user bookings..."
+    }
+  },
+  "customerBookingsDetails": {
+    "backButton": "Back to All User Bookings",
+    "pageTitle": "User Details",
+
+    "summary": {
+      "title": "Booking Summary",
+      "bus": "Bus Bookings",
+      "hotel": "Hotel Bookings",
+      "ride": "Ride Bookings"
+    },
+
+    "tabs": {
+      "all": "All Bookings",
+      "bus": "Bus Bookings",
+      "hotel": "Hotel Bookings",
+      "ride": "Ride Bookings",
+      "transactions": "Payment Transactions"
+    },
+
+    "search": {
+      "bookings": "Search bookings...",
+      "transactions": "Search transactions..."
+    },
+
+    "tables": {
+      "common": {
+        "id": "ID",
+        "date": "Date",
+        "amount": "Amount",
+        "status": "Status"
+      },
+      "all": {
+        "type": "Type",
+        "noData": "No booking history found"
+      },
+      "bus": {
+        "noData": "No bus bookings found"
+      },
+      "hotel": {
+        "noData": "No hotel bookings found"
+      },
+      "ride": {
+        "type": "Type",
+        "noData": "No ride bookings found"
+      },
+      "transactions": {
+        "type": "Type",
+        "noData": "No payment transaction found"
+      }
+    },
+
+    "wallet": {
+      "digitalCard": "Digital Debit Card",
+      "balanceLabel": "Balance",
+      "currency": "XAF"
+    }
+  },
+  "admins": {
+    "pageTitle": "Role Management",
+    "subTitleAdmin": "Manage sub-admin roles and their permissions",
+    "subTitleDefault": "Manage admin, sub-admin roles and their permissions",
+
+    "buttons": {
+      "addSubAdmin": "Add Sub-Admin",
+      "addAdminSubAdmin": "Add Admin / Sub-admin",
+      "cancel": "Cancel",
+      "add": "Add"
+    },
+
+    "dialog": {
+      "titleAddSubAdmin": "Add New Sub-Admin",
+      "titleAddAdmin": "Add New Admin / Sub-admin",
+      "placeholders": {
+        "enterName": "Enter full name",
+        "enterPhone": "Enter mobile number",
+        "enterEmail": "Enter email address",
+        "selectAdmin": "Select an Admin",
+        "typeCity": "Type city name..."
+      },
+      "loadingAdmins": "Loading admins...",
+      "noAdminsFound": "No admins found",
+      "selected": "Selected: {{branch}}"
+    },
+
+    "fields": {
+      "name": "Name",
+      "mobileNumber": "Mobile Number",
+      "email": "Email",
+      "role": "Role",
+      "assignAdmin": "Assign Admin",
+      "chooseBranch": "Choose Branch",
+      "permissions": "Permissions"
+    },
+
+    "roleOptions": {
+      "admin": "Admin",
+      "subAdmin": "Sub-Admin"
+    },
+
+    "permissions": {
+      "noPermissions": "No permissions available"
+    },
+    "tableHeaders": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "permissions": "Permissions",
+      "branch": "Branch",
+      "actions": "Actions",
+      "view": "View Details"
+    },
+    "tableValues": {
+      "fullAccess": "Full Access",
+      "permissionsCount": "{{count}} permissions",
+      "notAvailable": "N/A"
+    }
+  },
+  "adminManagement": {
+    "notFound": "Admin not found",
+
+    "backButton": "Back to All Admins / Sub-admins",
+    "pageTitle": "Admin / Sub-admin Details",
+
+    "buttons": {
+      "edit": "Edit Admin / Sub-admin",
+      "cancel": "Cancel",
+      "save": "Save Changes"
+    },
+
+    "tabs": {
+      "details": "Admin / Sub-admin Details",
+      "permissions": "Permissions",
+      "activity": "Activity Log"
+    },
+
+    "detailsSection": {
+      "title": "Admin / Sub-admin Information",
+      "viewDescription": "View Admin / Sub-admin details",
+      "editDescription": "Edit Admin / Sub-admin details",
+      "fields": {
+        "name": "Name",
+        "email": "Email",
+        "mobileNumber": "Mobile Number",
+        "role": "Role",
+        "roleOptions": {
+          "admin": "Admin",
+          "subadmin": "Subadmin"
+        },
+        "placeholder": {
+          "name": "Enter full name",
+          "email": "Enter email address",
+          "mobileNumber": "Enter mobile number"
+        }
+      }
+    },
+
+    "permissionsSection": {
+      "title": "User Permissions",
+      "description": {
+        "admin": "Admin users have full access to all features",
+        "subadmin": "Manage what this user can access and modify"
+      },
+      "noPermissions": "No permissions available"
+    },
+
+    "activitySection": {
+      "title": "Activity Log",
+      "description": "Recent activities performed by this user",
+      "loading": "Loading activity...",
+      "noActivity": "No activity found."
+    }
+  },
+  "commissionManagement": {
+    "title": "Commission Management",
+    "addNew": "Add New Commission",
+    "edit": "Edit Commission",
+    "serviceType": "Service Type",
+    "commission": "Commission",
+    "commissionType": "Commission Type",
+    "percentage": "Percentage",
+    "fixedRate": "Fixed Rate",
+    "commissionPercentage": "Commission Percentage",
+    "fixedRateCurrency": "Fixed Rate (₹)",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "actions": "Actions",
+    "editAction": "Edit",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "selectServiceType": "Select service type",
+    "cancel": "Cancel",
+    "save": "Save",
+    "serviceTypes": {
+      "bus": "Bus",
+      "hotel": "Hotel",
+      "taxi": "Taxi",
+      "bike": "Bike",
+      "user": "User Transfer"
+    },
+    "tableHeaders": {
+      "serviceType": "Service Type",
+      "commission": "Commission",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "statusLabels": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
+  "coupons": {
+    "title": "Coupons",
+    "addNew": "Add New Coupon",
+    "edit": "Edit Coupon",
+    "tableHeaders": {
+      "name": "Coupon Name",
+      "code": "Coupon Code",
+      "serviceType": "Service Type",
+      "discount": "Discount",
+      "startDate": "Start Date",
+      "expiryDate": "Expiry Date",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "discountTypes": {
+      "percentage": "Percentage",
+      "fixed": "Fixed Amount"
+    },
+    "labels": {
+      "name": "Coupon Name",
+      "code": "Coupon Code",
+      "serviceType": "Service Type",
+      "discountType": "Discount Type",
+      "discountPercentage": "Discount Percentage",
+      "discountAmount": "Discount Amount (₹)",
+      "startDate": "Start Date and Time",
+      "expiryDate": "Expiry Date and Time",
+      "status": "Status",
+      "placeholder": {
+        "name": "e.g. SUMMER20",
+        "code": "e.g. SUMMER20",
+        "selectServiceType": "Select service type"
+      },
+      "description": "This is the code users will enter to apply the coupon"
+    },
+    "statusLabels": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "filters": {
+      "serviceType": "Service Type",
+      "status": "Status",
+      "options": {
+        "allServices": "All Services",
+        "bus": "Bus",
+        "hotel": "Hotel",
+        "taxi": "Taxi",
+        "bike": "Bike"
+      }
+    },
+    "actions": {
+      "edit": "Edit",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save"
+    }
+  },
+  "wallet": {
+    "title": "Wallet Management",
+
+    "cards": {
+      "totalTransactions": "Total Transactions",
+      "totalCredits": "Total Credits",
+      "totalDebits": "Total Debits",
+      "pendingWithdrawals": "Pending Withdrawals"
+    },
+
+    "transactionHistory": {
+      "title": "Transaction History",
+      "noData": "No transactions found",
+      "loading": "Loading transactions..."
+    },
+
+    "tableHeaders": {
+      "transactionId": "Transaction ID",
+      "user": "User",
+      "role": "Role",
+      "type": "Type",
+      "amount": "Amount",
+      "date": "Date",
+      "status": "Status",
+      "description": "Description"
+    },
+
+    "types": {
+      "credit": "Credit",
+      "debit": "Debit",
+      "transfer": "Transfer",
+      "withdrawal": "Withdrawal"
+    },
+
+    "statusLabels": {
+      "pending": "Pending",
+      "completed": "Completed",
+      "failed": "Failed"
+    }
+  }
+}

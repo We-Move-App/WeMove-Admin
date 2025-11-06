@@ -24,6 +24,7 @@ import NotFoundImage from "@/assets/not-found-illustration.svg";
 import AmenitiesMultiSelect from "@/components/ui/amenitiesMultiSelect";
 import { FileText } from "lucide-react";
 import BranchSelect from "@/components/branch-select/BranchSelect";
+import { useTranslation } from "react-i18next";
 
 const HotelManagerDetails = () => {
   const { id } = useParams();
@@ -43,6 +44,7 @@ const HotelManagerDetails = () => {
   );
 
   const [loading, setLoading] = useState(true);
+  const { i18n, t } = useTranslation();
 
   const toTitleCaseStatus = (status: string): HotelManager["status"] => {
     const map: Record<string, HotelManager["status"]> = {
@@ -397,14 +399,15 @@ const HotelManagerDetails = () => {
         className="mb-4"
         onClick={() => navigate("/hotel-management/managers")}
       >
-        <ChevronLeft className="mr-2 h-4 w-4" /> Back to Hotel Managers
+        <ChevronLeft className="mr-2 h-4 w-4" />{" "}
+        {t("hotelManagerDetails.backButton")}
       </Button>
 
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">
           {isNewManager
-            ? "Add New Hotel Manager"
-            : `Hotel Manager: ${manager.name}`}
+            ? t("hotelManagerDetails.addNewTitle")
+            : t("hotelManagerDetails.viewTitle", { name: manager.name })}
         </h1>
         {/* <div className="flex gap-2">
           {!isNewManager && (
@@ -452,7 +455,7 @@ const HotelManagerDetails = () => {
             className="bg-gray-300 text-gray-800 border-gray-300 hover:bg-gray-300 hover:text-gray-900"
             onClick={() => navigate("/hotel-management/managers")}
           >
-            Cancel
+            {t("hotelManagerDetails.cancel")}
           </Button>
 
           {mode === "view" && id !== "new" && (
@@ -461,13 +464,15 @@ const HotelManagerDetails = () => {
                 navigate(`/hotel-management/managers/${id}?mode=edit`)
               }
             >
-              Edit
+              {t("hotelManagerDetails.edit")}
             </Button>
           )}
 
           {(mode === "edit" || mode === "post") && (
             <Button onClick={handleSubmit}>
-              {mode === "post" ? "Create Manager" : "Save Changes"}
+              {mode === "post"
+                ? t("hotelManagerDetails.create")
+                : t("hotelManagerDetails.saveChanges")}
             </Button>
           )}
         </div>
@@ -475,21 +480,31 @@ const HotelManagerDetails = () => {
 
       <Tabs defaultValue="personal" className="w-full">
         <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-5 mb-4">
-          <TabsTrigger value="personal">Personal Info</TabsTrigger>
-          <TabsTrigger value="hotel">Hotel Details</TabsTrigger>
-          <TabsTrigger value="rooms">Rooms</TabsTrigger>
-          <TabsTrigger value="banking">Banking</TabsTrigger>
+          <TabsTrigger value="personal">
+            {t("hotelManagerDetails.tabs.personal")}
+          </TabsTrigger>
+          <TabsTrigger value="hotel">
+            {t("hotelManagerDetails.tabs.hotel")}
+          </TabsTrigger>
+          <TabsTrigger value="rooms">
+            {t("hotelManagerDetails.tabs.rooms")}
+          </TabsTrigger>
+          <TabsTrigger value="banking">
+            {t("hotelManagerDetails.tabs.banking")}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="personal" className="space-y-4">
           <Card>
             <CardContent className="pt-6 space-y-4">
-              <h3 className="text-lg font-semibold mb-4">Personal Iinfo</h3>
+              <h3 className="text-lg font-semibold mb-4">
+                {t("hotelManagerDetails.personalInfo.sectionTitle")}
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <UploadField
                     disabled={isReadOnly}
-                    label="Profile Photo"
+                    label={t("hotelManagerDetails.personalInfo.profilePhoto")}
                     value={manager?.profilePhoto}
                     onChange={async (file) => {
                       if (file instanceof File) {
@@ -501,7 +516,9 @@ const HotelManagerDetails = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Name</label>
+                  <label className="block text-sm font-medium mb-1">
+                    {t("hotelManagerDetails.personalInfo.name")}
+                  </label>
                   <Input
                     disabled={isReadOnly}
                     value={manager.name}
@@ -510,7 +527,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Mobile
+                    {t("hotelManagerDetails.personalInfo.mobile")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -520,7 +537,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Email
+                    {t("hotelManagerDetails.personalInfo.email")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -531,7 +548,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
+                    {t("hotelManagerDetails.personalInfo.status")}
                   </label>
                   {mode === "view" ? (
                     <p className="filter-input w-full bg-gray-100">
@@ -561,7 +578,7 @@ const HotelManagerDetails = () => {
                   manager.status === "blocked") && (
                   <div className="col-span-full">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Remark
+                      {t("hotelManagerDetails.personalInfo.remark")}
                     </label>
                     <textarea
                       name="remark"
@@ -570,14 +587,16 @@ const HotelManagerDetails = () => {
                         setManager({ ...manager, remark: e.target.value })
                       }
                       className="filter-input w-full h-24"
-                      placeholder="Enter reason for rejection or blocking"
+                      placeholder={t(
+                        "hotelManagerDetails.personalInfo.remarkPlaceholder"
+                      )}
                       required
                     />
                   </div>
                 )}
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Choose Branch
+                    {t("hotelManagerDetails.personalInfo.chooseBranch")}
                   </label>
                   {mode === "view" ? (
                     <p className="filter-input w-full bg-gray-100">
@@ -593,12 +612,14 @@ const HotelManagerDetails = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Verification Status
+                    {t("hotelManagerDetails.personalInfo.verificationStatus")}
                   </label>
 
                   {mode === "view" ? (
                     <p className="filter-input w-full bg-gray-100">
-                      {manager.batchVerified ? "Verified" : "Not Verified"}
+                      {manager.batchVerified
+                        ? t("hotelManagerDetails.personalInfo.verified")
+                        : t("hotelManagerDetails.personalInfo.notVerified")}
                     </p>
                   ) : (
                     <select
@@ -614,8 +635,12 @@ const HotelManagerDetails = () => {
                       }
                       className="filter-select w-full"
                     >
-                      <option value="Verified">Verified</option>
-                      <option value="Not Verified">Not Verified</option>
+                      <option value="Verified">
+                        {t("hotelManagerDetails.personalInfo.verified")}
+                      </option>
+                      <option value="Not Verified">
+                        {t("hotelManagerDetails.personalInfo.notVerified")}
+                      </option>
                     </select>
                   )}
                 </div>
@@ -624,11 +649,13 @@ const HotelManagerDetails = () => {
           </Card>
           <Card>
             <CardContent className="pt-6 space-y-4">
-              <h3 className="text-lg font-semibold mb-4">Company Info</h3>
+              <h3 className="text-lg font-semibold mb-4">
+                {t("hotelManagerDetails.companyInfo.sectionTitle")}
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Company Name
+                    {t("hotelManagerDetails.companyInfo.companyName")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -640,7 +667,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Company Address
+                    {t("hotelManagerDetails.companyInfo.companyAddress")}
                   </label>
                   <Textarea
                     disabled={isReadOnly}
@@ -661,7 +688,7 @@ const HotelManagerDetails = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Hotel Name
+                    {t("hotelManagerDetails.hotelDetails.hotelName")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -671,7 +698,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Business License
+                    {t("hotelManagerDetails.hotelDetails.businessLicense")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -685,7 +712,7 @@ const HotelManagerDetails = () => {
                 <div className="md:col-span-2">
                   <UploadField
                     disabled={isReadOnly}
-                    label="Hotel Photos"
+                    label={t("hotelManagerDetails.hotelDetails.hotelPhotos")}
                     value={
                       isNewManager || !manager.hotelPhotos
                         ? null
@@ -707,7 +734,9 @@ const HotelManagerDetails = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">City</label>
+                  <label className="block text-sm font-medium mb-1">
+                    {t("hotelManagerDetails.hotelDetails.city")}
+                  </label>
                   <Input
                     disabled={isReadOnly}
                     value={manager.city || ""}
@@ -716,7 +745,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Locality
+                    {t("hotelManagerDetails.hotelDetails.locality")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -726,7 +755,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Landmark
+                    {t("hotelManagerDetails.hotelDetails.landmark")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -736,7 +765,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Pin Code
+                    {t("hotelManagerDetails.hotelDetails.pinCode")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -746,7 +775,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Total Rooms
+                    {t("hotelManagerDetails.hotelDetails.totalRooms")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -765,11 +794,13 @@ const HotelManagerDetails = () => {
         <TabsContent value="rooms" className="space-y-4">
           <Card>
             <CardContent className="pt-6">
-              <h3 className="text-lg font-semibold mb-4">Standard Rooms</h3>
+              <h3 className="text-lg font-semibold mb-4">
+                {t("hotelManagerDetails.rooms.standardRooms")}
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Price (per night)
+                    {t("hotelManagerDetails.rooms.pricePerNight")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -785,7 +816,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Number of Rooms
+                    {t("hotelManagerDetails.rooms.numberOfRooms")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -802,7 +833,7 @@ const HotelManagerDetails = () => {
 
                 <div className="col-span-2">
                   <label className="block text-sm font-medium mb-1">
-                    Amenities
+                    {t("hotelManagerDetails.rooms.amenities")}
                   </label>
                   <AmenitiesMultiSelect
                     value={manager.standardRooms?.amenities || []}
@@ -819,7 +850,7 @@ const HotelManagerDetails = () => {
                 <div className="col-span-2">
                   <UploadField
                     disabled={isReadOnly}
-                    label="Room Photos"
+                    label={t("hotelManagerDetails.rooms.roomPhotos")}
                     value={
                       isNewManager || !manager.standardRooms?.photos
                         ? null
@@ -844,11 +875,13 @@ const HotelManagerDetails = () => {
                 </div>
               </div>
 
-              <h3 className="text-lg font-semibold mb-4 mt-8">Luxury Rooms</h3>
+              <h3 className="text-lg font-semibold mb-4 mt-8">
+                {t("hotelManagerDetails.rooms.luxuryRooms")}
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Price (per night)
+                    {t("hotelManagerDetails.rooms.pricePerNight")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -864,7 +897,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Number of Rooms
+                    {t("hotelManagerDetails.rooms.numberOfRooms")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -880,7 +913,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm font-medium mb-1">
-                    Amenities
+                    {t("hotelManagerDetails.rooms.amenities")}
                   </label>
                   <AmenitiesMultiSelect
                     value={manager.luxuryRooms?.amenities || []}
@@ -924,7 +957,7 @@ const HotelManagerDetails = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Check-in Time
+                    {t("hotelManagerDetails.rooms.checkInTime")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -937,7 +970,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Check-out Time
+                    {t("hotelManagerDetails.rooms.checkOutTime")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -950,7 +983,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm font-medium mb-1">
-                    Hotel Amenities
+                    {t("hotelManagerDetails.rooms.hotelAmenities")}
                   </label>
                   {/* <AmenitiesMultiSelect
                     value={manager.amenities || []}
@@ -974,7 +1007,7 @@ const HotelManagerDetails = () => {
                     manager.policyDocuments.length > 0 && (
                       <div>
                         <label className="block text-sm font-medium mb-2">
-                          Policy Document
+                          {t("hotelManagerDetails.rooms.policyDocument")}
                         </label>
                         <div className="flex flex-col gap-2">
                           {manager.policyDocuments.map((doc) => (
@@ -996,7 +1029,7 @@ const HotelManagerDetails = () => {
                   {mode !== "view" && (
                     <UploadField
                       disabled={isReadOnly}
-                      label="Policy Documents"
+                      label={t("hotelManagerDetails.rooms.policyDocuments")}
                       value={
                         isNewManager || !manager.policyDocuments
                           ? null
@@ -1031,7 +1064,7 @@ const HotelManagerDetails = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Bank Name
+                    {t("hotelManagerDetails.banking.bankName")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -1041,7 +1074,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Bank Account Number
+                    {t("hotelManagerDetails.banking.bankAccountNumber")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -1053,7 +1086,7 @@ const HotelManagerDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Account Holder Name
+                    {t("hotelManagerDetails.banking.accountHolderName")}
                   </label>
                   <Input
                     disabled={isReadOnly}
@@ -1069,7 +1102,7 @@ const HotelManagerDetails = () => {
                   {mode === "view" && manager.bankAccountDetails && (
                     <div>
                       <label className="block text-sm font-medium mb-2">
-                        Bank Account Document
+                        {t("hotelManagerDetails.banking.bankAccountDocument")}
                       </label>
                       <a
                         href={
@@ -1097,7 +1130,9 @@ const HotelManagerDetails = () => {
                   {mode !== "view" && (
                     <UploadField
                       disabled={isReadOnly}
-                      label="Bank Account Details"
+                      label={t(
+                        "hotelManagerDetails.banking.bankAccountDetails"
+                      )}
                       value={manager.bankAccountDetails || null}
                       multiple={false}
                       onChange={async (file) => {

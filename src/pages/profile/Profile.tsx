@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "@/api/axiosInstance";
 import { toast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface ProfileProps {
   onBack?: () => void;
@@ -50,6 +51,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [resetEmail, setResetEmail] = useState("");
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const storedProfile = localStorage.getItem("adminProfile");
@@ -215,13 +217,13 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
             <div className="px-6 py-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  Personal Information
+                  {t("profile.personalInfoTitle") ?? " Personal Information"}
                 </h2>
                 <button
                   onClick={() => setIsEditing(!isEditing)}
                   className="px-4 py-2 bg-green-900 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  {isEditing ? "Cancel" : "Edit Profile"}
+                  {isEditing ? t("profile.cancel") : t("profile.editProfile")}
                 </button>
               </div>
 
@@ -254,7 +256,9 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
                   <h3 className="text-2xl font-bold text-gray-900">
                     {profile.name}
                   </h3>
-                  <p className="text-gray-600">Administrator</p>
+                  <p className="text-gray-600">
+                    {t("profile.administratorRole")}
+                  </p>
                 </div>
               </div>
 
@@ -263,7 +267,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <User className="inline h-4 w-4 mr-1" />
-                      Full Name
+                      {t("profile.fullNameLabel")}
                     </label>
                     <input
                       type="text"
@@ -274,14 +278,16 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
                           name: e.target.value,
                         }))
                       }
-                      disabled={!isEditing}
+                      // disabled={!isEditing}
+                      disabled
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-50 transition-colors"
+                      placeholder={t("profile.fullNameLabel")}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <Mail className="inline h-4 w-4 mr-1" />
-                      Email Address
+                      {t("profile.emailLabel")}
                     </label>
                     <input
                       type="email"
@@ -292,14 +298,16 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
                           email: e.target.value,
                         }))
                       }
-                      disabled={!isEditing}
+                      // disabled={!isEditing}
+                      disabled
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-50 transition-colors"
+                      placeholder={t("profile.emailLabel")}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <Phone className="inline h-4 w-4 mr-1" />
-                      Phone Number
+                      {t("profile.phoneLabel")}
                     </label>
                     <input
                       type="tel"
@@ -310,40 +318,21 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
                           phone: e.target.value,
                         }))
                       }
-                      disabled={!isEditing}
+                      // disabled={!isEditing}
+                      disabled
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-50 transition-colors"
+                      placeholder={t("profile.phoneLabel")}
                     />
                   </div>
-                  {/* <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            <Lock className="inline h-4 w-4 mr-1" />
-                                            Password
-                                        </label>
-                                        <div className="relative">
-                                            <input
-                                                type={showPassword ? 'text' : 'password'}
-                                                value="••••••••••••"
-                                                disabled
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 pr-12"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                            >
-                                                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                                            </button>
-                                        </div>
-                                    </div> */}
                 </div>
 
                 {isEditing && (
                   <div className="flex justify-end">
                     <button
                       type="submit"
-                      className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      className="px-6 py-3 bg-green-900 text-white rounded-lg hover:bg-green-700 transition-colors"
                     >
-                      Save Changes
+                      {t("profile.saveChanges")}
                     </button>
                   </div>
                 )}
@@ -355,7 +344,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
           <div className="bg-white shadow-lg rounded-lg overflow-hidden">
             <div className="px-6 py-8">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                Security Settings
+                {t("profile.securitySettingsTitle")}
               </h2>
               <div className="space-y-4">
                 <button
@@ -366,33 +355,15 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
                     <Key className="h-5 w-5 text-gray-400 group-hover:text-green-600 mr-3" />
                     <div className="text-left">
                       <p className="font-medium text-gray-900">
-                        Update Password
+                        {t("profile.updatePasswordTitle")}
                       </p>
                       <p className="text-sm text-gray-500">
-                        Change your current password
+                        {t("profile.updatePasswordDesc")}
                       </p>
                     </div>
                   </div>
                   <ArrowLeft className="h-5 w-5 text-gray-400 group-hover:text-green-600 rotate-180" />
                 </button>
-
-                {/* <button
-                  onClick={() => setShowForgotModal(true)}
-                  className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors group"
-                >
-                  <div className="flex items-center">
-                    <AlertCircle className="h-5 w-5 text-gray-400 group-hover:text-green-600 mr-3" />
-                    <div className="text-left">
-                      <p className="font-medium text-gray-900">
-                        Forgot Password
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Send password reset link to email
-                      </p>
-                    </div>
-                  </div>
-                  <ArrowLeft className="h-5 w-5 text-gray-400 group-hover:text-green-600 rotate-180" />
-                </button> */}
               </div>
             </div>
           </div>
@@ -404,60 +375,13 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Update Password
+              {t("profile.updatePasswordTitle")}
             </h3>
-            {/* <form onSubmit={handlePasswordReset} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
-                                <input
-                                    type="password"
-                                    value={currentPassword}
-                                    onChange={(e) => setCurrentPassword(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-                                <input
-                                    type="password"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
-                                <input
-                                    type="password"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                    required
-                                />
-                            </div>
-                            <div className="flex justify-end space-x-3 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowResetModal(false)}
-                                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                                >
-                                    Reset Password
-                                </button>
-                            </div>
-                        </form> */}
             <form onSubmit={handlePasswordReset} className="space-y-4">
               {/* Current Password */}
               <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Current Password
+                  {t("profile.currentPassword")}
                 </label>
                 <input
                   type={showOld ? "text" : "password"}
@@ -478,7 +402,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
               {/* New Password */}
               <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  New Password
+                  {t("profile.newPassword")}
                 </label>
                 <input
                   type={showNew ? "text" : "password"}
@@ -499,7 +423,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
               {/* Confirm New Password */}
               <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Confirm New Password
+                  {t("profile.confirmNewPassword")}
                 </label>
                 <input
                   type={showConfirm ? "text" : "password"}
@@ -524,69 +448,22 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
                   onClick={() => setShowResetModal(false)}
                   className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  {t("profile.cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  {loading ? "Updating..." : "Update Password"}
+                  {loading
+                    ? t("profile.updating")
+                    : t("profile.updatePasswordButton")}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-
-      {/* {showResetModal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-                        <h2 className="text-lg font-semibold mb-4">Reset Password</h2>
-
-                        <div className="space-y-3">
-                            <input
-                                type="password"
-                                placeholder="Old Password"
-                                value={oldPassword}
-                                onChange={(e) => setOldPassword(e.target.value)}
-                                className="w-full border rounded-lg p-2"
-                            />
-                            <input
-                                type="password"
-                                placeholder="New Password"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
-                                className="w-full border rounded-lg p-2"
-                            />
-                            <input
-                                type="password"
-                                placeholder="Confirm Password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full border rounded-lg p-2"
-                            />
-                        </div>
-
-                        <div className="flex justify-end mt-4 space-x-2">
-                            <button
-                                onClick={() => setShowResetModal(false)}
-                                className="px-4 py-2 bg-gray-200 rounded-lg"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handlePasswordReset}
-                                disabled={loading}
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
-                            >
-                                {loading ? "Updating..." : "Update"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )} */}
-
       {/* Forgot Password Modal */}
       {showForgotModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

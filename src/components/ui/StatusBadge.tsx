@@ -12,7 +12,7 @@ const StatusBadge = ({ status }: StatusBadgeProps) => {
     );
   }
 
-  console.log("StatusBadge input:", JSON.stringify(status));
+  // console.log("StatusBadge input:", JSON.stringify(status));
 
   // const getStatusClass = () => {
   //   const statusLower = status.toLowerCase().trim();
