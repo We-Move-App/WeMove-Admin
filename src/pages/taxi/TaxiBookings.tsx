@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import axiosInstance from "@/api/axiosInstance";
 import Loader from "@/components/ui/loader";
+import { useTranslation } from "react-i18next";
 
 const TaxiBookings = () => {
   const [bookings, setBookings] = useState<TaxiBooking[]>([]);
@@ -23,6 +24,7 @@ const TaxiBookings = () => {
   const [pageSize] = useState(10);
   const [totalBookings, setTotalBookings] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const { i18n, t } = useTranslation();
 
   const viewBookingDetails = (booking: TaxiBooking) => {
     setSelectedBooking(booking);
@@ -63,14 +65,26 @@ const TaxiBookings = () => {
   }, [currentPage, pageSize, searchTerm]);
 
   const columns = [
-    { key: "bookingId" as keyof TaxiBooking, header: "Booking ID" },
-    { key: "customerName" as keyof TaxiBooking, header: "Customer Name" },
-    { key: "riderName" as keyof TaxiBooking, header: "Driver Name" },
-    { key: "from" as keyof TaxiBooking, header: "From" },
-    { key: "to" as keyof TaxiBooking, header: "To" },
+    {
+      key: "bookingId" as keyof TaxiBooking,
+      header: t("taxiBookings.columns.bookingId"),
+    },
+    {
+      key: "customerName" as keyof TaxiBooking,
+      header: t("taxiBookings.columns.customerName"),
+    },
+    {
+      key: "riderName" as keyof TaxiBooking,
+      header: t("taxiBookings.columns.driverName"),
+    },
+    {
+      key: "from" as keyof TaxiBooking,
+      header: t("taxiBookings.columns.from"),
+    },
+    { key: "to" as keyof TaxiBooking, header: t("taxiBookings.columns.to") },
     {
       key: "rideDate" as keyof TaxiBooking,
-      header: "Ride Date",
+      header: t("taxiBookings.columns.rideDate"),
       render: (booking: TaxiBooking) => (
         <span>
           {booking.rideDate
@@ -81,19 +95,22 @@ const TaxiBookings = () => {
     },
     {
       key: "amount" as keyof TaxiBooking,
-      header: "Amount",
+      header: t("taxiBookings.columns.amount"),
       render: (booking: TaxiBooking) => (
-        <span>${booking.amount ? booking.amount.toFixed(2) : "0.00"}</span>
+        <span>
+          {t("taxiBookings.currencySymbol")}
+          {booking.amount ? booking.amount.toFixed(2) : "0.00"}
+        </span>
       ),
     },
     {
       key: "status" as keyof TaxiBooking,
-      header: "Status",
+      header: t("taxiBookings.columns.status"),
       render: (booking: TaxiBooking) => <StatusBadge status={booking.status} />,
     },
     {
       key: "actions" as "actions",
-      header: "Actions",
+      header: t("taxiBookings.columns.actions"),
       render: (booking: TaxiBooking) => (
         <button
           className="action-button flex items-center"
@@ -102,7 +119,8 @@ const TaxiBookings = () => {
             viewBookingDetails(booking);
           }}
         >
-          <Eye size={16} className="mr-1" /> View Details
+          <Eye size={16} className="mr-1" />
+          {t("taxiBookings.actions.viewDetails")}
         </button>
       ),
     },
@@ -124,8 +142,8 @@ const TaxiBookings = () => {
     <>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Taxi Bookings</h1>
-          <p className="text-gray-600">View and manage all taxi bookings</p>
+          <h1 className="text-2xl font-bold">{t("taxiBookings.title")}</h1>
+          <p className="text-gray-600">{t("taxiBookings.subtitle")}</p>
         </div>
       </div>
 
@@ -152,23 +170,29 @@ const TaxiBookings = () => {
       <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>Booking Details</SheetTitle>
+            <SheetTitle>{t("taxiBookings.sheet.title")}</SheetTitle>
           </SheetHeader>
           {selectedBooking && (
             <div className="mt-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="text-sm text-gray-500">Booking ID</h4>
+                  <h4 className="text-sm text-gray-500">
+                    {t("taxiBookings.sheet.labels.bookingId")}
+                  </h4>
                   <p className="font-medium">{selectedBooking.bookingId}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm text-gray-500">Status</h4>
+                  <h4 className="text-sm text-gray-500">
+                    {t("taxiBookings.sheet.labels.status")}
+                  </h4>
                   <StatusBadge status={selectedBooking.status} />
                 </div>
                 <div>
-                  <h4 className="text-sm text-gray-500">Amount</h4>
+                  <h4 className="text-sm text-gray-500">
+                    {t("taxiBookings.sheet.labels.amount")}
+                  </h4>
                   <p className="font-medium">
-                    $
+                    {t("taxiBookings.currencySymbol")}
                     {selectedBooking.amount
                       ? selectedBooking.amount.toFixed(2)
                       : "0.00"}
@@ -177,18 +201,26 @@ const TaxiBookings = () => {
               </div>
 
               <div className="pt-4 border-t">
-                <h3 className="font-semibold mb-2">Ride Details</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("taxiBookings.sheet.labels.rideDetails")}
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h4 className="text-sm text-gray-500">From</h4>
+                    <h4 className="text-sm text-gray-500">
+                      {t("taxiBookings.sheet.labels.from")}
+                    </h4>
                     <p className="font-medium">{selectedBooking.from}</p>
                   </div>
                   <div>
-                    <h4 className="text-sm text-gray-500">To</h4>
+                    <h4 className="text-sm text-gray-500">
+                      {t("taxiBookings.sheet.labels.to")}
+                    </h4>
                     <p className="font-medium">{selectedBooking.to}</p>
                   </div>
                   <div>
-                    <h4 className="text-sm text-gray-500">Ride Date</h4>
+                    <h4 className="text-sm text-gray-500">
+                      {t("taxiBookings.sheet.labels.rideDate")}
+                    </h4>
                     <p className="font-medium">
                       {selectedBooking.rideDate
                         ? new Date(selectedBooking.rideDate).toLocaleDateString(
@@ -201,12 +233,16 @@ const TaxiBookings = () => {
               </div>
 
               <div className="pt-4 border-t">
-                <h3 className="font-semibold mb-2">Customer Information</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("taxiBookings.sheet.labels.customerInformation")}
+                </h3>
                 <p className="font-medium">{selectedBooking.customerName}</p>
               </div>
 
               <div className="pt-4 border-t">
-                <h3 className="font-semibold mb-2">Driver Information</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("taxiBookings.sheet.labels.driverInformation")}
+                </h3>
                 <p className="font-medium">{selectedBooking.driverName}</p>
               </div>
             </div>

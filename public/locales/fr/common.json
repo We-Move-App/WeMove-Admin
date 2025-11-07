@@ -370,6 +370,287 @@
       "loading": "Chargement des réservations d'hôtel..."
     }
   },
+  "taxiDrivers": {
+    "title": "Chauffeurs de taxi",
+    "subtitle": "Gérer tous les chauffeurs de taxi",
+    "addButton": "Ajouter un chauffeur",
+    "noData": "Aucun chauffeur trouvé",
+    "loading": "Chargement des chauffeurs...",
+    "filters": {
+      "statusPlaceholder": "Filtrer par statut",
+      "searchPlaceholder": "Rechercher des chauffeurs..."
+    },
+    "columns": {
+      "name": "Nom",
+      "mobile": "Mobile",
+      "email": "E-mail",
+      "registrationNumber": "Numéro d'immatriculation",
+      "balance": "Solde du portefeuille",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "Voir les détails"
+    },
+    "currencySymbol": "₹",
+    "statuses": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "suspended": "Suspendu",
+      "pending": "En attente"
+    },
+    "pagination": {
+      "itemsPerPage": "Éléments par page"
+    }
+  },
+  "taxiDriversDetails": {
+    "backButton": "Retour aux chauffeurs",
+    "titleAdd": "Ajouter un nouveau chauffeur",
+    "titleDriver": "Chauffeur : {{name}}",
+    "buttons": {
+      "cancel": "Annuler",
+      "edit": "Modifier",
+      "create": "Créer",
+      "saveChanges": "Enregistrer les modifications"
+    },
+
+    "tabs": {
+      "personal": "Infos personnelles",
+      "experience": "Expérience & Documents",
+      "vehicle": "Détails du véhicule",
+      "bank": "Détails bancaires"
+    },
+
+    "fields": {
+      "profilePhoto": "Photo de profil",
+      "name": "Nom",
+      "age": "Âge",
+      "mobile": "Mobile",
+      "email": "E-mail",
+      "address": "Adresse",
+      "status": "Statut",
+      "remark": "Remarque",
+      "chooseBranch": "Choisir la succursale",
+      "verificationStatus": "Statut de vérification",
+      "verified": "Vérifié",
+      "notVerified": "Non vérifié",
+      "yearsOfExperience": "Années d'expérience",
+      "idProofs": "Pièces d'identité",
+      "driverLicense": "Permis de conduire",
+      "vehicleModel": "Modèle du véhicule",
+      "vehicleRegistrationNumber": "Numéro d'immatriculation",
+      "vehicleInsurance": "Assurance du véhicule",
+      "vehicleRegistrationCertificate": "Certificat d'immatriculation",
+      "vehiclePhotos": "Photos du véhicule",
+      "accountNumber": "Numéro de compte",
+      "accountHolderName": "Nom du titulaire du compte",
+      "bankAccountDetails": "Détails du compte bancaire"
+    },
+
+    "placeholders": {
+      "selectStatus": "Sélectionner le statut",
+      "selectBranch": "Sélectionner la succursale",
+      "remarkPlaceholder": "Saisir la raison du rejet ou du blocage"
+    },
+
+    "statusOptions": {
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Rejeté",
+      "blocked": "Bloqué"
+    },
+
+    "upload": {
+      "uploadButton": "Téléverser",
+      "noFile": "Aucun fichier sélectionné"
+    }
+  },
+  "taxiBookings": {
+    "title": "Réservations de taxi",
+    "subtitle": "Consultez et gérez toutes les réservations de taxi",
+    "columns": {
+      "bookingId": "ID de réservation",
+      "customerName": "Nom du client",
+      "driverName": "Nom du chauffeur",
+      "from": "De",
+      "to": "À",
+      "rideDate": "Date de la course",
+      "amount": "Montant",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "Voir les détails"
+    },
+    "loader": {
+      "loading": "Chargement des réservations..."
+    },
+    "empty": {
+      "noData": "Aucune réservation trouvée"
+    },
+    "sheet": {
+      "title": "Détails de la réservation",
+      "labels": {
+        "bookingId": "ID de réservation",
+        "status": "Statut",
+        "amount": "Montant",
+        "rideDetails": "Détails de la course",
+        "from": "De",
+        "to": "À",
+        "rideDate": "Date de la course",
+        "customerInformation": "Informations du client",
+        "driverInformation": "Informations du chauffeur"
+      }
+    },
+    "currencySymbol": "€",
+    "statuses": {
+      "completed": "Terminé",
+      "ongoing": "En cours",
+      "cancelled": "Annulé",
+      "pending": "En attente"
+    }
+  },
+  "bikeDrivers": {
+    "title": "Coureurs à moto",
+    "subtitle": "Gérer tous les coureurs à moto",
+    "addButton": "Ajouter un coursier",
+    "noData": "Aucun coursier trouvé",
+    "loading": "Chargement des coursiers...",
+    "filters": {
+      "statusPlaceholder": "Filtrer par statut",
+      "searchPlaceholder": "Rechercher des coursiers..."
+    },
+    "columns": {
+      "name": "Nom",
+      "mobile": "Mobile",
+      "email": "E-mail",
+      "registrationNumber": "Numéro d'immatriculation",
+      "balance": "Solde du portefeuille",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "Voir les détails"
+    },
+    "currencySymbol": "₹",
+    "statuses": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "suspended": "Suspendu",
+      "pending": "En attente"
+    },
+    "pagination": {
+      "itemsPerPage": "Éléments par page"
+    }
+  },
+  "bikeDriversDetails": {
+    "backButton": "Retour aux conducteurs",
+    "titleAdd": "Ajouter un nouveau conducteur",
+    "titleDriver": "Conducteur : {{name}}",
+    "buttons": {
+      "cancel": "Annuler",
+      "edit": "Modifier",
+      "create": "Créer",
+      "saveChanges": "Enregistrer les modifications"
+    },
+
+    "tabs": {
+      "personal": "Infos personnelles",
+      "experience": "Expérience & Documents",
+      "vehicle": "Détails du véhicule",
+      "bank": "Détails bancaires"
+    },
+
+    "fields": {
+      "profilePhoto": "Photo de profil",
+      "name": "Nom",
+      "age": "Âge",
+      "mobile": "Mobile",
+      "email": "E-mail",
+      "address": "Adresse",
+      "status": "Statut",
+      "remark": "Remarque",
+      "chooseBranch": "Choisir la succursale",
+      "verificationStatus": "Statut de vérification",
+      "verified": "Vérifié",
+      "notVerified": "Non vérifié",
+      "yearsOfExperience": "Années d'expérience",
+      "idProofs": "Pièces d'identité",
+      "driverLicense": "Permis de conduire",
+      "vehicleModel": "Modèle du véhicule",
+      "vehicleRegistrationNumber": "Numéro d'immatriculation",
+      "vehicleInsurance": "Assurance du véhicule",
+      "vehicleRegistrationCertificate": "Certificat d'immatriculation",
+      "vehiclePhotos": "Photos du véhicule",
+      "accountNumber": "Numéro de compte",
+      "accountHolderName": "Nom du titulaire du compte",
+      "bankAccountDetails": "Détails du compte bancaire"
+    },
+
+    "placeholders": {
+      "selectStatus": "Sélectionner le statut",
+      "selectBranch": "Sélectionner la succursale",
+      "remarkPlaceholder": "Saisir la raison du rejet ou du blocage"
+    },
+
+    "statusOptions": {
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Rejeté",
+      "blocked": "Bloqué"
+    },
+
+    "upload": {
+      "uploadButton": "Téléverser",
+      "noFile": "Aucun fichier sélectionné"
+    }
+  },
+  "bikeBookings": {
+    "title": "Réservations de moto",
+    "subtitle": "Consultez et gérez toutes les réservations de moto",
+    "columns": {
+      "bookingId": "ID de réservation",
+      "customerName": "Nom du client",
+      "riderName": "Nom du conducteur",
+      "from": "De",
+      "to": "À",
+      "rideDate": "Date du trajet",
+      "vehicleType": "Type de véhicule",
+      "amount": "Montant",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "Voir les détails"
+    },
+    "loader": {
+      "loading": "Chargement des réservations..."
+    },
+    "empty": {
+      "noData": "Aucune réservation trouvée"
+    },
+    "sheet": {
+      "title": "Détails de la réservation",
+      "labels": {
+        "bookingId": "ID de réservation",
+        "status": "Statut",
+        "vehicleType": "Type de véhicule",
+        "amount": "Montant",
+        "rideDetails": "Détails du trajet",
+        "from": "De",
+        "to": "À",
+        "rideDate": "Date du trajet",
+        "customerInformation": "Informations du client"
+      }
+    },
+    "currencySymbol": "€",
+    "statuses": {
+      "completed": "Terminé",
+      "ongoing": "En cours",
+      "cancelled": "Annulé",
+      "pending": "En attente"
+    }
+  },
   "customerManagement": {
     "pageTitle": "Gestion des utilisateurs",
     "pageSubtitle": "Afficher et gérer tous les utilisateurs",

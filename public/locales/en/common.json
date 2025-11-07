@@ -372,6 +372,287 @@
       "loading": "Loading hotel bookings..."
     }
   },
+  "taxiDrivers": {
+    "title": "Taxi Drivers",
+    "subtitle": "Manage all taxi drivers",
+    "addButton": "Add Taxi Driver",
+    "noData": "No drivers found",
+    "loading": "Loading drivers...",
+    "filters": {
+      "statusPlaceholder": "Filter by status",
+      "searchPlaceholder": "Search drivers..."
+    },
+    "columns": {
+      "name": "Name",
+      "mobile": "Mobile",
+      "email": "Email",
+      "registrationNumber": "Registration Number",
+      "balance": "Wallet Balance",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "View Details"
+    },
+    "currencySymbol": "₹",
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended",
+      "pending": "Pending"
+    },
+    "pagination": {
+      "itemsPerPage": "Items per page"
+    }
+  },
+  "taxiDriversDetails": {
+    "backButton": "Back to Taxi Drivers",
+    "titleAdd": "Add New Taxi Driver",
+    "titleDriver": "Taxi Driver: {{name}}",
+    "buttons": {
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "create": "Create",
+      "saveChanges": "Save Changes"
+    },
+
+    "tabs": {
+      "personal": "Personal Info",
+      "experience": "Experience & Documents",
+      "vehicle": "Vehicle Details",
+      "bank": "Bank Details"
+    },
+
+    "fields": {
+      "profilePhoto": "Profile Photo",
+      "name": "Name",
+      "age": "Age",
+      "mobile": "Mobile",
+      "email": "Email",
+      "address": "Address",
+      "status": "Status",
+      "remark": "Remark",
+      "chooseBranch": "Choose Branch",
+      "verificationStatus": "Verification Status",
+      "verified": "Verified",
+      "notVerified": "Not Verified",
+      "yearsOfExperience": "Years of Experience",
+      "idProofs": "ID Proofs",
+      "driverLicense": "Driver License",
+      "vehicleModel": "Vehicle Model",
+      "vehicleRegistrationNumber": "Registration Number",
+      "vehicleInsurance": "Vehicle Insurance",
+      "vehicleRegistrationCertificate": "Registration Certificate",
+      "vehiclePhotos": "Vehicle Photos",
+      "accountNumber": "Account Number",
+      "accountHolderName": "Account Holder Name",
+      "bankAccountDetails": "Bank Account Details"
+    },
+
+    "placeholders": {
+      "selectStatus": "Select status",
+      "selectBranch": "Select branch",
+      "remarkPlaceholder": "Enter reason for rejection or blocking"
+    },
+
+    "statusOptions": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "blocked": "Blocked"
+    },
+
+    "upload": {
+      "uploadButton": "Upload",
+      "noFile": "No file selected"
+    }
+  },
+  "taxiBookings": {
+    "title": "Taxi Bookings",
+    "subtitle": "View and manage all taxi bookings",
+    "columns": {
+      "bookingId": "Booking ID",
+      "customerName": "Customer Name",
+      "driverName": "Driver Name",
+      "from": "From",
+      "to": "To",
+      "rideDate": "Ride Date",
+      "amount": "Amount",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "View Details"
+    },
+    "loader": {
+      "loading": "Loading bookings..."
+    },
+    "empty": {
+      "noData": "No bookings found"
+    },
+    "sheet": {
+      "title": "Booking Details",
+      "labels": {
+        "bookingId": "Booking ID",
+        "status": "Status",
+        "amount": "Amount",
+        "rideDetails": "Ride Details",
+        "from": "From",
+        "to": "To",
+        "rideDate": "Ride Date",
+        "customerInformation": "Customer Information",
+        "driverInformation": "Driver Information"
+      }
+    },
+    "currencySymbol": "$",
+    "statuses": {
+      "completed": "Completed",
+      "ongoing": "Ongoing",
+      "cancelled": "Cancelled",
+      "pending": "Pending"
+    }
+  },
+  "bikeDrivers": {
+    "title": "Bike Riders",
+    "subtitle": "Manage all bike riders",
+    "addButton": "Add Bike Rider",
+    "noData": "No riders found",
+    "loading": "Loading riders...",
+    "filters": {
+      "statusPlaceholder": "Filter by status",
+      "searchPlaceholder": "Search riders..."
+    },
+    "columns": {
+      "name": "Name",
+      "mobile": "Mobile",
+      "email": "Email",
+      "registrationNumber": "Registration Number",
+      "balance": "Wallet Balance",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "View Details"
+    },
+    "currencySymbol": "₹",
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended",
+      "pending": "Pending"
+    },
+    "pagination": {
+      "itemsPerPage": "Items per page"
+    }
+  },
+  "bikeDriversDetails": {
+    "backButton": "Back to Bike Drivers",
+    "titleAdd": "Add New Bike Driver",
+    "titleDriver": "Bike Driver: {{name}}",
+    "buttons": {
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "create": "Create",
+      "saveChanges": "Save Changes"
+    },
+
+    "tabs": {
+      "personal": "Personal Info",
+      "experience": "Experience & Documents",
+      "vehicle": "Vehicle Details",
+      "bank": "Bank Details"
+    },
+
+    "fields": {
+      "profilePhoto": "Profile Photo",
+      "name": "Name",
+      "age": "Age",
+      "mobile": "Mobile",
+      "email": "Email",
+      "address": "Address",
+      "status": "Status",
+      "remark": "Remark",
+      "chooseBranch": "Choose Branch",
+      "verificationStatus": "Verification Status",
+      "verified": "Verified",
+      "notVerified": "Not Verified",
+      "yearsOfExperience": "Years of Experience",
+      "idProofs": "ID Proofs",
+      "driverLicense": "Driver License",
+      "vehicleModel": "Vehicle Model",
+      "vehicleRegistrationNumber": "Registration Number",
+      "vehicleInsurance": "Vehicle Insurance",
+      "vehicleRegistrationCertificate": "Registration Certificate",
+      "vehiclePhotos": "Vehicle Photos",
+      "accountNumber": "Account Number",
+      "accountHolderName": "Account Holder Name",
+      "bankAccountDetails": "Bank Account Details"
+    },
+
+    "placeholders": {
+      "selectStatus": "Select status",
+      "selectBranch": "Select branch",
+      "remarkPlaceholder": "Enter reason for rejection or blocking"
+    },
+
+    "statusOptions": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "blocked": "Blocked"
+    },
+
+    "upload": {
+      "uploadButton": "Upload",
+      "noFile": "No file selected"
+    }
+  },
+  "bikeBookings": {
+    "title": "Bike Bookings",
+    "subtitle": "View and manage all bike bookings",
+    "columns": {
+      "bookingId": "Booking ID",
+      "customerName": "Customer Name",
+      "riderName": "Rider Name",
+      "from": "From",
+      "to": "To",
+      "rideDate": "Ride Date",
+      "vehicleType": "Vehicle Type",
+      "amount": "Amount",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "View Details"
+    },
+    "loader": {
+      "loading": "Loading bookings..."
+    },
+    "empty": {
+      "noData": "No bookings found"
+    },
+    "sheet": {
+      "title": "Booking Details",
+      "labels": {
+        "bookingId": "Booking ID",
+        "status": "Status",
+        "vehicleType": "Vehicle Type",
+        "amount": "Amount",
+        "rideDetails": "Ride Details",
+        "from": "From",
+        "to": "To",
+        "rideDate": "Ride Date",
+        "customerInformation": "Customer Information"
+      }
+    },
+    "currencySymbol": "$",
+    "statuses": {
+      "completed": "Completed",
+      "ongoing": "Ongoing",
+      "cancelled": "Cancelled",
+      "pending": "Pending"
+    }
+  },
   "customerManagement": {
     "pageTitle": "User Management",
     "pageSubtitle": "View and manage all users",

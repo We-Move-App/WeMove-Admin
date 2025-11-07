@@ -479,7 +479,7 @@ const HotelManagerDetails = () => {
       </div>
 
       <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-5 mb-4">
+        <TabsList className="inline-flex gap-2 mb-4 px-2 py-1 rounded-md bg-gray-100">
           <TabsTrigger value="personal">
             {t("hotelManagerDetails.tabs.personal")}
           </TabsTrigger>

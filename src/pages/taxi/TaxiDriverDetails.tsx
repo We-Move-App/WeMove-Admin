@@ -19,6 +19,7 @@ import UploadField from "@/components/ui/UploadField";
 import axiosInstance from "@/api/axiosInstance";
 import fileUploadInstance from "@/api/fileUploadInstance";
 import BranchSelect from "@/components/branch-select/BranchSelect";
+import { useTranslation } from "react-i18next";
 
 const TaxiDriverDetails = () => {
   const { id } = useParams();
@@ -42,6 +43,8 @@ const TaxiDriverDetails = () => {
   const [selectedBranch, setSelectedBranch] = useState<string>(
     driver?.branch || ""
   );
+
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     if (id && id !== "new") {
@@ -489,14 +492,15 @@ const TaxiDriverDetails = () => {
         className="mb-4"
         onClick={() => navigate("/taxi-management/drivers")}
       >
-        <ChevronLeft className="mr-2 h-4 w-4" /> Back to Taxi Drivers
+        <ChevronLeft className="mr-2 h-4 w-4" />{" "}
+        {t("taxiDriversDetails.backButton")}
       </Button>
 
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">
           {mode === "post"
-            ? "Add New Taxi Driver"
-            : `Taxi Driver: ${driver.name}`}
+            ? t("taxiDriversDetails.titleAdd")
+            : t("taxiDriversDetails.titleDriver", { name: driver.name })}
         </h1>
         <div className="flex gap-2">
           {/* {mode !== "post" && (
@@ -524,9 +528,11 @@ const TaxiDriverDetails = () => {
                 className="bg-gray-300 text-gray-800 border-gray-300 hover:bg-gray-300 hover:text-gray-900"
                 onClick={() => navigate("/taxi-management/drivers")}
               >
-                Cancel
+                {t("taxiDriversDetails.buttons.cancel")}
               </Button>
-              <Button onClick={() => setMode("edit")}>Edit</Button>
+              <Button onClick={() => setMode("edit")}>
+                {t("taxiDriversDetails.buttons.edit")}
+              </Button>
             </div>
           )}
           {(mode === "post" || mode === "edit") && (
@@ -537,10 +543,12 @@ const TaxiDriverDetails = () => {
                 className="bg-gray-300 text-gray-800 border-gray-300 hover:bg-gray-300 hover:text-gray-900"
                 onClick={() => navigate("/taxi-management/drivers")}
               >
-                Cancel
+                {t("taxiDriversDetails.buttons.cancel")}
               </Button>
               <Button onClick={handleSubmit}>
-                {mode === "post" ? "Create" : "Save Changes"}
+                {mode === "post"
+                  ? t("taxiDriversDetails.buttons.create")
+                  : t("taxiDriversDetails.buttons.saveChanges")}
               </Button>
             </div>
           )}
@@ -548,11 +556,19 @@ const TaxiDriverDetails = () => {
       </div>
 
       <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-4 mb-4">
-          <TabsTrigger value="personal">Personal Info</TabsTrigger>
-          <TabsTrigger value="experience">Experience & Documents</TabsTrigger>
-          <TabsTrigger value="vehicle">Vehicle Details</TabsTrigger>
-          <TabsTrigger value="bank">Bank Details</TabsTrigger>
+        <TabsList className="inline-flex gap-2 mb-4 px-2 py-1 rounded-md bg-gray-100">
+          <TabsTrigger value="personal">
+            {t("taxiDriversDetails.tabs.personal")}
+          </TabsTrigger>
+          <TabsTrigger value="experience">
+            {t("taxiDriversDetails.tabs.experience")}
+          </TabsTrigger>
+          <TabsTrigger value="vehicle">
+            {t("taxiDriversDetails.tabs.vehicle")}
+          </TabsTrigger>
+          <TabsTrigger value="bank">
+            {t("taxiDriversDetails.tabs.bank")}
+          </TabsTrigger>
         </TabsList>
 
         {/* Personal Info */}
@@ -563,7 +579,7 @@ const TaxiDriverDetails = () => {
                 {/* Profile Photo */}
                 <div className="col-span-2">
                   <UploadField
-                    label="Profile Photo"
+                    label={t("taxiDriversDetails.fields.profilePhoto")}
                     value={driver.profilePhoto || null}
                     disabled={isReadOnly}
                     multiple={false}
@@ -582,7 +598,9 @@ const TaxiDriverDetails = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Name</label>
+                  <label className="block text-sm font-medium mb-1">
+                    {t("taxiDriversDetails.fields.name")}
+                  </label>
                   <Input
                     value={driver.name}
                     disabled={isReadOnly}
@@ -590,7 +608,9 @@ const TaxiDriverDetails = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Age</label>
+                  <label className="block text-sm font-medium mb-1">
+                    {t("taxiDriversDetails.fields.age")}
+                  </label>
                   <Input
                     type="number"
                     disabled={isReadOnly}
@@ -602,7 +622,7 @@ const TaxiDriverDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Mobile
+                    {t("taxiDriversDetails.fields.mobile")}
                   </label>
                   <Input
                     value={driver.mobile}
@@ -612,7 +632,7 @@ const TaxiDriverDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Email
+                    {t("taxiDriversDetails.fields.email")}
                   </label>
                   <Input
                     value={driver.email}
@@ -622,7 +642,7 @@ const TaxiDriverDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Address
+                    {t("taxiDriversDetails.fields.address")}
                   </label>
                   <Textarea
                     disabled={isReadOnly}
@@ -635,12 +655,12 @@ const TaxiDriverDetails = () => {
                   {/* Status Field */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Status
+                      {t("taxiDriversDetails.fields.status")}
                     </label>
 
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
-                        {driver.status}
+                        {t(`taxiDriversDetails.statusOptions.${driver.status}`)}
                       </p>
                     ) : (
                       <Select
@@ -670,7 +690,7 @@ const TaxiDriverDetails = () => {
                   driver.status === "blocked") && (
                   <div className="col-span-full">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Remark
+                      {t("taxiDriversDetails.fields.remark")}
                     </label>
                     <textarea
                       name="remark"
@@ -679,7 +699,9 @@ const TaxiDriverDetails = () => {
                         setDriver({ ...driver, remark: e.target.value })
                       }
                       className="filter-input w-full h-24"
-                      placeholder="Enter reason for rejection or blocking"
+                      placeholder={t(
+                        "taxiDriversDetails.placeholders.remarkPlaceholder"
+                      )}
                       required
                       disabled={mode === "view"}
                     />
@@ -688,7 +710,7 @@ const TaxiDriverDetails = () => {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Choose Branch
+                    {t("taxiDriversDetails.fields.chooseBranch")}
                   </label>
                   {mode === "view" ? (
                     <p className="filter-input w-full bg-gray-100">
@@ -704,12 +726,14 @@ const TaxiDriverDetails = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Verification Status
+                    {t("taxiDriversDetails.fields.verificationStatus")}
                   </label>
 
                   {mode === "view" ? (
                     <p className="filter-input w-full bg-gray-100">
-                      {driver.batchVerified ? "Verified" : "Not Verified"}
+                      {driver.batchVerified
+                        ? t("taxiDriversDetails.fields.verified")
+                        : t("taxiDriversDetails.fields.notVerified")}
                     </p>
                   ) : (
                     <select
@@ -723,8 +747,12 @@ const TaxiDriverDetails = () => {
                       }
                       className="filter-select w-full"
                     >
-                      <option value="Verified">Verified</option>
-                      <option value="Not Verified">Not Verified</option>
+                      <option value="verified">
+                        {t("taxiDriversDetails.fields.verified")}
+                      </option>
+                      <option value="notVerified">
+                        {t("taxiDriversDetails.fields.notVerified")}
+                      </option>
                     </select>
                   )}
                 </div>
@@ -740,7 +768,7 @@ const TaxiDriverDetails = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Years of Experience
+                    {t("taxiDriversDetails.fields.yearsOfExperience")}
                   </label>
                   <Input
                     type="number"
@@ -754,7 +782,7 @@ const TaxiDriverDetails = () => {
                 <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <UploadField
-                      label="ID Proofs"
+                      label={t("taxiDriversDetails.fields.idProofs")}
                       value={driver.idProofs || null}
                       disabled={isReadOnly}
                       multiple={false}
@@ -763,7 +791,7 @@ const TaxiDriverDetails = () => {
 
                     <div>
                       <UploadField
-                        label="Driver License"
+                        label={t("taxiDriversDetails.fields.driverLicense")}
                         value={driver.driverLicense || null}
                         disabled={isReadOnly}
                         multiple={false}
@@ -786,7 +814,7 @@ const TaxiDriverDetails = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Vehicle Model
+                    {t("taxiDriversDetails.fields.vehicleModel")}
                   </label>
                   <Input
                     value={driver.vehicleModel || ""}
@@ -798,7 +826,7 @@ const TaxiDriverDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Registration Number
+                    {t("taxiDriversDetails.fields.vehicleRegistrationNumber")}
                   </label>
                   <Input
                     value={driver.vehicleRegistrationNumber || ""}
@@ -810,7 +838,7 @@ const TaxiDriverDetails = () => {
                 </div>
                 <div>
                   <UploadField
-                    label="Vehicle Insurance"
+                    label={t("taxiDriversDetails.fields.vehicleInsurance")}
                     value={driver.vehicleInsurance || null}
                     disabled={isReadOnly}
                     multiple={false}
@@ -821,7 +849,9 @@ const TaxiDriverDetails = () => {
                 </div>
                 <div>
                   <UploadField
-                    label="Registration Certificate"
+                    label={t(
+                      "taxiDriversDetails.fields.vehicleRegistrationCertificate"
+                    )}
                     value={driver.vehicleRegistrationCertificate || null}
                     disabled={isReadOnly}
                     multiple={false}
@@ -832,7 +862,7 @@ const TaxiDriverDetails = () => {
                 </div>
                 <div className="col-span-2">
                   <UploadField
-                    label="Vehicle Photos"
+                    label={t("taxiDriversDetails.fields.vehiclePhotos")}
                     value={driver.vehiclePhotos || null}
                     disabled={isReadOnly}
                     multiple={false}
@@ -853,7 +883,7 @@ const TaxiDriverDetails = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Account Number
+                    {t("taxiDriversDetails.fields.accountNumber")}
                   </label>
                   <Input
                     value={driver.accountNumber || ""}
@@ -865,7 +895,7 @@ const TaxiDriverDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Account Holder Name
+                    {t("taxiDriversDetails.fields.accountHolderName")}
                   </label>
                   <Input
                     value={driver.accountHolderName || ""}
@@ -877,7 +907,7 @@ const TaxiDriverDetails = () => {
                 </div>
                 <div className="col-span-2">
                   <UploadField
-                    label="Bank Account Details"
+                    label={t("taxiDriversDetails.fields.bankAccountDetails")}
                     value={driver.bankAccountDetails || null}
                     disabled={isReadOnly}
                     multiple={false}

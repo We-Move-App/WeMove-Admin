@@ -10,6 +10,7 @@ import axiosInstance from "@/api/axiosInstance";
 import { useDebounce } from "@/hooks/useDebounce";
 import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 import Loader from "@/components/ui/loader";
+import { useTranslation } from "react-i18next";
 
 const TaxiDrivers = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const TaxiDrivers = () => {
   const [pageSize] = useState(10);
   const [totalDrivers, setTotalDrivers] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const { t, i18n } = useTranslation();
 
   const handleRowClick = (driver: TaxiDriver) => {
     navigate(`/taxi-management/drivers/${driver.driverId}`);
@@ -28,7 +30,7 @@ const TaxiDrivers = () => {
   const columns = [
     {
       key: "name" as keyof TaxiDriver,
-      header: "Name",
+      header: t("taxiDrivers.columns.name"),
       render: (driver: TaxiDriver) => (
         <div className="flex items-center gap-2">
           <span>{driver.name}</span>
@@ -38,29 +40,36 @@ const TaxiDrivers = () => {
         </div>
       ),
     },
-    { key: "mobile" as keyof TaxiDriver, header: "Mobile" },
-    { key: "email" as keyof TaxiDriver, header: "Email" },
+    {
+      key: "mobile" as keyof TaxiDriver,
+      header: t("taxiDrivers.columns.mobile"),
+    },
+    {
+      key: "email" as keyof TaxiDriver,
+      header: t("taxiDrivers.columns.email"),
+    },
     {
       key: "registrationNumber" as keyof TaxiDriver,
-      header: "Registration Number",
+      header: t("taxiDrivers.columns.registrationNumber"),
     },
     {
       key: "balance" as keyof TaxiDriver,
-      header: "Wallet Balance",
+      header: t("taxiDrivers.columns.balance"),
       render: (driver: TaxiDriver) => (
         <span className="text-gray-800 font-medium">
-          ₹{driver.balance?.toLocaleString() ?? 0}
+          {t("taxiDrivers.currencySymbol")}
+          {driver.balance?.toLocaleString() ?? 0}
         </span>
       ),
     },
     {
       key: "status" as keyof TaxiDriver,
-      header: "Status",
+      header: t("taxiDrivers.columns.status"),
       render: (driver: TaxiDriver) => <StatusBadge status={driver.status} />,
     },
     {
       key: "actions" as "actions",
-      header: "Actions",
+      header: t("taxiDrivers.columns.actions"),
       render: (driver: TaxiDriver) => (
         <button
           className="action-button flex items-center"
@@ -69,7 +78,8 @@ const TaxiDrivers = () => {
             navigate(`/taxi-management/drivers/${driver.driverId}`);
           }}
         >
-          <Eye size={16} className="mr-1" /> View Details
+          <Eye size={16} className="mr-1" />
+          {t("taxiDrivers.actions.viewDetails")}
         </button>
       ),
     },
@@ -129,14 +139,15 @@ const TaxiDrivers = () => {
     <>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Taxi Drivers</h1>
-          <p className="text-gray-600">Manage all taxi drivers</p>
+          <h1 className="text-2xl font-bold">{t("taxiDrivers.title")}</h1>
+          <p className="text-gray-600">{t("taxiDrivers.subtitle")}</p>
         </div>
         <Button
           onClick={() => navigate("/taxi-management/drivers/new")}
           className="flex items-center gap-2"
         >
-          <Plus size={16} /> Add Taxi Driver
+          <Plus size={16} />
+          {t("taxiDrivers.addButton")}
         </Button>
       </div>
 

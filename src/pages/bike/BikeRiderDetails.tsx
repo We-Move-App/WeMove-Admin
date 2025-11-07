@@ -20,6 +20,7 @@ import UploadField from "@/components/ui/UploadField";
 import axiosInstance from "@/api/axiosInstance";
 import fileUploadInstance from "@/api/fileUploadInstance";
 import BranchSelect from "@/components/branch-select/BranchSelect";
+import { useTranslation } from "react-i18next";
 
 const BikeRiderDetails = () => {
   const { id } = useParams();
@@ -41,6 +42,8 @@ const BikeRiderDetails = () => {
   const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
     undefined
   );
+
+  const { t, i18n } = useTranslation();
 
   // GET API
   useEffect(() => {
@@ -436,14 +439,15 @@ const BikeRiderDetails = () => {
         className="mb-4"
         onClick={() => navigate("/bike-management/riders")}
       >
-        <ChevronLeft className="mr-2 h-4 w-4" /> Back to Bike Drivers
+        <ChevronLeft className="mr-2 h-4 w-4" />{" "}
+        {t("bikeDriversDetails.backButton")}
       </Button>
 
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">
           {mode === "post"
-            ? "Add New Bike Driver"
-            : `Bike Driver: ${driver.name}`}
+            ? t("bikeDriversDetails.titleAdd")
+            : t("bikeDriversDetails.titleDriver", { name: driver.name })}
         </h1>
         <div className="flex gap-2">
           {/* status handling */}
@@ -472,9 +476,11 @@ const BikeRiderDetails = () => {
                 className="bg-gray-300 text-gray-800 border-gray-300 hover:bg-gray-300 hover:text-gray-900"
                 onClick={() => navigate("/bike-management/riders")}
               >
-                Cancel
+                {t("bikeDriversDetails.buttons.cancel")}
               </Button>
-              <Button onClick={() => setMode("edit")}>Edit</Button>
+              <Button onClick={() => setMode("edit")}>
+                {t("bikeDriversDetails.buttons.edit")}
+              </Button>
             </div>
           )}
           {(mode === "post" || mode === "edit") && (
@@ -485,10 +491,12 @@ const BikeRiderDetails = () => {
                 className="bg-gray-300 text-gray-800 border-gray-300 hover:bg-gray-300 hover:text-gray-900"
                 onClick={() => navigate("/taxi-management/drivers")}
               >
-                Cancel
+                {t("bikeDriversDetails.buttons.cancel")}
               </Button>
               <Button onClick={handleSubmit}>
-                {mode === "post" ? "Create" : "Save Changes"}
+                {mode === "post"
+                  ? t("bikeDriversDetails.buttons.create")
+                  : t("bikeDriversDetails.buttons.saveChanges")}
               </Button>
             </div>
           )}
@@ -496,11 +504,19 @@ const BikeRiderDetails = () => {
       </div>
 
       <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-4 mb-4">
-          <TabsTrigger value="personal">Personal Info</TabsTrigger>
-          <TabsTrigger value="experience">Experience & Documents</TabsTrigger>
-          <TabsTrigger value="vehicle">Vehicle Details</TabsTrigger>
-          <TabsTrigger value="bank">Bank Details</TabsTrigger>
+        <TabsList className="inline-flex gap-2 mb-4 px-2 py-1 rounded-md bg-gray-100">
+          <TabsTrigger value="personal">
+            {t("bikeDriversDetails.tabs.personal")}
+          </TabsTrigger>
+          <TabsTrigger value="experience">
+            {t("bikeDriversDetails.tabs.experience")}
+          </TabsTrigger>
+          <TabsTrigger value="vehicle">
+            {t("bikeDriversDetails.tabs.vehicle")}
+          </TabsTrigger>
+          <TabsTrigger value="bank">
+            {t("bikeDriversDetails.tabs.bank")}
+          </TabsTrigger>
         </TabsList>
 
         {/* Personal Info */}
@@ -511,7 +527,7 @@ const BikeRiderDetails = () => {
                 {/* Profile Photo */}
                 <div className="col-span-2">
                   <UploadField
-                    label="Profile Photo"
+                    label={t("bikeDriversDetails.fields.profilePhoto")}
                     value={driver.profilePhoto || null}
                     disabled={isReadOnly}
                     multiple={false}
@@ -523,16 +539,17 @@ const BikeRiderDetails = () => {
                       const uploaded = await uploadFiles(fileToUpload);
                       console.log("Uploaded file:", uploaded);
 
-                      // Store as FileObject
                       handleChange("profilePhoto", {
-                        fileUrl: uploaded.url, // backend expects this
-                        fileName: uploaded.fileName, // backend expects this
+                        fileUrl: uploaded.url,
+                        fileName: uploaded.fileName,
                       });
                     }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Name</label>
+                  <label className="block text-sm font-medium mb-1">
+                    {t("bikeDriversDetails.fields.name")}
+                  </label>
                   <Input
                     value={driver.name}
                     disabled={isReadOnly}
@@ -540,7 +557,9 @@ const BikeRiderDetails = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Age</label>
+                  <label className="block text-sm font-medium mb-1">
+                    {t("bikeDriversDetails.fields.age")}
+                  </label>
                   <Input
                     type="number"
                     disabled={isReadOnly}
@@ -552,7 +571,7 @@ const BikeRiderDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Mobile
+                    {t("bikeDriversDetails.fields.mobile")}
                   </label>
                   <Input
                     value={driver.mobile}
@@ -562,7 +581,7 @@ const BikeRiderDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Email
+                    {t("bikeDriversDetails.fields.email")}
                   </label>
                   <Input
                     value={driver.email}
@@ -572,7 +591,7 @@ const BikeRiderDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Address
+                    {t("bikeDriversDetails.fields.address")}
                   </label>
                   <Textarea
                     disabled={isReadOnly}
@@ -584,12 +603,12 @@ const BikeRiderDetails = () => {
                   {/* Status Field */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Status
+                      {t("bikeDriversDetails.fields.status")}
                     </label>
 
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
-                        {driver.status}
+                        {t(`bikeDriversDetails.statusOptions.${driver.status}`)}
                       </p>
                     ) : (
                       <Select
@@ -616,9 +635,9 @@ const BikeRiderDetails = () => {
                 {/* Remark Field (conditionally rendered) */}
                 {(driver.status === "rejected" ||
                   driver.status === "blocked") && (
-                  <div>
+                  <div className="col-span-full">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Remark
+                      {t("bikeDriversDetails.fields.remark")}
                     </label>
                     <textarea
                       name="remark"
@@ -627,7 +646,9 @@ const BikeRiderDetails = () => {
                         setDriver({ ...driver, remark: e.target.value })
                       }
                       className="filter-input w-full h-24"
-                      placeholder="Enter reason for rejection or blocking"
+                      placeholder={t(
+                        "bikeDriversDetails.placeholders.remarkPlaceholder"
+                      )}
                       required
                       disabled={mode === "view"}
                     />
@@ -635,7 +656,7 @@ const BikeRiderDetails = () => {
                 )}
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Choose Branch
+                    {t("bikeDriversDetails.fields.chooseBranch")}
                   </label>
                   {mode === "view" ? (
                     <p className="filter-input w-full bg-gray-100">
@@ -651,12 +672,14 @@ const BikeRiderDetails = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Verification Status
+                    {t("bikeDriversDetails.fields.verificationStatus")}
                   </label>
 
                   {mode === "view" ? (
                     <p className="filter-input w-full bg-gray-100">
-                      {driver.batchVerified ? "Verified" : "Not Verified"}
+                      {driver.batchVerified
+                        ? t("bikeDriversDetails.fields.verified")
+                        : t("bikeDriversDetails.fields.notVerified")}
                     </p>
                   ) : (
                     <select
@@ -670,8 +693,12 @@ const BikeRiderDetails = () => {
                       }
                       className="filter-select w-full"
                     >
-                      <option value="Verified">Verified</option>
-                      <option value="Not Verified">Not Verified</option>
+                      <option value="verified">
+                        {t("bikeDriversDetails.fields.verified")}
+                      </option>
+                      <option value="notVerified">
+                        {t("bikeDriversDetails.fields.notVerified")}
+                      </option>
                     </select>
                   )}
                 </div>
@@ -687,7 +714,7 @@ const BikeRiderDetails = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Years of Experience
+                    {t("bikeDriversDetails.fields.yearsOfExperience")}
                   </label>
                   <Input
                     type="number"
@@ -701,7 +728,7 @@ const BikeRiderDetails = () => {
                 <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <UploadField
-                      label="ID Proofs"
+                      label={t("bikeDriversDetails.fields.idProofs")}
                       value={driver.idProofs || null}
                       disabled={isReadOnly}
                       multiple={false}
@@ -709,7 +736,7 @@ const BikeRiderDetails = () => {
                     />
                     <div>
                       <UploadField
-                        label="Driver License"
+                        label={t("bikeDriversDetails.fields.driverLicense")}
                         value={driver.driverLicense || null}
                         disabled={isReadOnly}
                         multiple={false}
@@ -732,7 +759,7 @@ const BikeRiderDetails = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Vehicle Model
+                    {t("bikeDriversDetails.fields.vehicleModel")}
                   </label>
                   <Input
                     value={driver.vehicleModel || ""}
@@ -744,7 +771,7 @@ const BikeRiderDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Registration Number
+                    {t("bikeDriversDetails.fields.vehicleRegistrationNumber")}
                   </label>
                   <Input
                     value={driver.vehicleRegistrationNumber || ""}
@@ -756,7 +783,7 @@ const BikeRiderDetails = () => {
                 </div>
                 <div>
                   <UploadField
-                    label="Vehicle Insurance"
+                    label={t("bikeDriversDetails.fields.vehicleInsurance")}
                     value={driver.vehicleInsurance || null}
                     disabled={isReadOnly}
                     multiple={false}
@@ -767,7 +794,9 @@ const BikeRiderDetails = () => {
                 </div>
                 <div>
                   <UploadField
-                    label="Registration Certificate"
+                    label={t(
+                      "bikeDriversDetails.fields.vehicleRegistrationCertificate"
+                    )}
                     value={driver.vehicleRegistrationCertificate || null}
                     disabled={isReadOnly}
                     multiple={false}
@@ -778,7 +807,7 @@ const BikeRiderDetails = () => {
                 </div>
                 <div className="col-span-2">
                   <UploadField
-                    label="Vehicle Photos"
+                    label={t("bikeDriversDetails.fields.vehiclePhotos")}
                     value={driver.vehiclePhotos || null}
                     disabled={isReadOnly}
                     multiple={false}
@@ -799,7 +828,7 @@ const BikeRiderDetails = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Account Number
+                    {t("bikeDriversDetails.fields.accountNumber")}
                   </label>
                   <Input
                     value={driver.accountNumber || ""}
@@ -811,7 +840,7 @@ const BikeRiderDetails = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Account Holder Name
+                    {t("bikeDriversDetails.fields.accountHolderName")}
                   </label>
                   <Input
                     value={driver.accountHolderName || ""}
@@ -823,7 +852,7 @@ const BikeRiderDetails = () => {
                 </div>
                 <div className="col-span-2">
                   <UploadField
-                    label="Bank Account Details"
+                    label={t("bikeDriversDetails.fields.bankAccountDetails")}
                     value={driver.bankAccountDetails || null}
                     disabled={isReadOnly}
                     multiple={false}

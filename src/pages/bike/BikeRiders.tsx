@@ -8,6 +8,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/api/axiosInstance";
 import Loader from "@/components/ui/loader";
+import { useTranslation } from "react-i18next";
 
 // Mock data for bike riders
 // const mockBikeRiders: BikeRider[] = [
@@ -66,6 +67,7 @@ const BikeRiders = () => {
   const [totalDrivers, setTotalDrivers] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchRiders = async () => {
@@ -114,7 +116,7 @@ const BikeRiders = () => {
   const columns = [
     {
       key: "name" as keyof BikeRider,
-      header: "Name",
+      header: t("bikeDrivers.columns.name"),
       render: (rider: BikeRider) => (
         <div className="flex items-center gap-2">
           <span>{rider.name}</span>
@@ -124,30 +126,33 @@ const BikeRiders = () => {
         </div>
       ),
     },
-    { key: "mobile" as keyof BikeRider, header: "Mobile" },
-    { key: "email" as keyof BikeRider, header: "Email" },
-    // { key: "vehicleType" as keyof BikeRider, header: "Vehicle Type" },
+    {
+      key: "mobile" as keyof BikeRider,
+      header: t("bikeDrivers.columns.mobile"),
+    },
+    { key: "email" as keyof BikeRider, header: t("bikeDrivers.columns.email") },
     {
       key: "registrationNumber" as keyof BikeRider,
-      header: "Registration Number",
+      header: t("bikeDrivers.columns.registrationNumber"),
     },
     {
       key: "balance" as keyof BikeRider,
-      header: "Wallet Balance",
+      header: t("bikeDrivers.columns.balance"),
       render: (rider: BikeRider) => (
         <span className="text-gray-800 font-medium">
-          ₹{rider.balance?.toLocaleString() ?? 0}
+          {t("bikeDrivers.currencySymbol")}
+          {rider.balance?.toLocaleString() ?? 0}
         </span>
       ),
     },
     {
       key: "status" as keyof BikeRider,
-      header: "Status",
+      header: t("bikeDrivers.columns.status"),
       render: (rider: BikeRider) => <StatusBadge status={rider.status} />,
     },
     {
       key: "actions" as "actions",
-      header: "Actions",
+      header: t("bikeDrivers.columns.actions"),
       render: (rider: BikeRider) => (
         <button
           className="action-button flex items-center"
@@ -156,7 +161,8 @@ const BikeRiders = () => {
             navigate(`/bike-management/riders/${rider.driverId}`);
           }}
         >
-          <Eye size={16} className="mr-1" /> View Details
+          <Eye size={16} className="mr-1" />
+          {t("bikeDrivers.actions.viewDetails")}
         </button>
       ),
     },
@@ -179,14 +185,14 @@ const BikeRiders = () => {
     <>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Bike Riders</h1>
-          <p className="text-gray-600">Manage all bike riders</p>
+          <h1 className="text-2xl font-bold">{t("bikeDrivers.title")}</h1>
+          <p className="text-gray-600">{t("bikeDrivers.subtitle")}</p>
         </div>
         <Button
           onClick={() => navigate("/bike-management/riders/new")}
           className="flex items-center gap-2"
         >
-          <Plus size={16} /> Add Bike Rider
+          <Plus size={16} /> {t("bikeDrivers.addButton")}
         </Button>
       </div>
 
