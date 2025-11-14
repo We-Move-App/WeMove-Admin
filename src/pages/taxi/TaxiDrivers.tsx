@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BadgeCheck, Eye, Plus } from "lucide-react";
-// import Layout from '@/components/layout/Layout';
 import DataTable from "@/components/ui/DataTable";
 import { TaxiDriver } from "@/types/admin";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/api/axiosInstance";
 import { useDebounce } from "@/hooks/useDebounce";
-import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 import Loader from "@/components/ui/loader";
 import { useTranslation } from "react-i18next";
 
@@ -21,7 +19,9 @@ const TaxiDrivers = () => {
   const [pageSize] = useState(10);
   const [totalDrivers, setTotalDrivers] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 900);
 
   const handleRowClick = (driver: TaxiDriver) => {
     navigate(`/taxi-management/drivers/${driver.driverId}`);
@@ -40,20 +40,14 @@ const TaxiDrivers = () => {
         </div>
       ),
     },
+    { key: "mobile", header: t("taxiDrivers.columns.mobile") },
+    { key: "email", header: t("taxiDrivers.columns.email") },
     {
-      key: "mobile" as keyof TaxiDriver,
-      header: t("taxiDrivers.columns.mobile"),
-    },
-    {
-      key: "email" as keyof TaxiDriver,
-      header: t("taxiDrivers.columns.email"),
-    },
-    {
-      key: "registrationNumber" as keyof TaxiDriver,
+      key: "registrationNumber",
       header: t("taxiDrivers.columns.registrationNumber"),
     },
     {
-      key: "balance" as keyof TaxiDriver,
+      key: "balance",
       header: t("taxiDrivers.columns.balance"),
       render: (driver: TaxiDriver) => (
         <span className="text-gray-800 font-medium">
@@ -63,7 +57,7 @@ const TaxiDrivers = () => {
       ),
     },
     {
-      key: "status" as keyof TaxiDriver,
+      key: "status",
       header: t("taxiDrivers.columns.status"),
       render: (driver: TaxiDriver) => <StatusBadge status={driver.status} />,
     },
@@ -91,7 +85,6 @@ const TaxiDrivers = () => {
       label: "Status",
       options: [
         { label: "Approved", value: "approved" },
-        // { label: "Rejected", value: "Rejected" },
         { label: "Pending", value: "pending" },
         { label: "Blocked", value: "blocked" },
         { label: "Rejected", value: "rejected" },
@@ -99,22 +92,21 @@ const TaxiDrivers = () => {
     },
   ];
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearch = useDebounce(searchTerm, 500);
-
   useEffect(() => {
     const fetchDrivers = async () => {
       try {
         setLoading(true);
+
         const response = await axiosInstance.get("/driver-management/drivers", {
           params: {
             vehicleType: "taxi",
             page: currentPage,
             limit: pageSize,
-            search: searchTerm,
+            search: debouncedSearch,
             verificationStatus: selectedStatus,
           },
         });
+
         setDrivers(response.data?.data || []);
         setTotalDrivers(response.data?.total || 0);
       } catch (err: any) {
@@ -125,7 +117,11 @@ const TaxiDrivers = () => {
     };
 
     fetchDrivers();
-  }, [currentPage, pageSize, searchTerm, selectedStatus]);
+  }, [currentPage, pageSize, debouncedSearch, selectedStatus]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
   if (loading)
     return (

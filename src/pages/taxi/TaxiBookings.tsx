@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Eye } from "lucide-react";
 import DataTable from "@/components/ui/DataTable";
 import { TaxiBooking } from "@/types/admin";
@@ -23,15 +23,35 @@ const TaxiBookings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalBookings, setTotalBookings] = useState(0);
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const { i18n, t } = useTranslation();
+  const debounceRef = useRef<number | null>(null);
+  const DEBOUNCE_MS = 900;
+
+  const { t } = useTranslation();
 
   const viewBookingDetails = (booking: TaxiBooking) => {
     setSelectedBooking(booking);
     setIsDetailsOpen(true);
   };
 
+  const handleSearchChange = (val: string) => {
+    setSearchInput(val);
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = window.setTimeout(() => {
+      setCurrentPage(1);
+      setSearchTerm(val);
+      debounceRef.current = null;
+    }, DEBOUNCE_MS);
+  };
+
   useEffect(() => {
+    let mounted = true;
+
     const fetchBookings = async () => {
       try {
         setLoading(true);
@@ -47,6 +67,8 @@ const TaxiBookings = () => {
           }
         );
 
+        if (!mounted) return;
+
         if (response.data?.statusCode === 200) {
           setBookings(response.data.data || []);
           setTotalBookings(response.data?.totalBookings || 0);
@@ -55,35 +77,32 @@ const TaxiBookings = () => {
         }
       } catch (error) {
         console.error("Error fetching taxi bookings:", error);
+        if (!mounted) return;
         setBookings([]);
       } finally {
+        if (!mounted) return;
         setLoading(false);
       }
     };
 
     fetchBookings();
+
+    return () => {
+      mounted = false;
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
   }, [currentPage, pageSize, searchTerm]);
 
   const columns = [
+    { key: "bookingId", header: t("taxiBookings.columns.bookingId") },
+    { key: "customerName", header: t("taxiBookings.columns.customerName") },
+    { key: "riderName", header: t("taxiBookings.columns.driverName") },
+    { key: "from", header: t("taxiBookings.columns.from") },
+    { key: "to", header: t("taxiBookings.columns.to") },
     {
-      key: "bookingId" as keyof TaxiBooking,
-      header: t("taxiBookings.columns.bookingId"),
-    },
-    {
-      key: "customerName" as keyof TaxiBooking,
-      header: t("taxiBookings.columns.customerName"),
-    },
-    {
-      key: "riderName" as keyof TaxiBooking,
-      header: t("taxiBookings.columns.driverName"),
-    },
-    {
-      key: "from" as keyof TaxiBooking,
-      header: t("taxiBookings.columns.from"),
-    },
-    { key: "to" as keyof TaxiBooking, header: t("taxiBookings.columns.to") },
-    {
-      key: "rideDate" as keyof TaxiBooking,
+      key: "rideDate",
       header: t("taxiBookings.columns.rideDate"),
       render: (booking: TaxiBooking) => (
         <span>
@@ -94,7 +113,7 @@ const TaxiBookings = () => {
       ),
     },
     {
-      key: "amount" as keyof TaxiBooking,
+      key: "amount",
       header: t("taxiBookings.columns.amount"),
       render: (booking: TaxiBooking) => (
         <span>
@@ -104,12 +123,12 @@ const TaxiBookings = () => {
       ),
     },
     {
-      key: "status" as keyof TaxiBooking,
+      key: "status",
       header: t("taxiBookings.columns.status"),
       render: (booking: TaxiBooking) => <StatusBadge status={booking.status} />,
     },
     {
-      key: "actions" as "actions",
+      key: "actions",
       header: t("taxiBookings.columns.actions"),
       render: (booking: TaxiBooking) => (
         <button
@@ -125,18 +144,6 @@ const TaxiBookings = () => {
       ),
     },
   ];
-
-  // const filterOptions = [
-  //   {
-  //     key: "status" as keyof TaxiBooking,
-  //     label: "Status",
-  //     options: [
-  //       { label: "Completed", value: "Completed" },
-  //       { label: "Cancelled", value: "Cancelled" },
-  //       { label: "Pending", value: "Pending" },
-  //     ],
-  //   },
-  // ];
 
   return (
     <>
@@ -154,24 +161,22 @@ const TaxiBookings = () => {
           columns={columns}
           data={bookings}
           keyExtractor={(item) => item.bookingId}
-          filterable
-          // filterOptions={filterOptions}
           paginate
           pageSize={pageSize}
           currentPage={currentPage}
           totalItems={totalBookings}
           onPageChange={setCurrentPage}
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          searchTerm={searchInput}
+          onSearchChange={handleSearchChange}
         />
       )}
 
-      {/* Booking Details Sheet */}
       <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
           <SheetHeader>
             <SheetTitle>{t("taxiBookings.sheet.title")}</SheetTitle>
           </SheetHeader>
+
           {selectedBooking && (
             <div className="mt-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -200,10 +205,11 @@ const TaxiBookings = () => {
                 </div>
               </div>
 
-              <div className="pt-4 border-t">
+              <div className="border-t pt-4">
                 <h3 className="font-semibold mb-2">
                   {t("taxiBookings.sheet.labels.rideDetails")}
                 </h3>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h4 className="text-sm text-gray-500">
@@ -232,14 +238,14 @@ const TaxiBookings = () => {
                 </div>
               </div>
 
-              <div className="pt-4 border-t">
+              <div className="border-t pt-4">
                 <h3 className="font-semibold mb-2">
                   {t("taxiBookings.sheet.labels.customerInformation")}
                 </h3>
                 <p className="font-medium">{selectedBooking.customerName}</p>
               </div>
 
-              <div className="pt-4 border-t">
+              <div className="border-t pt-4">
                 <h3 className="font-semibold mb-2">
                   {t("taxiBookings.sheet.labels.driverInformation")}
                 </h3>

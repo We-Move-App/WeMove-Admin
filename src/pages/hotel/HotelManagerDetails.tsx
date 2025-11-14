@@ -172,10 +172,6 @@ const HotelManagerDetails = () => {
     fetchOperator();
   }, [id, isNewManager]);
 
-  // useEffect(() => {
-  //   console.log("Policy docs after state update:", manager?.policyDocuments);
-  // }, [manager]);
-
   const handleChange = (field: keyof HotelManager, value: any) => {
     setManager((prev) => ({ ...prev, [field]: value }));
   };
@@ -199,7 +195,6 @@ const HotelManagerDetails = () => {
 
     console.log("Uploaded file response:", uploadedData);
 
-    // return the full object
     return {
       public_id: uploadedData.public_id,
       url: uploadedData.url,
@@ -208,7 +203,6 @@ const HotelManagerDetails = () => {
     };
   };
 
-  // then use it like this:
   const handleFileUpload = async (file: File) => {
     return await uploadImage(file);
   };
@@ -217,7 +211,6 @@ const HotelManagerDetails = () => {
     return await Promise.all(files.map((file) => uploadImage(file)));
   };
 
-  // When handling upload
   const handlePolicyFileChange = async (file: File) => {
     const uploadedData = await handleFileUpload(file); // full object from upload API
     // Instead of wrapping in { name, Url }, just store the object directly
@@ -226,7 +219,6 @@ const HotelManagerDetails = () => {
   };
 
   const updateStatusApi = async (status: HotelManager["status"]) => {
-    // convert to server format (your old code used .toLowerCase())
     const payload = {
       status: status.toLowerCase(),
       remarks: manager?.remark,
@@ -409,45 +401,6 @@ const HotelManagerDetails = () => {
             ? t("hotelManagerDetails.addNewTitle")
             : t("hotelManagerDetails.viewTitle", { name: manager.name })}
         </h1>
-        {/* <div className="flex gap-2">
-          {!isNewManager && (
-            <Select
-              value={manager.status}
-              onValueChange={(value: HotelManager["status"]) =>
-                handleStatusChange(value)
-              }
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Approved">Approved</SelectItem>
-                <SelectItem value="Submitted">Submitted</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
-                <SelectItem value="Rejected">Rejected</SelectItem>
-                <SelectItem value="Blocked">Blocked</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-          <div className="flex gap-2">
-            {mode === "view" && id !== "new" && (
-              <Button
-                onClick={() =>
-                  navigate(`/hotel-management/managers/${id}?mode=edit`)
-                }
-              >
-                Edit
-              </Button>
-            )}
-
-            {(mode === "edit" || mode === "post") && (
-              <Button onClick={handleSubmit}>
-                {mode === "post" ? "Create Manager" : "Save Changes"}
-              </Button>
-            )}
-          </div>
-        </div> */}
-
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -780,7 +733,7 @@ const HotelManagerDetails = () => {
                   <Input
                     disabled={isReadOnly}
                     type="number"
-                    value={manager.totalRooms || 0}
+                    value={manager.totalRooms || ""}
                     onChange={(e) =>
                       handleChange("totalRooms", parseInt(e.target.value) || 0)
                     }
@@ -805,11 +758,11 @@ const HotelManagerDetails = () => {
                   <Input
                     disabled={isReadOnly}
                     type="number"
-                    value={manager.standardRooms?.price || 0}
+                    value={manager.standardRooms?.price || ""}
                     onChange={(e) =>
                       handleChange("standardRooms", {
                         ...manager.standardRooms,
-                        price: parseInt(e.target.value) || 0,
+                        price: parseInt(e.target.value) || "",
                       })
                     }
                   />
@@ -821,11 +774,11 @@ const HotelManagerDetails = () => {
                   <Input
                     disabled={isReadOnly}
                     type="number"
-                    value={manager.standardRooms?.numberOfRooms || 0}
+                    value={manager.standardRooms?.numberOfRooms || ""}
                     onChange={(e) =>
                       handleChange("standardRooms", {
                         ...manager.standardRooms,
-                        numberOfRooms: parseInt(e.target.value) || 0,
+                        numberOfRooms: parseInt(e.target.value) || "",
                       })
                     }
                   />
@@ -886,11 +839,11 @@ const HotelManagerDetails = () => {
                   <Input
                     disabled={isReadOnly}
                     type="number"
-                    value={manager.luxuryRooms?.price || 0}
+                    value={manager.luxuryRooms?.price || ""}
                     onChange={(e) =>
                       handleChange("luxuryRooms", {
                         ...manager.luxuryRooms,
-                        price: parseInt(e.target.value) || 0,
+                        price: parseInt(e.target.value) || "",
                       })
                     }
                   />
@@ -902,11 +855,11 @@ const HotelManagerDetails = () => {
                   <Input
                     disabled={isReadOnly}
                     type="number"
-                    value={manager.luxuryRooms?.numberOfRooms || 0}
+                    value={manager.luxuryRooms?.numberOfRooms || ""}
                     onChange={(e) =>
                       handleChange("luxuryRooms", {
                         ...manager.luxuryRooms,
-                        numberOfRooms: parseInt(e.target.value) || 0,
+                        numberOfRooms: parseInt(e.target.value) || "",
                       })
                     }
                   />

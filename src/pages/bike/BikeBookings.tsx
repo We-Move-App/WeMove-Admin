@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Eye } from "lucide-react";
-// import Layout from '@/components/layout/Layout';
 import DataTable from "@/components/ui/DataTable";
 import { TaxiBooking } from "@/types/admin";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -14,54 +13,6 @@ import axiosInstance from "@/api/axiosInstance";
 import Loader from "@/components/ui/loader";
 import { useTranslation } from "react-i18next";
 
-// Mock data for bike bookings
-// const mockBikeBookings: BikeBooking[] = [
-//   {
-//     id: "1",
-//     customerName: "John Doe",
-//     riderName: "Alex Johnson",
-//     from: "City Center",
-//     to: "University Campus",
-//     rideDate: "2023-10-15",
-//     vehicleType: "Scooter",
-//     amount: 20,
-//     status: "Completed",
-//   },
-//   {
-//     id: "2",
-//     customerName: "Jane Smith",
-//     riderName: "Sam Wilson",
-//     from: "Shopping Mall",
-//     to: "Residential Area",
-//     rideDate: "2023-10-16",
-//     vehicleType: "MotorBike",
-//     amount: 25,
-//     status: "Completed",
-//   },
-//   {
-//     id: "3",
-//     customerName: "David Wilson",
-//     riderName: "Jake Miller",
-//     from: "Hotel Zone",
-//     to: "Tourist Spot",
-//     rideDate: "2023-10-17",
-//     vehicleType: "Scooter",
-//     amount: 18,
-//     status: "Cancelled",
-//   },
-//   {
-//     id: "4",
-//     customerName: "Sarah Johnson",
-//     riderName: "Ryan Thomas",
-//     from: "Metro Station",
-//     to: "Office Park",
-//     rideDate: "2023-10-18",
-//     vehicleType: "MotorBike",
-//     amount: 22,
-//     status: "Pending",
-//   },
-// ];
-
 const BikeBookings = () => {
   const [bookings, setBookings] = useState<TaxiBooking[]>([]);
   const [selectedBooking, setSelectedBooking] = useState<TaxiBooking | null>(
@@ -72,8 +23,12 @@ const BikeBookings = () => {
   const [pageSize] = useState(10);
   const [totalBookings, setTotalBookings] = useState(0);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const { t, i18n } = useTranslation();
+  const debounceRef = useRef<number | null>(null);
+  const DEBOUNCE_MS = 900;
+
+  const { t } = useTranslation();
 
   const viewBookingDetails = (booking: TaxiBooking) => {
     setSelectedBooking(booking);
@@ -160,7 +115,23 @@ const BikeBookings = () => {
     },
   ];
 
+  const handleSearchChange = (val: string) => {
+    setSearchInput(val);
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = window.setTimeout(() => {
+      setCurrentPage(1);
+      setSearchTerm(val);
+      debounceRef.current = null;
+    }, DEBOUNCE_MS);
+  };
+
   useEffect(() => {
+    let mounted = true;
+
     const fetchBookings = async () => {
       try {
         setLoading(true);
@@ -176,21 +147,35 @@ const BikeBookings = () => {
           }
         );
 
+        if (!mounted) return;
+
         if (response.data?.statusCode === 200) {
           setBookings(response.data.data || []);
           setTotalBookings(response.data?.totalBookings || 0);
         } else {
           setBookings([]);
+          setTotalBookings(0);
         }
       } catch (error) {
         console.error("Error fetching taxi bookings:", error);
+        if (!mounted) return;
         setBookings([]);
+        setTotalBookings(0);
       } finally {
+        if (!mounted) return;
         setLoading(false);
       }
     };
 
     fetchBookings();
+
+    return () => {
+      mounted = false;
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+        debounceRef.current = null;
+      }
+    };
   }, [currentPage, pageSize, searchTerm]);
 
   return (
@@ -209,19 +194,17 @@ const BikeBookings = () => {
           columns={columns}
           data={bookings}
           keyExtractor={(item) => item.bookingId}
-          // filterable
-          // filterOptions={filterOptions}
           paginate
           pageSize={pageSize}
           currentPage={currentPage}
           totalItems={totalBookings}
           onPageChange={setCurrentPage}
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          searchTerm={searchInput}
+          onSearchChange={handleSearchChange}
+          filterOptions={filterOptions}
         />
       )}
 
-      {/* Booking Details Sheet */}
       <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
           <SheetHeader>
@@ -253,7 +236,8 @@ const BikeBookings = () => {
                     {t("bikeBookings.sheet.labels.amount")}
                   </h4>
                   <p className="font-medium">
-                    ${selectedBooking.amount.toFixed(2)}
+                    {t("bikeBookings.currencySymbol")}
+                    {selectedBooking.amount.toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -292,11 +276,6 @@ const BikeBookings = () => {
                 </h3>
                 <p className="font-medium">{selectedBooking.customerName}</p>
               </div>
-
-              {/* <div className="pt-4 border-t">
-                <h3 className="font-semibold mb-2">Rider Information</h3>
-                <p className="font-medium">{selectedBooking.driverName}</p>
-              </div> */}
             </div>
           )}
         </SheetContent>

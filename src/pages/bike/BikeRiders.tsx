@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BadgeCheck, Eye, Plus } from "lucide-react";
-// import Layout from '@/components/layout/Layout';
 import DataTable from "@/components/ui/DataTable";
 import { BikeRider } from "@/types/admin";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -9,54 +8,6 @@ import { Button } from "@/components/ui/button";
 import axiosInstance from "@/api/axiosInstance";
 import Loader from "@/components/ui/loader";
 import { useTranslation } from "react-i18next";
-
-// Mock data for bike riders
-// const mockBikeRiders: BikeRider[] = [
-//   {
-//     id: "1",
-//     name: "Alex Johnson",
-//     mobile: "9876543210",
-//     email: "alex.j@example.com",
-//     status: "Approved",
-//     age: 28,
-//     experience: 5,
-//     vehicleType: "Scooter",
-//     vehicleRegistrationNumber: "TN-01-AB-5678",
-//   },
-//   {
-//     id: "2",
-//     name: "Sam Wilson",
-//     mobile: "8765432109",
-//     email: "sam.w@example.com",
-//     status: "Approved",
-//     age: 25,
-//     experience: 3,
-//     vehicleType: "MotorBike",
-//     vehicleRegistrationNumber: "TN-02-CD-9012",
-//   },
-//   {
-//     id: "3",
-//     name: "Ryan Thomas",
-//     mobile: "7654321098",
-//     email: "ryan.t@example.com",
-//     status: "Rejected",
-//     age: 22,
-//     experience: 1,
-//     vehicleType: "Scooter",
-//     vehicleRegistrationNumber: "TN-03-EF-3456",
-//   },
-//   {
-//     id: "4",
-//     name: "Jake Miller",
-//     mobile: "6543210987",
-//     email: "jake.m@example.com",
-//     status: "Approved",
-//     age: 30,
-//     experience: 7,
-//     vehicleType: "MotorBike",
-//     vehicleRegistrationNumber: "TN-04-GH-7890",
-//   },
-// ];
 
 const BikeRiders = () => {
   const navigate = useNavigate();

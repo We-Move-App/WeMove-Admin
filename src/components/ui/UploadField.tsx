@@ -239,14 +239,16 @@ const UploadField = ({
                 <div className="mx-auto h-12 w-12 text-gray-400 flex items-center justify-center">
                   <Upload size={24} />
                 </div>
-                <div className="flex text-sm text-gray-600">
+                <div className="flex text-sm text-gray-600 items-center">
                   <label
                     htmlFor={`file-upload-${label
                       .replace(/\s+/g, "-")
                       .toLowerCase()}`}
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500"
+                    className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 text-center w-full"
                   >
-                    <span>{multiple ? "Upload files" : "Upload a file"}</span>
+                    <span className="text-center">
+                      {multiple ? "Upload files" : "Upload a file"}
+                    </span>
                     <input
                       ref={fileInputRef}
                       id={`file-upload-${label
@@ -260,7 +262,7 @@ const UploadField = ({
                       multiple={multiple}
                     />
                   </label>
-                  <p className="pl-1">or drag and drop</p>
+                  {/* <p className="pl-1">or drag and drop</p> */}
                 </div>
                 <p className="text-xs text-gray-500">
                   PNG, JPG, PDF up to 10MB

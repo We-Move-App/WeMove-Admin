@@ -285,104 +285,6 @@ const UserManagement = () => {
     }
   };
 
-  // const handleAddUser = async () => {
-  //   if (!newUser.name || !newUser.email || !newUser.phoneNumber) {
-  //     toast({ title: "Please fill in all required fields.." });
-  //     return;
-  //   }
-
-  //   try {
-  //     let branchId = newUser.branchId;
-
-  //     // Only Admins can create/select branch
-  //     if (newUser.role === "Admin") {
-  //       if (!newUser.branchName) {
-  //         toast({ title: "Please select a branch for Admin" });
-  //         return;
-  //       }
-
-  //       const branchPayload = {
-  //         name: newUser.branchName,
-  //         location: query,
-  //       };
-
-  //       const branchRes = await axiosInstance.post("/branch", branchPayload);
-  //       branchId = branchRes.data?.data?.branch?._id;
-  //       console.log("Branch created/confirmed with ID:", branchId);
-  //     }
-
-  //     //  Permissions payload
-  //     const allBackendKeys = [
-  //       "reportsAnalytics",
-  //       "busManagement",
-  //       "hotelManagement",
-  //       "taxiManagement",
-  //       "bikeManagement",
-  //       "userManagement",
-  //       "roleManagement",
-  //       "commissionManagement",
-  //       "couponManagement",
-  //       "notifications",
-  //       "walletManagement",
-  //     ];
-
-  //     const permissionsPayload: Record<string, boolean> = {};
-  //     allBackendKeys.forEach((key) => {
-  //       permissionsPayload[key] =
-  //         key === "reportsAnalytics" ? true : newUser.permissions.includes(key);
-  //     });
-
-  //     // Build user payload
-  //     const userPayload: any = {
-  //       email: newUser.email,
-  //       userName: newUser.name,
-  //       phoneNumber: newUser.phoneNumber,
-  //       role: newUser.role,
-  //       permissions: permissionsPayload,
-  //       branch: branchId,
-  //     };
-
-  //     if (newUser.role === "SubAdmin") {
-  //       userPayload.reportingManger = newUser.adminId;
-  //     }
-
-  //     console.log("Creating user with payload:", userPayload);
-
-  //     // API call
-  //     let userRes;
-  //     if (newUser.role === "Admin") {
-  //       userRes = await axiosInstance.post("/auth/add-admin", userPayload);
-  //     } else if (newUser.role === "SubAdmin") {
-  //       userRes = await axiosInstance.post("/auth/add-SubAdmin", userPayload);
-  //     }
-
-  //     toast({ title: `${newUser.role} created successfully!` });
-
-  //     // Update local state
-  //     setUsers((prev) => [
-  //       ...prev,
-  //       { ...userRes!.data, id: userRes!.data.id || Date.now().toString() },
-  //     ]);
-
-  //     // Reset form
-  //     setNewUser({
-  //       name: "",
-  //       email: "",
-  //       phoneNumber: "",
-  //       role: "Admin",
-  //       permissions: [],
-  //       branchId: "",
-  //       branchName: "",
-  //       adminId: "",
-  //     });
-  //     setQuery("");
-  //     setIsDialogOpen(false);
-  //   } catch (error: any) {
-  //     console.error(error);
-  //     toast({ title: `Failed to create ${newUser.role}.` });
-  //   }
-  // };
-
   const handleAddUser = async () => {
     if (!newUser.name || !newUser.email || !newUser.phoneNumber) {
       toast({ title: "Please fill in all required fields.." });
@@ -518,9 +420,6 @@ const UserManagement = () => {
       <div className="mb-6 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">{t("admins.pageTitle")}</h1>
-          {/* <p className="text-gray-600">
-            Manage admin, sub-admin roles and their permissions
-          </p> */}
           {role === "Admin"
             ? t("admins.subTitleAdmin")
             : t("admins.subTitleDefault")}
@@ -531,7 +430,6 @@ const UserManagement = () => {
           className="flex items-center gap-2"
         >
           <Plus size={16} />
-          {/* Add Admin / Sub-admin */}
           {role === "Admin"
             ? t("admins.buttons.addSubAdmin")
             : t("admins.buttons.addAdminSubAdmin")}
@@ -550,7 +448,6 @@ const UserManagement = () => {
         onPageChange={setCurrentPage}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        // searchable={true}
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -628,46 +525,7 @@ const UserManagement = () => {
               </div>
             )}
 
-            {/* {newUser.role === "SubAdmin" && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Assign Admin</label>
-                <Select
-                  value={newUser.adminId || ""}
-                  onValueChange={(value) => {
-                    const selectedAdmin = admins.find(
-                      (admin) => admin._id === value
-                    );
-                    if (selectedAdmin) {
-                      console.log("Admin ID:", selectedAdmin._id);
-                      console.log("Branch ID:", selectedAdmin.branch.branchId);
 
-                      setNewUser({
-                        ...newUser,
-                        adminId: selectedAdmin._id,
-                        branchId: selectedAdmin.branch.branchId,
-                      });
-                    }
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an Admin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {loadingAdmins ? (
-                      <div className="p-2 text-sm">Loading admins...</div>
-                    ) : admins.length === 0 ? (
-                      <div className="p-2 text-sm">No admins found</div>
-                    ) : (
-                      admins.map((admin) => (
-                        <SelectItem key={admin._id} value={admin._id}>
-                          {admin.name} ({admin.branch.location})
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-            )} */}
             {role !== "Admin" && newUser.role === "SubAdmin" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">

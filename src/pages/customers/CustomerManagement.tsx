@@ -1,22 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import DataTable from "@/components/ui/DataTable";
-import { Eye, History } from "lucide-react";
+import { Eye } from "lucide-react";
 import { Customer } from "@/types/admin";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table";
 import axiosInstance from "@/api/axiosInstance";
 import StatusBadge from "@/components/ui/StatusBadge";
 import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
@@ -27,19 +13,31 @@ const CustomerManagement = () => {
   const { userId } = useParams();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null
-  );
-  const [showHistory, setShowHistory] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalUsers, setTotalUsers] = useState(0);
+
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+
+  const debounceRef = useRef<number | null>(null);
+  const handleSearchChange = (val: string) => {
+    setSearchInput(val);
+    if (debounceRef.current) {
+      window.clearTimeout(debounceRef.current);
+    }
+    debounceRef.current = window.setTimeout(() => {
+      setCurrentPage(1);
+      setSearchTerm(val);
+      debounceRef.current = null;
+    }, 900);
+  };
 
   useEffect(() => {
+    let mounted = true;
+
     const fetchCustomers = async () => {
       setLoading(true);
       try {
@@ -52,8 +50,11 @@ const CustomerManagement = () => {
           },
         });
 
-        if (response.data.success) {
-          const apiUsers = response.data.data.map((u: any) => ({
+        const success = response.data?.success ?? true;
+        const apiUsers = response.data?.data ?? response.data ?? [];
+
+        if (success && Array.isArray(apiUsers)) {
+          const mapped = apiUsers.map((u: any) => ({
             id: u._id,
             userId: u.userId,
             name: u.fullName,
@@ -61,23 +62,37 @@ const CustomerManagement = () => {
             email: u.email,
             status: u.verificationStatus,
           }));
-          setCustomers(apiUsers);
-          setTotalUsers(response.data?.totalUsers || 0);
+
+          if (!mounted) return;
+          setCustomers(mapped);
+          const total =
+            response.data?.totalUsers ??
+            response.data?.total ??
+            response.data?.data?.total ??
+            0;
+          setTotalUsers(total);
+        } else {
+          if (!mounted) return;
+          setCustomers([]);
+          setTotalUsers(0);
         }
       } catch (error) {
         console.error("Error fetching users:", error);
+        if (!mounted) return;
+        setCustomers([]);
+        setTotalUsers(0);
       } finally {
+        if (!mounted) return;
         setLoading(false);
       }
     };
 
     fetchCustomers();
-  }, [currentPage, pageSize, searchTerm, status]);
 
-  const handleShowHistory = (customer: Customer) => {
-    setSelectedCustomer(customer);
-    setShowHistory(true);
-  };
+    return () => {
+      mounted = false;
+    };
+  }, [currentPage, pageSize, searchTerm, status]);
 
   const columns = [
     { key: "name", header: t("customerManagement.tableHeaders.name") },
@@ -93,6 +108,7 @@ const CustomerManagement = () => {
       header: t("customerManagement.tableHeaders.actions"),
       render: (customer: Customer) => (
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             navigate(`/customer-management/${customer.id}`);
@@ -106,23 +122,6 @@ const CustomerManagement = () => {
     },
   ];
 
-  const filterOptions = [
-    {
-      key: "status" as keyof Customer,
-      label: "Status",
-      options: [
-        { label: "Approved", value: "Approved" },
-        { label: "Submitted", value: "Submitted" },
-        { label: "Blocked", value: "Blocked" },
-        { label: "Rejected", value: "Rejected" },
-      ],
-    },
-  ];
-
-  const handleRowClick = (customer: Customer) => {
-    navigate(`/customer-management/${customer.id}`);
-  };
-
   return (
     <>
       <div className="mb-6">
@@ -133,29 +132,39 @@ const CustomerManagement = () => {
       </div>
 
       {loading ? (
-        <>
-          <CustomerDetailsSkeleton />
-        </>
+        <CustomerDetailsSkeleton />
       ) : (
         <DataTable
           columns={columns}
           data={customers}
           keyExtractor={(item) => item.id}
-          onRowClick={handleRowClick}
+          onRowClick={(c) => navigate(`/customer-management/${c.id}`)}
           paginate={true}
           pageSize={pageSize}
           currentPage={currentPage}
           totalItems={totalUsers}
-          onPageChange={setCurrentPage}
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          onPageChange={(page) => setCurrentPage(page)}
+          searchTerm={searchInput}
+          onSearchChange={handleSearchChange}
           filterable
-          filterOptions={filterOptions}
-          filters={{ status: status }}
+          filterOptions={[
+            {
+              key: "status" as keyof Customer,
+              label: "Status",
+              options: [
+                { label: "Approved", value: "Approved" },
+                { label: "Submitted", value: "Submitted" },
+                { label: "Blocked", value: "Blocked" },
+                { label: "Rejected", value: "Rejected" },
+              ],
+            },
+          ]}
+          filters={{ status }}
           onFilterChange={(filters) => {
             setStatus(filters.status || "");
             setCurrentPage(1);
           }}
+          loading={loading}
         />
       )}
     </>

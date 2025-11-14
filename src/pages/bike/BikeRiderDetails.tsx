@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
-// import Layout from '@/components/layout/Layout';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -153,7 +152,6 @@ const BikeRiderDetails = () => {
   };
 
   // POST API Payload Builder
-
   const buildDriverPayload = async (driver: TaxiDriver) => {
     const isFile = (file: any): file is File =>
       file && typeof file === "object" && "name" in file;
@@ -254,7 +252,6 @@ const BikeRiderDetails = () => {
   };
 
   // PUT API Payload Builder
-
   const buildPutDriverPayload = async (
     driver: TaxiDriver,
     selectedBranch?: string
