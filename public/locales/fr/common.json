@@ -453,11 +453,12 @@
       "remarkPlaceholder": "Saisir la raison du rejet ou du blocage"
     },
 
-    "statusOptions": {
+    "status": {
       "pending": "En attente",
       "approved": "Approuvé",
       "rejected": "Rejeté",
-      "blocked": "Bloqué"
+      "blocked": "Bloqué",
+      "processing": "En traitement"
     },
 
     "upload": {
@@ -593,11 +594,12 @@
       "remarkPlaceholder": "Saisir la raison du rejet ou du blocage"
     },
 
-    "statusOptions": {
+    "status": {
       "pending": "En attente",
       "approved": "Approuvé",
       "rejected": "Rejeté",
-      "blocked": "Bloqué"
+      "blocked": "Bloqué",
+      "processing": "En traitement"
     },
 
     "upload": {

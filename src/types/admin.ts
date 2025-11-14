@@ -206,6 +206,7 @@ export interface TaxiDriver {
   name: string;
   email: string;
   branch?: string;
+  branchId?: string;
   mobile?: string;
   remark?: string;
   phone?: string;
@@ -270,6 +271,7 @@ export interface BikeRider {
   phone?: string;
   licenseNumber?: string;
   bikeNumber?: string;
+  branchId?: string;
   balance?: string;
   bikeModel?: string;
   vehicleType?: string;

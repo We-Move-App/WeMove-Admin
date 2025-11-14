@@ -455,11 +455,12 @@
       "remarkPlaceholder": "Enter reason for rejection or blocking"
     },
 
-    "statusOptions": {
+    "status": {
       "pending": "Pending",
       "approved": "Approved",
       "rejected": "Rejected",
-      "blocked": "Blocked"
+      "blocked": "Blocked",
+      "processing": "Processing"
     },
 
     "upload": {
@@ -595,11 +596,12 @@
       "remarkPlaceholder": "Enter reason for rejection or blocking"
     },
 
-    "statusOptions": {
+    "status": {
       "pending": "Pending",
       "approved": "Approved",
       "rejected": "Rejected",
-      "blocked": "Blocked"
+      "blocked": "Blocked",
+      "processing": "Processing"
     },
 
     "upload": {

@@ -53,13 +53,16 @@ const TaxiDriverDetails = () => {
         .then((res) => {
           const apiData = res.data.data;
 
-          // map API response into your TaxiDriver shape
           const mappedDriver: TaxiDriver = {
             id: apiData.TaxiDriverDetails?.driverId || "",
             driverId: apiData.TaxiDriverDetails?.driverId || "",
             name: apiData.TaxiDriverDetails?.name || "",
             email: apiData.TaxiDriverDetails?.email || "",
             mobile: apiData.TaxiDriverDetails?.mobile || "",
+            branchId:
+              apiData.TaxiDriverDetails?.branch?._id ||
+              apiData.TaxiDriverDetails?.branch?.id ||
+              "",
             branch: apiData.TaxiDriverDetails?.branch?.name || "",
             batchVerified: apiData.TaxiDriverDetails?.batchVerified || "",
             status: apiData.TaxiDriverDetails?.status || "",
@@ -258,7 +261,8 @@ const TaxiDriverDetails = () => {
 
   const buildPutDriverPayload = async (
     driver: TaxiDriver,
-    selectedBranch?: string
+    selectedBranch?: string,
+    selectedBranchId?: string
   ) => {
     const isFile = (file: any): file is File =>
       file && typeof file === "object" && "name" in file;
@@ -332,7 +336,8 @@ const TaxiDriverDetails = () => {
         age: driver.age || null,
         experience: driver.experience || 0,
         address: driver.address || "",
-        branch: selectedBranch || driver.branch || "",
+        branch: selectedBranchId || driver.branchId || "",
+        // branch: selectedBranch || driver.branch || "",
       },
       bankDetails: {
         accountNumber: driver.accountNumber || "",
@@ -354,62 +359,6 @@ const TaxiDriverDetails = () => {
       ],
     };
   };
-
-  // const handleSubmit = async () => {
-  //   try {
-  //     if (mode === "post") {
-  //       const payload = await buildDriverPayload(driver);
-  //       await axiosInstance.post(
-  //         "/driver-management/taxi-drivers/register",
-  //         payload
-  //       );
-  //     } else if (mode === "edit") {
-  //       try {
-  //         // 1. Build payload for driver update
-  //         const payload = await buildPutDriverPayload(driver, selectedBranch);
-  //         console.log("PUT payload:", JSON.stringify(payload, null, 2));
-
-  //         // 2. First API call -> Update driver details
-  //         await axiosInstance.put(
-  //           `/driver-management/taxi-drivers/${id}?vehicleType=taxi`,
-  //           payload
-  //         );
-
-  //         // 3. Second API call -> Verify driver status
-  //         // await axiosInstance.put(
-  //         //   `/driver-management/drivers/verify/${driver.driverId}`,
-  //         //   { status: driver.status }
-  //         // );
-  //         if (driver.driverId) {
-  //           await axiosInstance.put(
-  //             `/driver-management/drivers/verify/${driver.driverId}`,
-  //             { status: driver.status }
-  //           );
-  //         } else {
-  //           console.warn("⚠️ Skipping verify API: missing driverId");
-  //         }
-
-  //         // ✅ Success message / toast
-  //         console.log("Driver updated & verified successfully");
-  //         console.log("Editing driver", {
-  //           id,
-  //           driverId: driver.driverId,
-  //           status: driver.status,
-  //         });
-  //         console.log("Payload being sent", payload);
-  //       } catch (error) {
-  //         console.error("Error updating driver:", error);
-  //       }
-  //     }
-  //     toast({
-  //       title: mode === "post" ? "Driver Created" : "Driver Updated",
-  //       description: driver.name,
-  //     });
-  //     navigate("/taxi-management/drivers");
-  //   } catch (error) {
-  //     console.error("Error saving driver:", error);
-  //   }
-  // };
 
   const handleSubmit = async () => {
     try {
@@ -660,7 +609,7 @@ const TaxiDriverDetails = () => {
 
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
-                        {t(`taxiDriversDetails.statusOptions.${driver.status}`)}
+                        {t(`taxiDriversDetails.status.${driver.status}`)}
                       </p>
                     ) : (
                       <Select

@@ -59,6 +59,10 @@ const BikeRiderDetails = () => {
             name: apiData.BikeDriverDetails?.name || "",
             email: apiData.BikeDriverDetails?.email || "",
             mobile: apiData.BikeDriverDetails?.mobile || "",
+            branchId:
+              apiData.BikeDriverDetails?.branch?._id ||
+              apiData.BikeDriverDetails?.branch?.id ||
+              "",
             branch: apiData.BikeDriverDetails?.branch?.name || "",
             status: apiData.BikeDriverDetails?.status || "",
             remark: apiData.BikeDriverDetails?.remarks || "",
@@ -254,7 +258,8 @@ const BikeRiderDetails = () => {
   // PUT API Payload Builder
   const buildPutDriverPayload = async (
     driver: TaxiDriver,
-    selectedBranch?: string
+    selectedBranch?: string,
+    selectedBranchId?: string
   ) => {
     const isFile = (file: any): file is File =>
       file && typeof file === "object" && "name" in file;
@@ -335,7 +340,8 @@ const BikeRiderDetails = () => {
         age: driver.age || null,
         experience: driver.experience || 0,
         address: driver.address || "",
-        branch: selectedBranch || driver.branch || "",
+        branch: selectedBranchId || driver.branchId || "",
+        // branch: selectedBranch || driver.branch || "",
       },
       bankDetails: {
         accountNumber: driver.accountNumber || "",
@@ -605,7 +611,7 @@ const BikeRiderDetails = () => {
 
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
-                        {t(`bikeDriversDetails.statusOptions.${driver.status}`)}
+                        {t(`bikeDriversDetails.status.${driver.status}`)}
                       </p>
                     ) : (
                       <Select
