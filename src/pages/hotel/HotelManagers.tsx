@@ -154,12 +154,21 @@ const HotelManagers = () => {
           {t("hotelManagers.addButton")}
         </Button>
       </div>
+      <div className="relative">
+        {loading && (
+          <div>
+            <Loader />
+          </div>
+        )}
 
-      {loading ? (
-        <Loader />
-      ) : error ? (
-        <p className="text-red-500">{error}</p>
-      ) : (
+        {/* Error message */}
+        {error && (
+          <div className="mb-4">
+            <p className="text-red-500">{error}</p>
+          </div>
+        )}
+
+        {/* DataTable ALWAYS mounted */}
         <DataTable
           columns={columns}
           data={managers}
@@ -174,6 +183,7 @@ const HotelManagers = () => {
           filterable={true}
           filterOptions={filterOptions}
           searchTerm={searchInput}
+          searchPlaceholder="Search by name / email"
           onSearchChange={handleSearchChange}
           filters={{ status: selectedStatus }}
           onFilterChange={(filters) => {
@@ -181,7 +191,7 @@ const HotelManagers = () => {
             setCurrentPage(1);
           }}
         />
-      )}
+      </div>
     </>
   );
 };

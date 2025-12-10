@@ -154,9 +154,12 @@ const TaxiBookings = () => {
         </div>
       </div>
 
-      {loading ? (
-        <Loader />
-      ) : (
+      <div className="relative">
+        {loading && (
+          <div>
+            <Loader />
+          </div>
+        )}
         <DataTable
           columns={columns}
           data={bookings}
@@ -164,12 +167,13 @@ const TaxiBookings = () => {
           paginate
           pageSize={pageSize}
           currentPage={currentPage}
+          searchPlaceholder="Search by ID / name"
           totalItems={totalBookings}
           onPageChange={setCurrentPage}
           searchTerm={searchInput}
           onSearchChange={handleSearchChange}
         />
-      )}
+      </div>
 
       <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
@@ -230,8 +234,8 @@ const TaxiBookings = () => {
                     <p className="font-medium">
                       {selectedBooking.rideDate
                         ? new Date(selectedBooking.rideDate).toLocaleDateString(
-                            "en-GB"
-                          )
+                          "en-GB"
+                        )
                         : "-"}
                     </p>
                   </div>

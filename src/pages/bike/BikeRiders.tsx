@@ -147,9 +147,13 @@ const BikeRiders = () => {
         </Button>
       </div>
 
-      {loading ? (
-        <Loader />
-      ) : (
+      <div className="relative">
+        {loading && (
+          <div>
+            <Loader />
+          </div>
+        )}
+
         <DataTable
           columns={columns}
           data={riders}
@@ -163,6 +167,7 @@ const BikeRiders = () => {
           totalItems={totalDrivers}
           onPageChange={(page) => setCurrentPage(page)}
           searchTerm={searchTerm}
+          searchPlaceholder="Search by name / email"
           onSearchChange={setSearchTerm}
           filters={{ status: selectedStatus }}
           onFilterChange={(filters) => {
@@ -170,7 +175,7 @@ const BikeRiders = () => {
             setCurrentPage(1);
           }}
         />
-      )}
+      </div>
     </>
   );
 };

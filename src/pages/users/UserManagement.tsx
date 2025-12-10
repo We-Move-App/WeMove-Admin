@@ -233,8 +233,8 @@ const UserManagement = () => {
           {user.role === "SuperAdmin"
             ? t("admins.tableValues.fullAccess")
             : t("admins.tableValues.permissionsCount", {
-                count: user.permissionsCount,
-              })}
+              count: user.permissionsCount,
+            })}
         </span>
       ),
     },
@@ -443,6 +443,7 @@ const UserManagement = () => {
         onRowClick={handleRowClick}
         paginate
         pageSize={pageSize}
+        searchPlaceholder="Search by name / email"
         currentPage={currentPage}
         totalItems={totalBookings}
         onPageChange={setCurrentPage}

@@ -128,23 +128,22 @@ const Wallet = () => {
           ${transaction.type === "Credit" ? "bg-green-100 text-green-800" : ""}
           ${transaction.type === "Debit" ? "bg-red-100 text-red-800" : ""}
           ${transaction.type === "Transfer" ? "bg-blue-100 text-blue-800" : ""}
-          ${
-            transaction.type === "Withdrawal"
+          ${transaction.type === "Withdrawal"
               ? "bg-amber-100 text-amber-800"
               : ""
-          }
+            }
         `}
         >
           {/* Map type strings to translation keys; fall back to raw value if unknown */}
           {transaction.type === "Credit"
             ? t("wallet.types.credit")
             : transaction.type === "Debit"
-            ? t("wallet.types.debit")
-            : transaction.type === "Transfer"
-            ? t("wallet.types.transfer")
-            : transaction.type === "Withdrawal"
-            ? t("wallet.types.withdrawal")
-            : transaction.type}
+              ? t("wallet.types.debit")
+              : transaction.type === "Transfer"
+                ? t("wallet.types.transfer")
+                : transaction.type === "Withdrawal"
+                  ? t("wallet.types.withdrawal")
+                  : transaction.type}
         </span>
       ),
     },
@@ -409,20 +408,21 @@ const Wallet = () => {
         <h2 className="text-lg font-semibold mb-4">
           {t("wallet.transactionHistory.title")}
         </h2>
-        {loading ? (
-          <div>
-            {Array(5)
-              .fill(0)
-              .map((_, i) => (
-                <div key={i} className="flex justify-between p-2 border-b">
-                  <Skeleton width={100} />
-                  <Skeleton width={80} />
-                  <Skeleton width={60} />
-                  <Skeleton width={150} />
-                </div>
-              ))}
-          </div>
-        ) : (
+        <div className="relative">
+          {loading && (
+            <div>
+              {Array(5)
+                .fill(0)
+                .map((_, i) => (
+                  <div key={i} className="flex justify-between p-2 border-b">
+                    <Skeleton width={100} />
+                    <Skeleton width={80} />
+                    <Skeleton width={60} />
+                    <Skeleton width={150} />
+                  </div>
+                ))}
+            </div>
+          )}
           <DataTable
             columns={columns}
             data={transactions}
@@ -432,6 +432,7 @@ const Wallet = () => {
             // filterable
             // filterOptions={filterOptions}
             searchTerm={searchTerm}
+            searchPlaceholder="Search by Transaction ID"
             onSearchChange={setSearchTerm}
             paginate
             pageSize={pageSize}
@@ -439,8 +440,8 @@ const Wallet = () => {
             totalItems={totalTransactions}
             onPageChange={(page) => setCurrentPage(page)}
           />
-        )}
-      </div>
+        </div>
+      </div >
     </>
   );
 };

@@ -85,10 +85,10 @@ const BusBookings = () => {
             to: booking.to || "N/A",
             journeyDate: booking.journeyDate
               ? new Date(booking.journeyDate).toLocaleDateString("en-GB", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
               : "N/A",
             amount: booking.amount || 0,
             // status: booking.status || "N/A",
@@ -99,17 +99,13 @@ const BusBookings = () => {
             passengers: booking.passengers || [],
           };
         });
-        // const uniqueFrom = Array.from(
-        //   new Set(bookingsData.map((b: any) => String(b.from)))
-        // ).map((f) => ({ label: f, value: f }));
-
-        // const uniqueTo = Array.from(
-        //   new Set(bookingsData.map((b: any) => String(b.to)))
-        // ).map((t) => ({ label: t, value: t }));
-
-        // setFromOptions(uniqueFrom);
-        // setToOptions(uniqueTo);
-
+        console.log('API raw response:', response.data);
+        console.log('bookingsData length:', bookingsData.length, bookingsData);
+        console.log('formattedBookings:', formattedBookings);
+        console.log(
+          'duplicate ids:',
+          formattedBookings.map(b => b.id).filter((v, i, a) => a.indexOf(v) !== i)
+        );
         setBookings(formattedBookings);
       } catch (error) {
         console.error("❌ Failed to fetch bookings:", error);
@@ -240,12 +236,8 @@ const BusBookings = () => {
         onPageChange={(page) => setCurrentPage(page)}
         keyExtractor={(item) => item.id}
         onRowClick={handleRowClick}
-        // filterOptions={filterOptions}
-        // onFilterChange={(key, value) => {
-        //   if (key === "from") setSelectedFrom(value);
-        //   if (key === "to") setSelectedTo(value);
-        // }}
         searchTerm={searchTerm}
+        searchPlaceholder="Search by name / email"
         onSearchChange={setSearchTerm}
       />
 

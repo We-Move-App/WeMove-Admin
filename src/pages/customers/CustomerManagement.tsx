@@ -7,6 +7,7 @@ import axiosInstance from "@/api/axiosInstance";
 import StatusBadge from "@/components/ui/StatusBadge";
 import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 import { useTranslation } from "react-i18next";
+import Loader from "@/components/ui/loader";
 
 const CustomerManagement = () => {
   const navigate = useNavigate();
@@ -131,9 +132,12 @@ const CustomerManagement = () => {
         <p className="text-gray-600">{t("customerManagement.pageSubtitle")}</p>
       </div>
 
-      {loading ? (
-        <CustomerDetailsSkeleton />
-      ) : (
+      <div className="relative">
+        {loading && (
+          <div>
+            <Loader />
+          </div>
+        )}
         <DataTable
           columns={columns}
           data={customers}
@@ -144,6 +148,7 @@ const CustomerManagement = () => {
           currentPage={currentPage}
           totalItems={totalUsers}
           onPageChange={(page) => setCurrentPage(page)}
+          searchPlaceholder="Search by name / email"
           searchTerm={searchInput}
           onSearchChange={handleSearchChange}
           filterable
@@ -166,7 +171,7 @@ const CustomerManagement = () => {
           }}
           loading={loading}
         />
-      )}
+      </div>
     </>
   );
 };

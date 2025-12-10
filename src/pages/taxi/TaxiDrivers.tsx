@@ -66,6 +66,7 @@ const TaxiDrivers = () => {
       header: t("taxiDrivers.columns.actions"),
       render: (driver: TaxiDriver) => (
         <button
+          type="button" /* <- prevent accidental form submit */
           className="action-button flex items-center"
           onClick={(e) => {
             e.stopPropagation();
@@ -96,6 +97,7 @@ const TaxiDrivers = () => {
     const fetchDrivers = async () => {
       try {
         setLoading(true);
+        setError(null);
 
         const response = await axiosInstance.get("/driver-management/drivers", {
           params: {
@@ -110,7 +112,7 @@ const TaxiDrivers = () => {
         setDrivers(response.data?.data || []);
         setTotalDrivers(response.data?.total || 0);
       } catch (err: any) {
-        setError(err.message || "Failed to fetch drivers");
+        setError(err?.message || "Failed to fetch drivers");
       } finally {
         setLoading(false);
       }
@@ -122,14 +124,6 @@ const TaxiDrivers = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearch]);
-
-  if (loading)
-    return (
-      <>
-        <Loader />
-      </>
-    );
-  if (error) return <p>Error: {error}</p>;
 
   return (
     <>
@@ -147,25 +141,41 @@ const TaxiDrivers = () => {
         </Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={drivers}
-        keyExtractor={(item) => item.driverId}
-        filterable={true}
-        filterOptions={filterOptions}
-        paginate={true}
-        pageSize={10}
-        currentPage={currentPage}
-        totalItems={totalDrivers}
-        onPageChange={(page) => setCurrentPage(page)}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        filters={{ status: selectedStatus }}
-        onFilterChange={(filters) => {
-          setSelectedStatus(filters.status || "");
-          setCurrentPage(1);
-        }}
-      />
+      <div className="relative">
+        {loading && (
+          <div>
+            <Loader />
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-4">
+            <p className="text-red-500">{error}</p>
+          </div>
+        )}
+
+        <DataTable
+          columns={columns}
+          data={drivers}
+          loading={loading}
+          keyExtractor={(item) => item.driverId}
+          filterable={true}
+          filterOptions={filterOptions}
+          paginate={true}
+          pageSize={10}
+          currentPage={currentPage}
+          totalItems={totalDrivers}
+          onPageChange={(page) => setCurrentPage(page)}
+          searchPlaceholder="Search by name / email"
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          filters={{ status: selectedStatus }}
+          onFilterChange={(filters) => {
+            setSelectedStatus(filters.status || "");
+            setCurrentPage(1);
+          }}
+        />
+      </div>
     </>
   );
 };

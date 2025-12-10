@@ -187,9 +187,12 @@ const BikeBookings = () => {
         </div>
       </div>
 
-      {loading ? (
-        <Loader />
-      ) : (
+      <div className="relative">
+        {loading && (
+          <div>
+            <Loader />
+          </div>
+        )}
         <DataTable
           columns={columns}
           data={bookings}
@@ -200,10 +203,11 @@ const BikeBookings = () => {
           totalItems={totalBookings}
           onPageChange={setCurrentPage}
           searchTerm={searchInput}
+          searchPlaceholder="Search by ID / name"
           onSearchChange={handleSearchChange}
           filterOptions={filterOptions}
         />
-      )}
+      </div>
 
       <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">

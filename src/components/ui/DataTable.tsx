@@ -38,6 +38,7 @@ type DataTableProps<T> = {
   onRowClick?: (item: T) => void;
   searchable?: boolean;
   searchTerm?: string;
+  searchPlaceholder?: string;
   onSearchChange?: (term: string) => void;
   exportable?: boolean;
   filterable?: boolean;
@@ -60,6 +61,7 @@ function DataTable<T>({
   searchable = true,
   searchTerm = "",
   onSearchChange,
+  searchPlaceholder = "Search...",
   filterable = true,
   filterOptions = [],
   onFilterChange,
@@ -159,18 +161,22 @@ function DataTable<T>({
     });
   }, [sortedData, searchTerm, filters, columns]);
 
+  // --- NEW: determine data source and paginate appropriately ---
+  const usingServerSearch = Boolean(onSearchChange); // parent handles search => server-side
+  const sourceData = usingServerSearch ? data : filteredData;
+
+  const current = Math.max(1, Number(currentPage || 1));
+  const size = Number(pageSize || 10);
+  const start = (current - 1) * size;
+  const end = start + size;
+
+  const paginatedData =
+    paginate && !usingServerSearch ? sourceData.slice(start, end) : sourceData;
+  // --- END NEW ---
+
   // Pagination
   const totalPages =
     totalItems && pageSize ? Math.ceil(totalItems / pageSize) : 1;
-
-  // Filter change
-  // const handleFilterChange = (key: string, value: string) => {
-  //   setFilters((prev) => ({
-  //     ...prev,
-  //     [key]: value === "" ? null : value,
-  //   }));
-  //   onPageChange?.(1);
-  // };
 
   // Pagination links
   const getPageLinks = (): number[] => {
@@ -193,25 +199,11 @@ function DataTable<T>({
     <div className="space-y-4">
       {/* Search and filters */}
       <div className="flex flex-wrap gap-4 justify-between">
-        {/* {filterable && (
+        {searchable && (
           <div className="relative w-full sm:w-64 flex items-center gap-20">
             <Search className="absolute top-2.5 left-3 h-4 w-4 text-gray-500" />
             <Input
-              placeholder="Search..."
-              className="pl-10"
-              value={searchTerm || ""}
-              onChange={(e) => {
-                onSearchChange?.(e.target.value);
-                onPageChange?.(1);
-              }}
-            />
-          </div>
-        )} */}
-        {searchable && ( // <-- changed from `filterable` to `searchable`
-          <div className="relative w-full sm:w-64 flex items-center gap-20">
-            <Search className="absolute top-2.5 left-3 h-4 w-4 text-gray-500" />
-            <Input
-              placeholder="Search..."
+              placeholder={searchPlaceholder}
               className="pl-10"
               value={searchTerm || ""}
               onChange={(e) => {
@@ -244,71 +236,77 @@ function DataTable<T>({
       </div>
 
       {/* Table */}
-      <div className="border rounded-md overflow-hidden overflow-x-sroll">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {columns.map((column) => (
-                <TableHead
-                  key={String(column.key)}
-                  className={column.key !== "actions" ? "cursor-pointer" : ""}
-                  onClick={() => {
-                    if (
-                      column.key !== "actions" &&
-                      typeof column.key !== "string"
-                    ) {
-                      requestSort(column.key);
-                    }
-                  }}
-                >
-                  <div className="flex items-center space-x-1">
-                    <span>{column.header}</span>
-                    {sortConfig.key === column.key &&
-                      (sortConfig.direction === "asc" ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      ))}
-                  </div>
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.length > 0 ? (
-              data.map((item) => (
-                <TableRow
-                  key={keyExtractor(item)}
-                  onClick={() => onRowClick?.(item)}
-                  className={
-                    onRowClick ? "cursor-pointer hover:bg-gray-100" : ""
-                  }
-                >
-                  {columns.map((column) => (
-                    <TableCell
-                      key={`${keyExtractor(item)}-${String(column.key)}`}
-                    >
-                      {column.render
-                        ? column.render(item)
-                        : item[column.key as keyof T] !== undefined
-                        ? String(item[column.key as keyof T])
-                        : ""}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="text-center py-8"
-                >
-                  No data found
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+      <div className="border rounded-md overflow-hidden">
+        <div className="w-full overflow-x-auto">
+          <table className="min-w-[800px] w-full table-auto text-sm">
+            <thead>
+              <tr className="bg-white/80 backdrop-blur-md">
+                {columns.map((column) => (
+                  <th
+                    key={String(column.key)}
+                    className={`whitespace-nowrap px-4 py-3 text-left align-middle font-medium text-sm text-muted-foreground ${column.key !== "actions" ? "cursor-pointer" : ""}`}
+                    onClick={() => {
+                      if (column.key !== "actions" && typeof column.key !== "string") {
+                        requestSort(column.key as keyof T);
+                      }
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="whitespace-nowrap">{column.header}</span>
+                      {sortConfig.key === column.key &&
+                        (sortConfig.direction === "asc" ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        ))}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+
+            <tbody>
+              {paginatedData.length > 0 ? (
+                paginatedData.map((item, rowIndex) => (
+                  <tr
+                    key={keyExtractor(item)}
+                    onClick={() => onRowClick?.(item)}
+                    className={`group ${onRowClick ? "cursor-pointer" : ""} hover:bg-gray-50 focus-within:bg-gray-50 ${rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                  >
+                    {columns.map((column) => (
+                      <td
+                        key={`${keyExtractor(item)}-${String(column.key)}`}
+                        className="px-4 py-3 align-middle border-b max-w-[220px]"
+                      >
+                        <div className="flex items-center">
+                          <span className="block truncate" title={String(column.render ? (column.render(item) as any) ?? "" : (item[column.key as keyof T] ?? ""))}>
+                            {column.render
+                              ? column.render(item)
+                              : item[column.key as keyof T] !== undefined
+                                ? String(item[column.key as keyof T])
+                                : ""}
+                          </span>
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={columns.length} className="text-center py-10 text-sm text-muted-foreground">
+                    <div className="flex flex-col items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" />
+                      </svg>
+                      <div>No data found</div>
+                      <div className="text-xs text-muted-foreground/70">Try changing filters or search</div>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Pagination */}

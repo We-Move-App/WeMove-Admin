@@ -6,6 +6,7 @@ import { Eye } from "lucide-react";
 import axiosInstance from "@/api/axiosInstance";
 import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 import { useTranslation } from "react-i18next";
+import Loader from "@/components/ui/loader";
 
 interface CustomerBooking {
   id: string;
@@ -66,26 +67,26 @@ const CustomerBookings = () => {
             customerPhone: item.phone || "N/A",
             serviceType:
               item.serviceType?.charAt(0).toUpperCase() +
-                item.serviceType?.slice(1).toLowerCase() || "N/A",
+              item.serviceType?.slice(1).toLowerCase() || "N/A",
             bookingDate: item.bookingDate
               ? new Date(item.bookingDate).toLocaleDateString("en-IN", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
               : "-",
             amount: item.amount || 0,
             paymentStatus:
               item.paymentStatus?.charAt(0).toUpperCase() +
-                item.paymentStatus?.slice(1).toLowerCase() || "Unknown",
+              item.paymentStatus?.slice(1).toLowerCase() || "Unknown",
             createdAt: item.createdAt
               ? new Date(item.createdAt).toLocaleString("en-IN", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
               : "-",
           })
         );
@@ -170,9 +171,12 @@ const CustomerBookings = () => {
         <p className="text-gray-600">{t("customerBookings.pageSubtitle")}</p>
       </div>
 
-      {loading ? (
-        <CustomerDetailsSkeleton />
-      ) : (
+      <div className="relative">
+        {loading && (
+          <div>
+            <Loader />
+          </div>
+        )}
         <DataTable
           columns={columns}
           data={bookings}
@@ -184,10 +188,11 @@ const CustomerBookings = () => {
           keyExtractor={(item) => item.id}
           onRowClick={handleRowClick}
           searchTerm={searchInput}
+          searchPlaceholder="Search by Booking ID"
           onSearchChange={handleSearchChange}
           loading={loading}
         />
-      )}
+      </div>
     </>
   );
 };

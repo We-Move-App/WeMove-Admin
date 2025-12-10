@@ -782,6 +782,7 @@ const HotelBookings = () => {
         keyExtractor={(item) => item.id}
         filterable={true}
         searchable={true}
+        searchPlaceholder="Search by name / email"
         exportable={true}
         paginate={true}
         pageSize={pageSize}
