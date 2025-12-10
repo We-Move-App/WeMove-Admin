@@ -311,26 +311,31 @@ const Wallet = () => {
     fetchTransactions();
   }, [currentPage, searchTerm, pageSize]);
 
+  const formatCurrency = (value) =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 2,
+    }).format(Number(value ?? 0));
+
   return (
     <>
       <div className="mb-6">
         <h1 className="text-2xl font-bold">{t("wallet.title")}</h1>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {loading ? (
-          Array(4)
-            .fill(0)
-            .map((_, i) => (
-              <Card key={i}>
-                <CardHeader className="pb-2">
-                  <Skeleton width={100} height={15} />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton width={60} height={30} />
-                </CardContent>
-              </Card>
-            ))
+          Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="pb-2">
+                <Skeleton width={100} height={15} />
+              </CardHeader>
+              <CardContent>
+                <Skeleton width={60} height={30} />
+              </CardContent>
+            </Card>
+          ))
         ) : (
           <>
             <Card>
@@ -342,7 +347,9 @@ const Wallet = () => {
               <CardContent>
                 <div className="flex items-center space-x-2">
                   <WalletIcon className="h-5 w-5 text-blue-500" />
-                  <div className="text-2xl font-bold">{totalTransactions}</div>
+                  <div className="text-2xl font-bold min-w-0 truncate">
+                    {totalTransactions}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -358,8 +365,10 @@ const Wallet = () => {
                   <div className="p-1 rounded-full bg-green-100">
                     <WalletIcon className="h-4 w-4 text-green-600" />
                   </div>
-                  <div className="text-2xl font-bold text-green-600">
-                    ${totalCredits.toFixed(2)}
+
+                  {/* min-w-0 + truncate prevents overflow inside flex */}
+                  <div className="text-2xl font-bold text-green-600 min-w-0 truncate">
+                    {formatCurrency(totalCredits)}
                   </div>
                 </div>
               </CardContent>
@@ -376,8 +385,8 @@ const Wallet = () => {
                   <div className="p-1 rounded-full bg-red-100">
                     <WalletIcon className="h-4 w-4 text-red-600" />
                   </div>
-                  <div className="text-2xl font-bold text-red-600">
-                    ${totalDebits.toFixed(2)}
+                  <div className="text-2xl font-bold text-red-600 min-w-0 truncate">
+                    {formatCurrency(totalDebits)}
                   </div>
                 </div>
               </CardContent>
@@ -394,8 +403,8 @@ const Wallet = () => {
                   <div className="p-1 rounded-full bg-amber-100">
                     <WalletIcon className="h-4 w-4 text-amber-600" />
                   </div>
-                  <div className="text-2xl font-bold text-amber-600">
-                    ${pendingWithdrawals.toFixed(2)}
+                  <div className="text-2xl font-bold text-amber-600 min-w-0 truncate">
+                    {formatCurrency(pendingWithdrawals)}
                   </div>
                 </div>
               </CardContent>
@@ -403,6 +412,7 @@ const Wallet = () => {
           </>
         )}
       </div>
+
 
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-4">
