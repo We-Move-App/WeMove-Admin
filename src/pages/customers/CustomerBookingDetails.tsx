@@ -20,6 +20,47 @@ import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 import { useTranslation } from "react-i18next";
 
 // Mock Customer Data
+interface AllBooking {
+  id: string;
+  bookingId: string;
+  type: string;
+  createdAt: string;
+  amount: number;
+  status: string;
+}
+
+interface BusBooking {
+  id: string;
+  bookingId: string;
+  from: string;
+  to: string;
+  journeyDate: string;
+  amount: number;
+  status: string;
+}
+
+interface HotelBooking {
+  id: string;
+  bookingId: string;
+  checkInDate: string;
+  checkOutDate: string;
+  rooms: number;
+  amount: number;
+  status: string;
+}
+
+interface RideBooking {
+  id: string;
+  bookingId: string;
+  vehicleType: string;
+  pickup: string;
+  drop: string;
+  fare: number;
+  rideStatus: string;
+  paymentStatus: string;
+}
+
+
 interface NormalizedBooking {
   id: string;
   type: string;
@@ -138,43 +179,86 @@ const CustomerBookingDetails = () => {
           }
         );
 
-        const apiData = response.data?.data || {};
-        const bookingsRaw = apiData.bookings || [];
+        const bookingsRaw = response.data?.data?.bookings ?? [];
+        const allBookings = bookingsRaw.map((b: any) => ({
+          id: b._id,
+          bookingId: b.bookingId,
+          type: b.source ?? b.vehicleType ?? "-",
+          createdAt: b.createdAt,
+          amount: b.finalAmount ?? b.price ?? b.fare ?? 0,
+          status: b.paymentStatus ?? b.status ?? "-",
+        }));
 
-        // Normalize bookings to a shape the UI expects
-        const normalized = bookingsRaw.map((b: any) => {
-          const idFrom = b._id ?? b.bookingId ?? b.id ?? "";
+        const busBookings = bookingsRaw.map((b: any) => ({
+          id: b._id,
+          bookingId: b.bookingId,
+          from: b.from,
+          to: b.to,
+          journeyDate: b.journeyDate,
+          amount: b.price,
+          status: b.paymentStatus ?? b.status,
+        }));
+
+        const hotelBookings = bookingsRaw.map((b: any) => ({
+          id: b._id,
+          bookingId: b.bookingId,
+          checkInDate: b.checkInDate,
+          checkOutDate: b.checkOutDate,
+          rooms: b.noOfRoom,
+          amount: b.finalAmount,
+          status: b.paymentStatus ?? b.status,
+        }));
+
+        const rideBookings = bookingsRaw.map((b: any) => ({
+          id: b._id,
+          bookingId: b.bookingId,
+          vehicleType: b.vehicleType,
+          pickup: b.pickupLocation?.address ?? "-",
+          drop: b.dropLocation?.address ?? "-",
+          fare: b.fare ?? 0,
+          rideStatus: b.rideStatus ?? "-",
+          paymentStatus: b.paymentStatus ?? "-",
+        }));
+
+        const paymentTransactions = bookingsRaw.map((t: any) => {
+          const isWalletTopUp =
+            t.type === "CREDIT" &&
+            t.description?.toLowerCase().includes("wallet");
 
           return {
-            id: String(idFrom),
-            bookingId: b.bookingId ?? b._id ?? b.id ?? "",
-            type: b.vehicleType ?? b.source ?? b.type ?? "",
-            status: b.paymentStatus ?? b.rideStatus ?? b.status ?? "",
-            finalAmount: b.finalAmount ?? b.fare ?? b.price ?? b.amount ?? 0,
-            createdAt: b.createdAt,
+            id: t._id,
+            transactionId: t.transactionId,
+            date: t.createdAt,
+            amount: t.amount,
+            type: t.type,
+            label: isWalletTopUp
+              ? "Wallet Top-up"
+              : t.transactionType ?? "-",
 
-            transactionId: b.transactionId,
-            amount: b.amount,
-            meta: b.meta ?? null,
-
-            user: b.user && b.user[0] ? b.user[0] : b.user ?? null,
+            from: t.meta?.from?.name ?? "-",
+            to: t.meta?.to?.name ?? "-",
+            status: t.status,
           };
         });
-
-
-        const userInfo = normalized?.[0]?.user || {};
+        const user =
+          Array.isArray(bookingsRaw?.[0]?.user)
+            ? bookingsRaw[0].user[0]
+            : bookingsRaw?.[0]?.user ?? {};
 
         setCustomerData({
-          id: userInfo._id || "",
-          name: userInfo.name || "",
-          email: userInfo.email || "",
-          mobile: userInfo.phoneNumber || userInfo.phone || "",
+          id: user?._id || "",
+          name: user?.name || "",
+          email: user?.email || "",
+          mobile: user?.phoneNumber || user?.phone || "",
           status: "Active",
-          allBookings: activeTab === "all" ? normalized : [],
-          busBookings: activeTab === "bus" ? normalized : [],
-          hotelBookings: activeTab === "hotel" ? normalized : [],
-          rideBookings: activeTab === "ride" ? normalized : [],
-          paymentTransactions: activeTab === "transactions" ? normalized : [],
+
+          allBookings: activeTab === "all" ? allBookings : [],
+          busBookings: activeTab === "bus" ? busBookings : [],
+          hotelBookings: activeTab === "hotel" ? hotelBookings : [],
+          rideBookings: activeTab === "ride" ? rideBookings : [],
+          paymentTransactions:
+            activeTab === "transactions" ? paymentTransactions : [],
+
         });
       } catch (err) {
         console.error(err);
@@ -185,7 +269,7 @@ const CustomerBookingDetails = () => {
     };
 
     if (id) fetchCustomerDetails();
-  }, [id, activeTab, searchAll, searchRide, searchPayment]);
+  }, [id, activeTab, searchAll]);
 
   useEffect(() => {
     const userBalance = async () => {
@@ -216,7 +300,6 @@ const CustomerBookingDetails = () => {
   }, []);
 
   useEffect(() => {
-    // when any tab search changes, go back to first page
     setCurrentPageAll(1);
   }, [searchAll, searchRide, searchPayment]);
 
@@ -392,19 +475,18 @@ const CustomerBookingDetails = () => {
                           ).map((b) => (
                             <TableRow key={b.id}>
                               <TableCell>{b.bookingId}</TableCell>
-                              <TableCell>{b.vehicleType || b.source}</TableCell>
+                              <TableCell>{b.type}</TableCell>
                               <TableCell>
                                 {new Date(b.createdAt).toLocaleDateString()}
                               </TableCell>
+                              <TableCell>₹{b.amount}</TableCell>
                               <TableCell>
-                                ₹{b.finalAmount || b.fare || b.price}
-                              </TableCell>
-                              <TableCell>
-                                <StatusBadge status={b.paymentStatus} />
+                                <StatusBadge status={b.status} />
                               </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
+
                       </Table>
 
                       <PaginationComponent
@@ -444,11 +526,14 @@ const CustomerBookingDetails = () => {
                         <TableHeader>
                           <TableRow>
                             <TableHead>ID</TableHead>
-                            <TableHead>Date</TableHead>
+                            <TableHead>From</TableHead>
+                            <TableHead>To</TableHead>
+                            <TableHead>Journey Date</TableHead>
                             <TableHead>Amount</TableHead>
                             <TableHead>Status</TableHead>
                           </TableRow>
                         </TableHeader>
+
                         <TableBody>
                           {paginate(
                             customerData.busBookings,
@@ -457,11 +542,12 @@ const CustomerBookingDetails = () => {
                           ).map((b) => (
                             <TableRow key={b.id}>
                               <TableCell>{b.bookingId}</TableCell>
-                              {/* <TableCell>{b.type}</TableCell> */}
+                              <TableCell>{b.from}</TableCell>
+                              <TableCell>{b.to}</TableCell>
                               <TableCell>
-                                {new Date(b.createdAt).toLocaleDateString()}
+                                {new Date(b.journeyDate).toLocaleDateString()}
                               </TableCell>
-                              <TableCell>₹{b.price}</TableCell>
+                              <TableCell>₹{b.amount}</TableCell>
                               <TableCell>
                                 <StatusBadge status={b.status} />
                               </TableCell>
@@ -506,11 +592,14 @@ const CustomerBookingDetails = () => {
                         <TableHeader>
                           <TableRow>
                             <TableHead>ID</TableHead>
-                            <TableHead>Date</TableHead>
+                            <TableHead>Check-in</TableHead>
+                            <TableHead>Check-out</TableHead>
+                            <TableHead>Rooms</TableHead>
                             <TableHead>Amount</TableHead>
                             <TableHead>Status</TableHead>
                           </TableRow>
                         </TableHeader>
+
                         <TableBody>
                           {paginate(
                             customerData.hotelBookings,
@@ -519,11 +608,19 @@ const CustomerBookingDetails = () => {
                           ).map((b) => (
                             <TableRow key={b.id}>
                               <TableCell>{b.bookingId}</TableCell>
+
                               <TableCell>
-                                {new Date(b.createdAt).toLocaleDateString()}
+                                {new Date(b.checkInDate).toLocaleDateString()}
                               </TableCell>
-                              <TableCell>₹{b.finalAmount}</TableCell>
-                              {/* <TableCell>{b.status}</TableCell> */}
+
+                              <TableCell>
+                                {new Date(b.checkOutDate).toLocaleDateString()}
+                              </TableCell>
+
+                              <TableCell>{b.rooms}</TableCell>
+
+                              <TableCell>₹{b.amount}</TableCell>
+
                               <TableCell>
                                 <StatusBadge status={b.status} />
                               </TableCell>
@@ -569,25 +666,34 @@ const CustomerBookingDetails = () => {
                         <TableHeader>
                           <TableRow>
                             <TableHead>ID</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead>Vehicle</TableHead>
+                            <TableHead>Pickup</TableHead>
+                            <TableHead>Drop</TableHead>
+                            <TableHead>Fare</TableHead>
+                            <TableHead>Ride Status</TableHead>
+                            <TableHead>Payment Status</TableHead>
                           </TableRow>
                         </TableHeader>
+
                         <TableBody>
                           {paginate(
-                            filterData(customerData.rideBookings, searchRide),
+                            customerData.rideBookings,
                             currentPageAll,
                             pageSize
                           ).map((b) => (
                             <TableRow key={b.id}>
                               <TableCell>{b.bookingId}</TableCell>
-                              <TableCell>{b.vehicleType}</TableCell>
-                              <TableCell>
-                                {new Date(b.createdAt).toLocaleDateString()}
+                              <TableCell className="capitalize">{b.vehicleType}</TableCell>
+                              <TableCell className="max-w-[220px] truncate">
+                                {b.pickup}
+                              </TableCell>
+                              <TableCell className="max-w-[220px] truncate">
+                                {b.drop}
                               </TableCell>
                               <TableCell>₹{b.fare}</TableCell>
+                              <TableCell>
+                                <StatusBadge status={b.rideStatus} />
+                              </TableCell>
                               <TableCell>
                                 <StatusBadge status={b.paymentStatus} />
                               </TableCell>
@@ -595,6 +701,7 @@ const CustomerBookingDetails = () => {
                           ))}
                         </TableBody>
                       </Table>
+
                       <PaginationComponent
                         currentPage={currentPageAll}
                         totalItems={customerData.rideBookings.length}
@@ -610,14 +717,11 @@ const CustomerBookingDetails = () => {
             <TabsContent value="transactions">
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <CardTitle>
-                    {t("customerBookingsDetails.tabs.transactions")}
-                  </CardTitle>
+                  <CardTitle>Transactions</CardTitle>
+
                   <input
                     type="text"
-                    placeholder={t(
-                      "customerBookingsDetails.search.transactions"
-                    )}
+                    placeholder="Search transactions"
                     value={searchPayment}
                     onChange={(e) => setSearchPayment(e.target.value)}
                     className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
@@ -625,48 +729,27 @@ const CustomerBookingDetails = () => {
                 </CardHeader>
 
                 <CardContent>
-                  <div className="mb-6">
-                    <div className="relative bg-[#3E7C68] text-white rounded-2xl p-6 w-full max-w-sm shadow-md overflow-hidden">
-                      <div className="absolute -top-8 -right-8 w-28 h-28 bg-[#F7B24A] rounded-full opacity-90"></div>
-                      <div className="relative z-10">
-                        <p className="text-sm font-medium mb-2">
-                          {t("customerBookingsDetails.wallet.digitalCard")}
-                        </p>
-                        <p className="tracking-widest mb-3">
-                          {userBalance.cardNumber || "***** ***** ***** ****"}
-                        </p>
-                        <div className="flex items-baseline space-x-1 mb-2">
-                          <p className="text-2xl font-bold">
-                            {userBalance.balance}
-                          </p>
-                          <span className="text-sm font-semibold">
-                            {t("customerBookingsDetails.wallet.currency")}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
                   {filterData(customerData.paymentTransactions, searchPayment)
                     .length === 0 ? (
-                    <p className="text-center py-4">
-                      {t("customerBookingsDetails.tables.transactions.noData")}
+                    <p className="text-center py-4 text-sm text-gray-500">
+                      No transactions found
                     </p>
                   ) : (
                     <>
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>ID</TableHead>
+                            <TableHead>Transaction ID</TableHead>
                             <TableHead>Date</TableHead>
                             <TableHead>Amount</TableHead>
                             <TableHead>Type</TableHead>
+                            <TableHead>Transaction</TableHead>
                             <TableHead>From</TableHead>
                             <TableHead>To</TableHead>
                             <TableHead>Status</TableHead>
-
                           </TableRow>
                         </TableHeader>
+
                         <TableBody>
                           {paginate(
                             filterData(
@@ -675,50 +758,48 @@ const CustomerBookingDetails = () => {
                             ),
                             currentPageAll,
                             pageSize
-                          ).map((b) => {
-                            const from = b.meta?.from?.name ?? "-";
-                            const to = b.meta?.to?.name ?? "-";
-                            console.log("ROW META:", b.meta);
+                          ).map((t) => (
+                            <TableRow key={t.id}>
+                              <TableCell>{t.transactionId}</TableCell>
 
-                            return (
-                              <TableRow key={b._id}>
-                                <TableCell>{b.transactionId}</TableCell>
+                              <TableCell>
+                                {new Date(t.date).toLocaleDateString()}
+                              </TableCell>
 
-                                <TableCell>
-                                  {new Date(b.createdAt).toLocaleDateString("en-IN")}
-                                </TableCell>
+                              <TableCell
+                                className={
+                                  t.type === "CREDIT"
+                                    ? "text-green-600 font-medium"
+                                    : "text-red-600 font-medium"
+                                }
+                              >
+                                ₹{t.amount}
+                              </TableCell>
 
-                                <TableCell
-                                  className={
-                                    b.type === "CREDIT"
-                                      ? "text-green-600 font-medium"
-                                      : "text-red-600 font-medium"
-                                  }
+                              <TableCell>
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs font-semibold ${t.type === "CREDIT"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-100 text-red-700"
+                                    }`}
                                 >
-                                  ₹{b.amount}
-                                </TableCell>
+                                  {t.type}
+                                </span>
+                              </TableCell>
 
-                                <TableCell>
-                                  <span
-                                    className={`px-2 py-1 rounded-full text-xs font-semibold ${b.type === "CREDIT"
-                                      ? "bg-green-100 text-green-700"
-                                      : "bg-red-100 text-red-700"
-                                      }`}
-                                  >
-                                    {b.type}
-                                  </span>
-                                </TableCell>
-                                <TableCell>{from}</TableCell>
-                                <TableCell>{to}</TableCell>
+                              <TableCell className="text-sm">
+                                {t.label}
+                              </TableCell>
 
-                                <TableCell>
-                                  <StatusBadge status={b.status} />
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
+                              <TableCell>{t.from}</TableCell>
+                              <TableCell>{t.to}</TableCell>
+
+                              <TableCell>
+                                <StatusBadge status={t.status} />
+                              </TableCell>
+                            </TableRow>
+                          ))}
                         </TableBody>
-
                       </Table>
 
                       <PaginationComponent
@@ -737,6 +818,7 @@ const CustomerBookingDetails = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+
           </Tabs>
         </div>
       </div>
