@@ -664,11 +664,13 @@
       "mobile": "Mobile",
       "email": "Email ID",
       "status": "Status",
-      "actions": "Actions"
+      "actions": "Actions",
+      "bookings": "Bookings"
     },
 
     "labels": {
-      "viewDetails": "View Details"
+      "viewDetails": "View Details",
+      "bookingHistory": "Booking History"
     },
 
     "messages": {

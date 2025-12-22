@@ -141,7 +141,7 @@ const CustomerDetails = () => {
             status: user.verificationStatus || "",
             nationality: user.nationality
               ? user.nationality.charAt(0).toUpperCase() +
-                user.nationality.slice(1)
+              user.nationality.slice(1)
               : "Cameroon",
             nationalIdExpiry: user.nationIdExpiry
               ? user.nationIdExpiry.split("T")[0]
@@ -329,21 +329,21 @@ const CustomerDetails = () => {
                 {/* Remarks field - appears below the grid when status is rejected/blocked */}
                 {(operator.status === "rejected" ||
                   operator.status === "blocked") && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("customerDetails.fields.remarks")}
-                    </label>
-                    <textarea
-                      value={remarks}
-                      onChange={(e) => setRemarks(e.target.value)}
-                      className="filter-input w-full resize-none"
-                      style={{ outline: "none" }}
-                      rows={4}
-                      placeholder="Enter remarks for rejection or blocking..."
-                      disabled={!isEditMode}
-                    />
-                  </div>
-                )}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t("customerDetails.fields.remarks")}
+                      </label>
+                      <textarea
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                        className="filter-input w-full resize-none"
+                        style={{ outline: "none" }}
+                        rows={4}
+                        placeholder="Enter remarks for rejection or blocking..."
+                        disabled={!isEditMode}
+                      />
+                    </div>
+                  )}
                 {/* Address */}
                 {/* <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">

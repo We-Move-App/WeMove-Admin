@@ -144,22 +144,22 @@ const CustomerBookings = () => {
         <StatusBadge status={booking.paymentStatus} />
       ),
     },
-    {
-      key: "actions",
-      header: t("customerBookings.tableHeaders.actions"),
-      render: (booking: CustomerBooking) => (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/customer-management/bookings/${booking.id}`);
-          }}
-          className="action-button flex items-center"
-        >
-          <Eye size={16} className="mr-1" />
-          {t("customerBookings.labels.viewDetails")}
-        </button>
-      ),
-    },
+    // {
+    //   key: "actions",
+    //   header: t("customerBookings.tableHeaders.actions"),
+    //   render: (booking: CustomerBooking) => (
+    //     <button
+    //       onClick={(e) => {
+    //         e.stopPropagation();
+    //         navigate(`/customer-management/bookings/${booking.id}`);
+    //       }}
+    //       className="action-button flex items-center"
+    //     >
+    //       <Eye size={16} className="mr-1" />
+    //       {t("customerBookings.labels.viewDetails")}
+    //     </button>
+    //   ),
+    // },
   ];
 
   return (

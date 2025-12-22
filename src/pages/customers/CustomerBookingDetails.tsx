@@ -56,197 +56,9 @@ interface CustomerData {
   rideBookings: RideTransaction[];
   paymentTransactions: PaymentTransaction[];
 }
-
-// const mockCustomerData: CustomerData = {
-//   id: "C-1001",
-//   name: "Riya Sharma",
-//   email: "riya.sharma@example.com",
-//   mobile: "+91 9876543210",
-//   status: "active",
-//   allBookings: [
-//     {
-//       id: "B-1001",
-//       type: "Bus",
-//       date: "2025-10-15",
-//       amount: 850,
-//       status: "Completed",
-//     },
-//     {
-//       id: "H-2001",
-//       type: "Hotel",
-//       date: "2025-10-16",
-//       amount: 5200,
-//       status: "Completed",
-//     },
-//     {
-//       id: "R-3001",
-//       type: "Ride",
-//       date: "2025-10-17",
-//       amount: 450,
-//       status: "Pending",
-//     },
-//   ],
-//   busBookings: [
-//     {
-//       id: "B-1001",
-//       type: "Bus",
-//       date: "2025-10-15",
-//       amount: 850,
-//       status: "Completed",
-//     },
-//     {
-//       id: "B-1001",
-//       type: "Bus",
-//       date: "2025-10-15",
-//       amount: 850,
-//       status: "Completed",
-//     },
-//     {
-//       id: "B-1001",
-//       type: "Bus",
-//       date: "2025-10-15",
-//       amount: 850,
-//       status: "Completed",
-//     },
-//     {
-//       id: "B-1001",
-//       type: "Bus",
-//       date: "2025-10-15",
-//       amount: 850,
-//       status: "Completed",
-//     },
-//   ],
-//   hotelBookings: [
-//     {
-//       id: "H-2001",
-//       type: "Hotel",
-//       date: "2025-10-16",
-//       amount: 5200,
-//       status: "Completed",
-//     },
-//     {
-//       id: "H-2001",
-//       type: "Hotel",
-//       date: "2025-10-16",
-//       amount: 5200,
-//       status: "Completed",
-//     },
-//     {
-//       id: "H-2001",
-//       type: "Hotel",
-//       date: "2025-10-16",
-//       amount: 5200,
-//       status: "Completed",
-//     },
-//     {
-//       id: "H-2001",
-//       type: "Hotel",
-//       date: "2025-10-16",
-//       amount: 5200,
-//       status: "Completed",
-//     },
-//     {
-//       id: "H-2001",
-//       type: "Hotel",
-//       date: "2025-10-16",
-//       amount: 5200,
-//       status: "Completed",
-//     },
-//     {
-//       id: "H-2001",
-//       type: "Hotel",
-//       date: "2025-10-16",
-//       amount: 5200,
-//       status: "Completed",
-//     },
-//     {
-//       id: "H-2001",
-//       type: "Hotel",
-//       date: "2025-10-16",
-//       amount: 5200,
-//       status: "Completed",
-//     },
-//   ],
-//   rideBookings: [
-//     {
-//       id: "R-3001",
-//       type: "Ride",
-//       date: "2025-10-17",
-//       amount: 450,
-//       status: "Pending",
-//     },
-//     {
-//       id: "R-3001",
-//       type: "Ride",
-//       date: "2025-10-17",
-//       amount: 450,
-//       status: "Pending",
-//     },
-//     {
-//       id: "R-3001",
-//       type: "Ride",
-//       date: "2025-10-17",
-//       amount: 450,
-//       status: "Pending",
-//     },
-//     {
-//       id: "R-3001",
-//       type: "Ride",
-//       date: "2025-10-17",
-//       amount: 450,
-//       status: "Pending",
-//     },
-//     {
-//       id: "R-3001",
-//       type: "Ride",
-//       date: "2025-10-17",
-//       amount: 450,
-//       status: "Pending",
-//     },
-//   ],
-//   paymentTransactions: [
-//     {
-//       id: "P-5001",
-//       date: "2025-10-15",
-//       amount: 850,
-//       method: "UPI",
-//       status: "Completed",
-//     },
-//     {
-//       id: "P-5002",
-//       date: "2025-10-16",
-//       amount: 5200,
-//       method: "Credit Card",
-//       status: "Completed",
-//     },
-//     {
-//       id: "P-5003",
-//       date: "2025-10-17",
-//       amount: 450,
-//       method: "Wallet",
-//       status: "Pending",
-//     },
-//     {
-//       id: "P-5004",
-//       date: "2025-10-18",
-//       amount: 1200,
-//       method: "Net Banking",
-//       status: "Failed",
-//     },
-//     {
-//       id: "P-5005",
-//       date: "2025-10-19",
-//       amount: 300,
-//       method: "UPI",
-//       status: "Completed",
-//     },
-//   ],
-// };
-
 const CustomerBookingDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  // const [customerData, setCustomerData] = useState<CustomerData | null>(null);
   const [customerData, setCustomerData] = useState<CustomerData>({
     id: "",
     name: "",
@@ -280,51 +92,19 @@ const CustomerBookingDetails = () => {
   });
   const { i18n, t } = useTranslation();
 
-  // const filterData = (data: any[], searchTerm: string) => {
-  //   return data.filter((item) => {
-  //     const id = item.id?.toLowerCase() || "";
-  //     const type = item.type?.toLowerCase() || "";
-  //     const status = item.status?.toLowerCase() || "";
-  //     return (
-  //       id.includes(searchTerm.toLowerCase()) ||
-  //       type.includes(searchTerm.toLowerCase()) ||
-  //       status.includes(searchTerm.toLowerCase())
-  //     );
-  //   });
-  // };
+  const filterData = <T extends Record<string, any>>(
+    data: T[],
+    search: string
+  ): T[] => {
+    if (!search) return data;
 
-  const filterData = (data: any[], searchTerm: string) => {
-    if (!searchTerm) return data;
-    const q = searchTerm.toLowerCase();
-    return data.filter((item) => {
-      // check several candidate fields
-      const bookingId = String(
-        item.bookingId ?? item.booking_id ?? item._id ?? ""
-      ).toLowerCase();
-      const id = String(item.id ?? "").toLowerCase();
-      const type = String(
-        item.type ?? item.vehicleType ?? item.source ?? ""
-      ).toLowerCase();
-      const status = String(
-        item.status ?? item.paymentStatus ?? item.rideStatus ?? ""
-      ).toLowerCase();
-      const amount = String(
-        item.finalAmount ?? item.fare ?? item.price ?? item.amount ?? ""
-      ).toLowerCase();
-      const userName = String(
-        item.user?.name ?? item.userName ?? ""
-      ).toLowerCase();
-
-      return (
-        bookingId.includes(q) ||
-        id.includes(q) ||
-        type.includes(q) ||
-        status.includes(q) ||
-        amount.includes(q) ||
-        userName.includes(q)
-      );
-    });
+    return data.filter((item) =>
+      Object.values(item).some((value) =>
+        String(value).toLowerCase().includes(search.toLowerCase())
+      )
+    );
   };
+
 
   const getActiveSearch = () => {
     switch (activeTab) {
@@ -341,11 +121,6 @@ const CustomerBookingDetails = () => {
         return "";
     }
   };
-
-  // useEffect(() => {
-  //   // Mock fetch
-  //   setCustomerData(mockCustomerData);
-  // }, [customerId]);
 
   useEffect(() => {
     const fetchCustomerDetails = async () => {
@@ -369,35 +144,23 @@ const CustomerBookingDetails = () => {
         // Normalize bookings to a shape the UI expects
         const normalized = bookingsRaw.map((b: any) => {
           const idFrom = b._id ?? b.bookingId ?? b.id ?? "";
-          const type = b.vehicleType ?? b.source ?? b.type ?? "";
-          const status = b.paymentStatus ?? b.rideStatus ?? b.status ?? "";
-          const amount = b.finalAmount ?? b.fare ?? b.price ?? b.amount ?? 0;
-          const createdAt =
-            b.createdAt ?? b.timestamps?.requestedAt ?? b.createdAt;
 
           return {
-            // canonical fields your UI uses
             id: String(idFrom),
             bookingId: b.bookingId ?? b._id ?? b.id ?? "",
-            type,
-            status,
-            finalAmount: amount,
-            createdAt,
-            // keep the raw object if you need other nested properties later
-            raw: b,
-            // copy common display fields so individual tables don't need to read raw
-            vehicleType: b.vehicleType,
-            source: b.source,
-            fare: b.fare,
-            price: b.price,
-            paymentStatus: b.paymentStatus,
-            rideStatus: b.rideStatus,
+            type: b.vehicleType ?? b.source ?? b.type ?? "",
+            status: b.paymentStatus ?? b.rideStatus ?? b.status ?? "",
+            finalAmount: b.finalAmount ?? b.fare ?? b.price ?? b.amount ?? 0,
+            createdAt: b.createdAt,
+
             transactionId: b.transactionId,
             amount: b.amount,
-            // user info if present
+            meta: b.meta ?? null,
+
             user: b.user && b.user[0] ? b.user[0] : b.user ?? null,
           };
         });
+
 
         const userInfo = normalized?.[0]?.user || {};
 
@@ -459,20 +222,12 @@ const CustomerBookingDetails = () => {
 
   const personalInfo = customerData
     ? {
-        id: customerData.id,
-        name: customerData.name,
-        email: customerData.email,
-        mobile: customerData.mobile,
-      }
+      id: customerData.id,
+      name: customerData.name,
+      email: customerData.email,
+      mobile: customerData.mobile,
+    }
     : { id: "-", name: "-", email: "-", mobile: "-" };
-
-  // const bookingSummary = customerData
-  //   ? {
-  //       busBookings: customerData.busBookings.length,
-  //       hotelBookings: customerData.hotelBookings.length,
-  //       rideBookings: customerData.rideBookings.length,
-  //     }
-  //   : { busBookings: 0, hotelBookings: 0, rideBookings: 0 };
 
   const handleStatusChange = (newStatus: string) => {
     if (customerData) {
@@ -503,7 +258,7 @@ const CustomerBookingDetails = () => {
       <Button
         variant="ghost"
         className="mb-4"
-        onClick={() => navigate("/customer-management/bookings")}
+        onClick={() => navigate("/customer-management")}
       >
         <ChevronLeft className="mr-2 h-4 w-4" />
         {t("customerBookingsDetails.backButton")}
@@ -613,7 +368,7 @@ const CustomerBookingDetails = () => {
                 </CardHeader>
                 <CardContent>
                   {filterData(customerData.allBookings, searchAll).length ===
-                  0 ? (
+                    0 ? (
                     <p className="text-center py-4">
                       {t("customerBookingsDetails.tables.all.noData")}
                     </p>
@@ -804,7 +559,7 @@ const CustomerBookingDetails = () => {
                 </CardHeader>
                 <CardContent>
                   {filterData(customerData.rideBookings, searchRide).length ===
-                  0 ? (
+                    0 ? (
                     <p className="text-center py-4">
                       {t("customerBookingsDetails.tables.ride.noData")}
                     </p>
@@ -870,7 +625,6 @@ const CustomerBookingDetails = () => {
                 </CardHeader>
 
                 <CardContent>
-                  {/* Total Balance Card (Admin only) */}
                   <div className="mb-6">
                     <div className="relative bg-[#3E7C68] text-white rounded-2xl p-6 w-full max-w-sm shadow-md overflow-hidden">
                       <div className="absolute -top-8 -right-8 w-28 h-28 bg-[#F7B24A] rounded-full opacity-90"></div>
@@ -883,9 +637,6 @@ const CustomerBookingDetails = () => {
                         </p>
                         <div className="flex items-baseline space-x-1 mb-2">
                           <p className="text-2xl font-bold">
-                            {/* {userBalance.balance
-                              ? customerData.walletBalance.toLocaleString()
-                              : "0"} */}
                             {userBalance.balance}
                           </p>
                           <span className="text-sm font-semibold">
@@ -910,7 +661,10 @@ const CustomerBookingDetails = () => {
                             <TableHead>Date</TableHead>
                             <TableHead>Amount</TableHead>
                             <TableHead>Type</TableHead>
+                            <TableHead>From</TableHead>
+                            <TableHead>To</TableHead>
                             <TableHead>Status</TableHead>
+
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -921,20 +675,50 @@ const CustomerBookingDetails = () => {
                             ),
                             currentPageAll,
                             pageSize
-                          ).map((b) => (
-                            <TableRow key={b.id}>
-                              <TableCell>{b.transactionId}</TableCell>
-                              <TableCell>
-                                {new Date(b.createdAt).toLocaleDateString()}
-                              </TableCell>
-                              <TableCell>₹{b.amount}</TableCell>
-                              <TableCell>{b.type}</TableCell>
-                              <TableCell>
-                                <StatusBadge status={b.status} />
-                              </TableCell>
-                            </TableRow>
-                          ))}
+                          ).map((b) => {
+                            const from = b.meta?.from?.name ?? "-";
+                            const to = b.meta?.to?.name ?? "-";
+                            console.log("ROW META:", b.meta);
+
+                            return (
+                              <TableRow key={b._id}>
+                                <TableCell>{b.transactionId}</TableCell>
+
+                                <TableCell>
+                                  {new Date(b.createdAt).toLocaleDateString("en-IN")}
+                                </TableCell>
+
+                                <TableCell
+                                  className={
+                                    b.type === "CREDIT"
+                                      ? "text-green-600 font-medium"
+                                      : "text-red-600 font-medium"
+                                  }
+                                >
+                                  ₹{b.amount}
+                                </TableCell>
+
+                                <TableCell>
+                                  <span
+                                    className={`px-2 py-1 rounded-full text-xs font-semibold ${b.type === "CREDIT"
+                                      ? "bg-green-100 text-green-700"
+                                      : "bg-red-100 text-red-700"
+                                      }`}
+                                  >
+                                    {b.type}
+                                  </span>
+                                </TableCell>
+                                <TableCell>{from}</TableCell>
+                                <TableCell>{to}</TableCell>
+
+                                <TableCell>
+                                  <StatusBadge status={b.status} />
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
                         </TableBody>
+
                       </Table>
 
                       <PaginationComponent

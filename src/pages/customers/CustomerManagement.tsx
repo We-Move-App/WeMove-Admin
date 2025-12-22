@@ -114,13 +114,30 @@ const CustomerManagement = () => {
             e.stopPropagation();
             navigate(`/customer-management/${customer.id}`);
           }}
-          className="action-button flex items-center"
+          className="action-button flex items-center text-sm"
         >
           <Eye size={16} className="mr-1" />
           {t("customerManagement.labels.viewDetails")}
         </button>
       ),
     },
+    {
+      key: "bookings",
+      header: t("customerManagement.tableHeaders.bookings"),
+      render: (customer: Customer) => (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/customer-management/bookings/${customer.id}`);
+          }}
+          className="action-button flex items-center text-sm text-green-700"
+        >
+          <Eye size={16} className="mr-1" />
+          {t("customerManagement.labels.bookingHistory")}
+        </button>
+      ),
+    }
   ];
 
   return (
