@@ -393,9 +393,9 @@ const UserManagement = () => {
     }
   };
 
-  const handleRowClick = (user: User) => {
-    navigate(`/user-management/${user.id}`);
-  };
+  // const handleRowClick = (user: User) => {
+  //   navigate(`/user-management/${user.id}`);
+  // };
 
   const filteredPermissions = availablePermissions.filter((perm) => {
     // Hide "Manage Roles" if logged-in user is Admin
@@ -440,7 +440,7 @@ const UserManagement = () => {
         columns={columns}
         data={users}
         keyExtractor={(item) => item.id}
-        onRowClick={handleRowClick}
+        // onRowClick={handleRowClick}
         paginate
         pageSize={pageSize}
         searchPlaceholder="Search by name / email"
