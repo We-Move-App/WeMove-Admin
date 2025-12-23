@@ -105,9 +105,9 @@ const CustomerBookings = () => {
     fetchBookings();
   }, [currentPage, searchTerm]);
 
-  const handleRowClick = (booking: CustomerBooking) => {
-    navigate(`/customer-management/bookings/${booking.id}`);
-  };
+  // const handleRowClick = (booking: CustomerBooking) => {
+  //   navigate(`/customer-management/bookings/${booking.id}`);
+  // };
 
   const columns = [
     { key: "userId", header: t("customerBookings.tableHeaders.userId") },
@@ -186,7 +186,7 @@ const CustomerBookings = () => {
           totalItems={totalItems}
           onPageChange={(page) => setCurrentPage(page)}
           keyExtractor={(item) => item.id}
-          onRowClick={handleRowClick}
+          // onRowClick={handleRowClick}
           searchTerm={searchInput}
           searchPlaceholder="Search by Booking ID"
           onSearchChange={handleSearchChange}

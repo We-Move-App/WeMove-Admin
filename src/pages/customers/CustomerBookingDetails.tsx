@@ -318,7 +318,7 @@ const CustomerBookingDetails = () => {
     }
   };
 
-  const pageSize = 2;
+  const pageSize = 5;
 
   // Pagination state inside component
   const [currentPageAll, setCurrentPageAll] = useState(1);
