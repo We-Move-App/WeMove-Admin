@@ -395,8 +395,14 @@ const UserManagement = () => {
       setIsDialogOpen(false);
     } catch (error: any) {
       console.error(error);
-      toast({ title: `Failed to create ${newUser.role}.` });
+      const backendMessage =
+        error?.response?.data?.message || `Failed to create ${newUser.role}.`;
+      toast({
+        title: backendMessage,
+        variant: "destructive",
+      });
     }
+
   };
 
   // const handleRowClick = (user: User) => {
@@ -477,8 +483,6 @@ const UserManagement = () => {
                 placeholder={t("admins.dialog.placeholders.enterName")}
                 onChange={(e) => {
                   const value = e.target.value;
-
-                  // Allow only alphabets and spaces
                   if (/^[A-Za-z\s]*$/.test(value)) {
                     setNewUser({ ...newUser, name: value });
                   }
@@ -491,14 +495,21 @@ const UserManagement = () => {
               <label className="text-sm font-medium">
                 {t("admins.fields.mobileNumber")}
               </label>
+
               <Input
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={newUser.phoneNumber}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, phoneNumber: e.target.value })
-                }
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setNewUser({ ...newUser, phoneNumber: value });
+                }}
                 placeholder={t("admins.dialog.placeholders.enterPhone")}
+                maxLength={9}
               />
             </div>
+
 
             <div className="space-y-2">
               <label className="text-sm font-medium">
