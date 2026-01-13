@@ -395,9 +395,8 @@ const Dashboard = () => {
             {role === "SuperAdmin" && bookingSummary?.revenue && (
               <StatsCard
                 title={t("dashboard.stats.revenue")}
-                value={`₹${
-                  bookingSummary.revenue?.amount?.toLocaleString() ?? "0"
-                }`}
+                value={`₹${bookingSummary.revenue?.amount?.toLocaleString() ?? "0"
+                  }`}
                 icon={<CreditCard size={20} />}
                 change={bookingSummary.revenue?.trend ?? 0}
                 status={bookingSummary.revenue?.status ?? "increased"}
@@ -515,8 +514,8 @@ const Dashboard = () => {
                                     trx.status === "SUCCESS"
                                       ? "status-approved"
                                       : trx.status === "PENDING"
-                                      ? "status-pending"
-                                      : "status-rejected"
+                                        ? "status-pending"
+                                        : "status-rejected"
                                   }
                                 >
                                   {trx.status}

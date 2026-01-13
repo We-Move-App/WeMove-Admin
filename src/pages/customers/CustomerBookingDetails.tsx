@@ -18,6 +18,7 @@ import PaginationComponent from "@/components/pagination/PaginationComponent";
 import axiosInstance from "@/api/axiosInstance";
 import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 import { useTranslation } from "react-i18next";
+import DigitalWalletCard from "@/components/ui/DigitalWalletCard";
 
 // Mock Customer Data
 interface AllBooking {
@@ -118,7 +119,6 @@ const CustomerBookingDetails = () => {
     hotel: "",
     ride: "",
   });
-
   const [searchAll, setSearchAll] = useState("");
   const [searchBus, setSearchBus] = useState("");
   const [searchHotel, setSearchHotel] = useState("");
@@ -145,7 +145,6 @@ const CustomerBookingDetails = () => {
       )
     );
   };
-
 
   const getActiveSearch = () => {
     switch (activeTab) {
@@ -220,26 +219,49 @@ const CustomerBookingDetails = () => {
           paymentStatus: b.paymentStatus ?? "-",
         }));
 
+        // const paymentTransactions = bookingsRaw.map((t: any) => {
+        //   const isWalletTopUp =
+        //     t.type === "CREDIT" &&
+        //     t.description?.toLowerCase().includes("wallet");
+
+        //   return {
+        //     id: t._id,
+        //     transactionId: t.transactionId,
+        //     date: t.createdAt,
+        //     amount: t.totalAmount ?? 0,
+        //     // type: t.type,
+        //     type: t.type ?? "-",
+        //     label: isWalletTopUp
+        //       ? "Wallet Top-up"
+        //       : t.transactionType ?? "-",
+
+        //     from: t.meta?.from?.name ?? "-",
+        //     to: t.meta?.to?.name ?? "-",
+        //     status: t.status,
+        //   };
+        // });
+
         const paymentTransactions = bookingsRaw.map((t: any) => {
-          const isWalletTopUp =
-            t.type === "CREDIT" &&
-            t.description?.toLowerCase().includes("wallet");
+          const userEntry = t.entries?.find(
+            (e: any) =>
+              e.entityType === "USER" &&
+              e.entityId === id
+          );
 
           return {
             id: t._id,
             transactionId: t.transactionId,
             date: t.createdAt,
-            amount: t.amount,
-            type: t.type,
-            label: isWalletTopUp
-              ? "Wallet Top-up"
-              : t.transactionType ?? "-",
-
+            amount: userEntry?.amount ?? t.totalAmount ?? 0,
+            type: userEntry?.type ?? "-",
+            label: t.transactionType ?? "-",
             from: t.meta?.from?.name ?? "-",
             to: t.meta?.to?.name ?? "-",
-            status: t.status,
+            status: t.status ?? "-",
           };
         });
+
+
         const user =
           Array.isArray(bookingsRaw?.[0]?.user)
             ? bookingsRaw[0].user[0]
@@ -271,18 +293,42 @@ const CustomerBookingDetails = () => {
     if (id) fetchCustomerDetails();
   }, [id, activeTab, searchAll]);
 
+  // Show Balance 
   useEffect(() => {
-    const userBalance = async () => {
+    if (!id) return;
+
+    const fetchUserBalance = async () => {
       try {
-        const res = await axiosInstance.get(`/user-management/wallet/${id}`);
-        setUserBalance(res.data?.data);
-        console.log("User Balance: ", res.data.data);
+        const res = await axiosInstance.get(
+          `/user-management/wallet/${id}`
+        );
+
+        setUserBalance({
+          balance: res.data?.data?.balance ?? "0",
+          cardNumber: res.data?.data?.cardNumber ?? "",
+        });
+
+        console.log("User Balance:", res.data?.data);
       } catch (error) {
-        console.error("Error fetching the data", error);
+        console.error("Error fetching user balance", error);
       }
     };
-    userBalance();
-  }, []);
+
+    fetchUserBalance();
+  }, [id]);
+
+  // useEffect(() => {
+  //   const userBalance = async () => {
+  //     try {
+  //       const res = await axiosInstance.get(`/user-management/wallet/${id}`);
+  //       setUserBalance(res.data?.data);
+  //       console.log("User Balance: ", res.data.data);
+  //     } catch (error) {
+  //       console.error("Error fetching the data", error);
+  //     }
+  //   };
+  //   userBalance();
+  // }, []);
 
   useEffect(() => {
     const bookingSummary = async () => {
@@ -302,6 +348,8 @@ const CustomerBookingDetails = () => {
   useEffect(() => {
     setCurrentPageAll(1);
   }, [searchAll, searchRide, searchPayment]);
+
+
 
   const personalInfo = customerData
     ? {
@@ -353,7 +401,7 @@ const CustomerBookingDetails = () => {
         </h1>
 
         {/* Personal Info & Booking Summary */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-[3fr_2fr] gap-6">
           <Card>
             <CardHeader>
               <CardTitle>
@@ -389,6 +437,11 @@ const CustomerBookingDetails = () => {
               </div>
             </CardContent>
           </Card>
+          <DigitalWalletCard
+            balance={Number(userBalance.balance)}
+            cardNumber={userBalance.cardNumber}
+            expiry="06/25"
+          />
         </div>
 
         {/* Tabs */}
