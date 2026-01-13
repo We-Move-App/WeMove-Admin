@@ -565,7 +565,7 @@ const UserManagement = () => {
                     ) : (
                       admins.map((admin) => (
                         <SelectItem key={admin._id} value={admin._id}>
-                          {admin.name} ({admin.branch.location})
+                          {admin.name} ({admin.branch?.location})
                         </SelectItem>
                       ))
                     )}
