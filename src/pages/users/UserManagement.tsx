@@ -130,6 +130,8 @@ const UserManagement = () => {
   const [role, setRole] = useState<string | null>(null);
   const [adminProfile, setAdminProfile] = useState<any>(null);
   const { i18n, t } = useTranslation();
+  const [isBranchOpen, setIsBranchOpen] = useState(false);
+
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -294,7 +296,7 @@ const UserManagement = () => {
     try {
       let branchId = newUser.branchId;
 
-      // 🔑 Permissions payload
+      // Permissions payload
       const allBackendKeys = [
         "reportsAnalytics",
         "busManagement",
@@ -315,7 +317,7 @@ const UserManagement = () => {
           key === "reportsAnalytics" ? true : newUser.permissions.includes(key);
       });
 
-      // 👤 Build base payload
+      // Build base payload
       const userPayload: any = {
         email: newUser.email,
         userName: newUser.name,
@@ -326,16 +328,21 @@ const UserManagement = () => {
       // --- Role-based branching ---
       let userRes;
 
-      // 🏢 SuperAdmin → Admin
+      // SuperAdmin → Admin
       if (role === "SuperAdmin" && newUser.role === "Admin") {
         if (!newUser.branchName) {
           toast({ title: "Please select a branch for Admin" });
           return;
         }
 
-        const branchPayload = { name: newUser.branchName, location: query };
+        const branchPayload = { name: newUser.branchName, location: newUser.branchName };
         const branchRes = await axiosInstance.post("/branch", branchPayload);
-        branchId = branchRes.data?.data?.branch?._id;
+        const branchId = branchRes.data?.data?._id;
+
+        if (!branchId) {
+          toast({ title: "Branch creation failed" });
+          return;
+        }
 
         userPayload.role = "Admin";
         userPayload.branch = branchId;
@@ -343,7 +350,7 @@ const UserManagement = () => {
         userRes = await axiosInstance.post("/auth/add-admin", userPayload);
       }
 
-      // ⚡ SuperAdmin → SubAdmin
+      // SuperAdmin → SubAdmin
       else if (role === "SuperAdmin" && newUser.role === "SubAdmin") {
         if (!newUser.adminId) {
           toast({ title: "Please assign an Admin for the Sub-Admin" });
@@ -357,10 +364,9 @@ const UserManagement = () => {
         userRes = await axiosInstance.post("/auth/add-SubAdmin", userPayload);
       }
 
-      // ⚡ Admin → SubAdmin
+      // Admin → SubAdmin
       else if (role === "Admin") {
         userPayload.role = "SubAdmin";
-        // No branch, no reportingManager
         userRes = await axiosInstance.post("/auth/add-SubAdmin", userPayload);
       } else {
         throw new Error("Invalid role combination for user creation");
@@ -465,14 +471,21 @@ const UserManagement = () => {
               <label className="text-sm font-medium">
                 {t("admins.fields.name")}
               </label>
+
               <Input
                 value={newUser.name}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, name: e.target.value })
-                }
                 placeholder={t("admins.dialog.placeholders.enterName")}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  // Allow only alphabets and spaces
+                  if (/^[A-Za-z\s]*$/.test(value)) {
+                    setNewUser({ ...newUser, name: value });
+                  }
+                }}
               />
             </div>
+
 
             <div className="space-y-2">
               <label className="text-sm font-medium">
@@ -614,7 +627,7 @@ const UserManagement = () => {
               </div>
             )} */}
 
-            {role !== "Admin" && newUser.role === "Admin" && (
+            {/* {role !== "Admin" && newUser.role === "Admin" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">
                   {t("admins.fields.chooseBranch")}
@@ -662,7 +675,72 @@ const UserManagement = () => {
                   </p>
                 )}
               </div>
+            )} */}
+
+            {role !== "Admin" && newUser.role === "Admin" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  {t("admins.fields.chooseBranch")}
+                </label>
+
+                <Command className="border rounded-md">
+                  <CommandInput
+                    placeholder={t("admins.dialog.placeholders.typeCity")}
+                    value={query}
+                    onFocus={() => setIsBranchOpen(true)}
+                    onValueChange={(val) => {
+                      setQuery(val);
+                      setIsBranchOpen(true);
+                    }}
+                  />
+
+                  {isBranchOpen && (
+                    <CommandList>
+                      {loading && (
+                        <div className="p-2 text-sm">
+                          {t("admins.dialog.loadingAdmins")}
+                        </div>
+                      )}
+
+                      {!loading && branches.length === 0 && query.length > 2 && (
+                        <div className="p-2 text-sm">
+                          {t("admins.dialog.noAdminsFound")}
+                        </div>
+                      )}
+
+                      <CommandGroup>
+                        {branches.map((branch) => (
+                          <CommandItem
+                            key={branch.id}
+                            onSelect={() => {
+                              setNewUser((prev) => ({
+                                ...prev,
+                                branchId: branch.id,
+                                branchName: branch.name,
+                              }));
+
+                              setQuery(branch.name);
+                              setIsBranchOpen(false);
+                            }}
+                          >
+                            {branch.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  )}
+                </Command>
+
+                {/* {newUser.branchName && (
+                  <p className="text-xs text-gray-400">
+                    {t("admins.dialog.selected", {
+                      branch: newUser.branchName,
+                    })}
+                  </p>
+                )} */}
+              </div>
             )}
+
 
             {/* <div className="space-y-2">
               <label className="text-sm font-medium">Permissions</label>

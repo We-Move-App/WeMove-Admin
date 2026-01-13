@@ -48,7 +48,6 @@ const UserDetails = () => {
   const { userId } = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  // const [editedUser, setEditedUser] = useState<User | null>(user ? { ...user } : null);
   const [editedUser, setEditedUser] = useState<User>({
     ...user,
     branch: user?.branch ?? {
@@ -143,13 +142,11 @@ const UserDetails = () => {
 
   const handleSave = async () => {
     try {
-      // Build permissions object (Dashboard always disabled)
       const updatedPermissions = {
         ...editedUser.permissions,
-        reportsAnalytics: true, // Dashboard enabled
+        reportsAnalytics: true,
       };
 
-      // Prepare user payload
       const userPayload = {
         userName: editedUser.userName,
         email: editedUser.email,
@@ -158,11 +155,7 @@ const UserDetails = () => {
       };
 
       console.log("User Payload:", userPayload);
-
-      // Update user first
       await axiosInstance.put(`/auth/updateAdmin/${userId}`, userPayload);
-
-      // If branch details exist, update branch too
       if (editedUser.branch?.branchId) {
         const branchPayload = {
           name: editedUser.branch.name,
@@ -176,8 +169,6 @@ const UserDetails = () => {
           branchPayload
         );
       }
-
-      // Update local state
       setIsEditing(false);
       setUser({ ...editedUser, permissions: updatedPermissions });
     } catch (err) {
@@ -187,7 +178,6 @@ const UserDetails = () => {
 
   const togglePermission = (id: string) => {
     if (!editedUser) return;
-
     setEditedUser((prev) =>
       prev
         ? {
@@ -204,8 +194,6 @@ const UserDetails = () => {
   const handleRoleChange = (role: string) => {
     setEditedUser((prev) => {
       if (!prev) return prev;
-
-      // If changing to Admin, set all permissions
       if (role === "Admin") {
         return {
           ...prev,
@@ -213,8 +201,6 @@ const UserDetails = () => {
           permissions: ["all"],
         };
       }
-
-      // If changing from Admin, set some default permissions
       if (prev.role === "Admin") {
         return {
           ...prev,
@@ -222,7 +208,6 @@ const UserDetails = () => {
           permissions: ["view_reports"],
         };
       }
-
       return {
         ...prev,
         role: role as User["role"],
