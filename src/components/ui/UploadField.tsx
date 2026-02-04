@@ -7,13 +7,13 @@ interface UploadFieldProps {
   // onChange: (files: File[] | File | null) => void;
   onChange: (file: File | File[] | null) => void;
   value:
-    | string
-    | string[]
-    | { name?: string; fileUrl?: string }
-    | { name?: string; fileUrl?: string }[]
-    | File
-    | File[]
-    | null;
+  | string
+  | string[]
+  | { name?: string; fileUrl?: string }
+  | { name?: string; fileUrl?: string }[]
+  | File
+  | File[]
+  | null;
   multiple?: boolean;
   showCloseButton?: boolean;
   disabled?: boolean;
@@ -39,6 +39,9 @@ const UploadField = ({
     }
     return [];
   });
+
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [activePreview, setActivePreview] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -201,11 +204,18 @@ const UploadField = ({
     // Otherwise assume image
     return (
       <div key={idx} className="relative mt-2 flex items-start gap-2">
-        <img
+        {/* <img
           src={src}
           alt={fileName}
           className="h-40 object-cover rounded-md border border-gray-200"
+        /> */}
+        <img
+          src={src}
+          alt={fileName}
+          onClick={() => openPreview(src)}
+          className="h-40 object-cover rounded-md border border-gray-200 cursor-pointer hover:opacity-90"
         />
+
         {showCloseButton && !disabled && (
           <button
             type="button"
@@ -220,6 +230,17 @@ const UploadField = ({
     );
   };
 
+  const openPreview = (src: string) => {
+    setActivePreview(src);
+    setIsPreviewOpen(true);
+  };
+
+  const closePreview = () => {
+    setIsPreviewOpen(false);
+    setActivePreview(null);
+  };
+
+
   return (
     <div className="mb-4">
       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -227,7 +248,7 @@ const UploadField = ({
       </label>
       {/* {previews.length > 0  */}
       {previews.length > 0 &&
-      !(previews.length === 1 && previews[0].startsWith("No ") && !disabled) ? (
+        !(previews.length === 1 && previews[0].startsWith("No ") && !disabled) ? (
         <div className="flex flex-wrap gap-2">
           {previews.map(renderPreview)}
         </div>
@@ -272,6 +293,33 @@ const UploadField = ({
           </div>
         )
       )}
+
+      {isPreviewOpen && activePreview && (
+        <div
+          className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center"
+          onClick={closePreview}
+        >
+          <div
+            className="relative max-w-4xl max-h-[90vh] bg-white rounded-lg p-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={activePreview}
+              alt="Preview"
+              className="max-h-[80vh] max-w-full object-contain rounded"
+            />
+
+            <button
+              type="button"
+              onClick={closePreview}
+              className="absolute top-2 right-2 bg-white rounded-full p-1 shadow text-gray-600 hover:text-gray-800"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
