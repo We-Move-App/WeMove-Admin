@@ -165,7 +165,7 @@ const CustomerManagement = () => {
           currentPage={currentPage}
           totalItems={totalUsers}
           onPageChange={(page) => setCurrentPage(page)}
-          searchPlaceholder="Search by name / email"
+          searchPlaceholder={t("common.searchPlaceholder")}
           searchTerm={searchInput}
           onSearchChange={handleSearchChange}
           filterable

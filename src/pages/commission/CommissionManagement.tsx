@@ -345,9 +345,8 @@ const CommissionManagement = () => {
           newStatus === "active"
             ? "Commission Activated"
             : "Commission Deactivated",
-        description: `${commission.serviceType} commission has been ${
-          newStatus === "active" ? "activated" : "deactivated"
-        }.`,
+        description: `${commission.serviceType} commission has been ${newStatus === "active" ? "activated" : "deactivated"
+          }.`,
       });
     } catch (error: any) {
       console.error("Error toggling commission status:", error);
@@ -399,11 +398,10 @@ const CommissionManagement = () => {
       header: t("commissionManagement.tableHeaders.status"),
       render: (commission: Commission) => (
         <span
-          className={`px-2 py-1 rounded-full text-xs font-medium ${
-            commission.isActive
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
+          className={`px-2 py-1 rounded-full text-xs font-medium ${commission.isActive
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+            }`}
         >
           {commission.isActive
             ? t("commissionManagement.statusLabels.active")
@@ -423,11 +421,10 @@ const CommissionManagement = () => {
             {t("commissionManagement.editAction")}
           </button>
           <button
-            className={`action-button ${
-              commission.isActive
-                ? "bg-red-50 text-red-600"
-                : "bg-green-50 text-green-600"
-            }`}
+            className={`action-button ${commission.isActive
+              ? "bg-red-50 text-red-600"
+              : "bg-green-50 text-green-600"
+              }`}
             onClick={() => toggleCommissionStatus(commission.id)}
           >
             {commission.isActive
@@ -450,7 +447,7 @@ const CommissionManagement = () => {
             c.serviceType?.trim().toLowerCase()
           );
 
-          const requiredServices = ["bus", "hotel", "taxi", "bike", "user"];
+          const requiredServices = ["bus", "hotel", "taxi", "bike", "user", "referral"];
 
           const allServicesAdded = requiredServices.every((service) =>
             existingServices.includes(service)
@@ -522,6 +519,10 @@ const CommissionManagement = () => {
                   </SelectItem>
                   <SelectItem value="User">
                     {t("commissionManagement.serviceTypes.user")}
+                  </SelectItem>
+                  <SelectItem value="Referral">
+                    {/* {t("commissionManagement.serviceTypes.referral")} */}
+                    Referral
                   </SelectItem>
                 </SelectContent>
               </Select>

@@ -14,10 +14,12 @@ import { ChartData } from "@/types/admin";
 import { Loader } from "lucide-react";
 import DashboardSkeleton from "../ui/DashboardSkeleton";
 import CustomerDetailsSkeleton from "../ui/loader-skeleton";
+import { useTranslation } from "react-i18next";
 
 const pastelColors = ["#FCE9A0", "#A5C8FF", "#A8E6E1", "#B7E4C7"];
 
 const BookingChart = () => {
+  const { t, i18n } = useTranslation();
   const [timeRange, setTimeRange] = useState<"weekly" | "monthly" | "yearly">(
     "monthly"
   );
@@ -124,7 +126,7 @@ const BookingChart = () => {
         <>
           <div className="bg-white rounded-lg shadow-md p-4">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-medium">Booking Statistics</h3>
+              <h3 className="text-lg font-medium">{t("dashboard.bookingStatistics.title")}</h3>
               <div className="flex space-x-2">
                 {["weekly", "monthly", "yearly"].map((range) => (
                   <button
@@ -132,13 +134,12 @@ const BookingChart = () => {
                     onClick={() =>
                       setTimeRange(range as "weekly" | "monthly" | "yearly")
                     }
-                    className={`px-3 py-1 text-xs rounded-md ${
-                      timeRange === range
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
+                    className={`px-3 py-1 text-xs rounded-md ${timeRange === range
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
                   >
-                    {range.charAt(0).toUpperCase() + range.slice(1)}
+                    {t(`dashboard.bookingStatistics.duration.${range}`)}
                   </button>
                 ))}
               </div>

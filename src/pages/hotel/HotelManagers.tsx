@@ -183,7 +183,7 @@ const HotelManagers = () => {
           filterable={true}
           filterOptions={filterOptions}
           searchTerm={searchInput}
-          searchPlaceholder="Search by name / email"
+          searchPlaceholder={t("common.searchPlaceholder")}
           onSearchChange={handleSearchChange}
           filters={{ status: selectedStatus }}
           onFilterChange={(filters) => {

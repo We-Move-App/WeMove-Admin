@@ -22,17 +22,18 @@ type NavItem = {
   icon: JSX.Element;
   subItems?: { path: string; label: string }[];
   requiredPermission?:
-    | "userManagement"
-    | "busManagement"
-    | "taxiManagement"
-    | "hotelManagement"
-    | "walletManagement"
-    | "reportsAnalytics"
-    | "notifications"
-    | "roleManagement"
-    | "commissionManagement"
-    | "couponManagement"
-    | "bikeManagement";
+  | "userManagement"
+  | "busManagement"
+  | "taxiManagement"
+  | "hotelManagement"
+  | "walletManagement"
+  | "reportsAnalytics"
+  | "notifications"
+  | "roleManagement"
+  | "commissionManagement"
+  | "referralManagement"
+  | "couponManagement"
+  | "bikeManagement";
 };
 
 type Props = {
@@ -129,6 +130,12 @@ const Sidebar = ({ adminProfile, adminAvatar }: Props) => {
       requiredPermission: "commissionManagement",
     },
     {
+      path: "/referral-management",
+      label: t("sidebar.referralManagement"),
+      icon: <Percent size={20} />,
+      requiredPermission: "referralManagement",
+    },
+    {
       path: "/coupons",
       label: t("sidebar.coupons"),
       icon: <Tag size={20} />,
@@ -160,7 +167,7 @@ const Sidebar = ({ adminProfile, adminAvatar }: Props) => {
         setExpandedSubNav(matchingNavItem.path);
       }
     }
-  }, [location.pathname, t]); // include t to update labels when language changes
+  }, [location.pathname, t]);
 
   const toggleSubNav = (path: string) => {
     setExpandedSubNav((prev) => (prev === path ? null : path));
@@ -204,15 +211,13 @@ const Sidebar = ({ adminProfile, adminAvatar }: Props) => {
 
   return (
     <div
-      className={`admin-sidebar min-h-screen h-full ${
-        isOpen ? "w-64" : "w-20"
-      } flex flex-col fixed left-0 top-0 bottom-0 z-40 transition-all duration-300 ease-in-out overflow-hidden`}
+      className={`admin-sidebar min-h-screen h-full ${isOpen ? "w-64" : "w-20"
+        } flex flex-col fixed left-0 top-0 bottom-0 z-40 transition-all duration-300 ease-in-out overflow-hidden`}
     >
       <div className="flex items-center justify-between px-4 py-5 border-b border-white-100">
         <div
-          className={`flex items-center ${
-            isOpen ? "" : "justify-center w-full"
-          }`}
+          className={`flex items-center ${isOpen ? "" : "justify-center w-full"
+            }`}
         >
           <img src={LogoImg} alt="" width={24} height={24} />
           {isOpen && <span className="ml-3 font-bold text-lg">WeMove</span>}
@@ -222,16 +227,20 @@ const Sidebar = ({ adminProfile, adminAvatar }: Props) => {
       <nav className="flex-1 py-4 overflow-y-auto">
         <ul>
           {navItems
-            .filter((item) => permissions[item.requiredPermission])
+            .filter((item) => {
+              if (role?.toLowerCase() === "superadmin") return true;
+              return item.requiredPermission
+                ? permissions[item.requiredPermission]
+                : true;
+            })
             .map((item) => (
               <li key={item.path} className="mb-1 px-2">
                 {item.subItems ? (
                   <>
                     <button
                       onClick={() => toggleSubNav(item.path)}
-                      className={`sidebar-menu-item w-full justify-between ${
-                        activeNavItem === item.path ? "bg-green-900" : ""
-                      }`}
+                      className={`sidebar-menu-item w-full justify-between ${activeNavItem === item.path ? "bg-green-900" : ""
+                        }`}
                     >
                       <div className="flex items-center">
                         {item.icon}
@@ -239,11 +248,10 @@ const Sidebar = ({ adminProfile, adminAvatar }: Props) => {
                       </div>
                       {isOpen && (
                         <span
-                          className={`transform transition-transform ${
-                            expandedSubNav === item.path
-                              ? "rotate-180"
-                              : "rotate-0"
-                          }`}
+                          className={`transform transition-transform ${expandedSubNav === item.path
+                            ? "rotate-180"
+                            : "rotate-0"
+                            }`}
                         >
                           ▼
                         </span>
@@ -255,11 +263,10 @@ const Sidebar = ({ adminProfile, adminAvatar }: Props) => {
                           <Link
                             key={subItem.path}
                             to={subItem.path}
-                            className={`block py-2 px-3 rounded-md text-sm ${
-                              location.pathname === subItem.path
-                                ? "bg-green-900 text-white"
-                                : "hover:bg-green-900"
-                            }`}
+                            className={`block py-2 px-3 rounded-md text-sm ${location.pathname === subItem.path
+                              ? "bg-green-900 text-white"
+                              : "hover:bg-green-900"
+                              }`}
                           >
                             {subItem.label}
                           </Link>
@@ -270,9 +277,8 @@ const Sidebar = ({ adminProfile, adminAvatar }: Props) => {
                 ) : (
                   <Link
                     to={item.path}
-                    className={`sidebar-menu-item ${
-                      location.pathname === item.path ? "bg-green-900" : ""
-                    }`}
+                    className={`sidebar-menu-item ${location.pathname === item.path ? "bg-green-900" : ""
+                      }`}
                   >
                     {item.icon}
                     {isOpen && <span className="ml-3">{item.label}</span>}
@@ -297,8 +303,8 @@ const Sidebar = ({ adminProfile, adminAvatar }: Props) => {
                 {adminProfile?.userName
                   ? adminProfile.userName.charAt(0).toUpperCase()
                   : adminProfile?.email
-                  ? adminProfile.email.charAt(0).toUpperCase()
-                  : "A"}
+                    ? adminProfile.email.charAt(0).toUpperCase()
+                    : "A"}
               </div>
             )}
             <div className="ml-3">
@@ -323,8 +329,8 @@ const Sidebar = ({ adminProfile, adminAvatar }: Props) => {
                 {adminProfile?.userName
                   ? adminProfile.userName.charAt(0).toUpperCase()
                   : adminProfile?.email
-                  ? adminProfile.email.charAt(0).toUpperCase()
-                  : "A"}
+                    ? adminProfile.email.charAt(0).toUpperCase()
+                    : "A"}
               </div>
             )}
           </div>

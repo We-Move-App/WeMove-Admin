@@ -34,34 +34,6 @@ import axiosInstance from "@/api/axiosInstance";
 import { permission } from "process";
 import { useTranslation } from "react-i18next";
 
-// Mock user data
-// const mockUsers: User[] = [
-//   {
-//     id: '1',
-//     name: 'Admin',
-//     email: 'admin@example.com',
-//     role: 'Admin',
-//     permissions: ['all'],
-//     createdAt: '2023-01-01'
-//   },
-//   // {
-//   //   id: '2',
-//   //   name: 'Manager User',
-//   //   email: 'manager@example.com',
-//   //   role: 'Manager',
-//   //   permissions: ['view_reports', 'manage_bookings'],
-//   //   createdAt: '2023-03-15'
-//   // },
-//   {
-//     id: '3',
-//     name: 'Subadmin',
-//     email: 'subadmin@example.com',
-//     role: 'Subadmin',
-//     permissions: ['view_reports', 'manage_bookings', 'manage_customers'],
-//     createdAt: '2023-04-20'
-//   }
-// ];
-
 // Available permissions
 const availablePermissions = [
   { id: "reportsAnalytics", label: "Dashboard" },
@@ -72,6 +44,7 @@ const availablePermissions = [
   { id: "userManagement", label: "Manage Users" },
   // { id: 'subadminManagement', label: 'Manage Sub-admins' },
   { id: "commissionManagement", label: "Manage Commissions" },
+  { id: "referralManagement", label: "Manage Referrals" },
   { id: "couponManagement", label: "Manage Coupons" },
   { id: "roleManagement", label: "Manage Roles" },
   // { id: "notifications", label: "Manage Notifications" },
@@ -455,7 +428,7 @@ const UserManagement = () => {
         // onRowClick={handleRowClick}
         paginate
         pageSize={pageSize}
-        searchPlaceholder="Search by name / email"
+        searchPlaceholder={t("common.searchPlaceholder")}
         currentPage={currentPage}
         totalItems={totalBookings}
         onPageChange={setCurrentPage}
@@ -597,96 +570,6 @@ const UserManagement = () => {
                 </Select>
               </div>
             )}
-            {/* 
-            {newUser.role === "Admin" && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Choose Branch</label>
-                <Command className="border rounded-md">
-                  <CommandInput
-                    placeholder="Type city name..."
-                    value={query}
-                    onValueChange={(val) => setQuery(val)}
-                  />
-                  <CommandList>
-                    {loading && <div className="p-2 text-sm">Loading...</div>}
-                    {!loading && branches.length === 0 && query.length > 2 && (
-                      <div className="p-2 text-sm">No results found</div>
-                    )}
-                    <CommandGroup>
-                      {branches.map((branch) => (
-                        <CommandItem
-                          key={branch.id}
-                          onSelect={() =>
-                            setNewUser({
-                              ...newUser,
-                              branchId: branch.id,
-                              branchName: branch.name,
-                            })
-                          }
-                        >
-                          {branch.name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-                {newUser.branchName && (
-                  <p className="text-xs text-gray-400">
-                    Selected: {newUser.branchName}
-                  </p>
-                )}
-              </div>
-            )} */}
-
-            {/* {role !== "Admin" && newUser.role === "Admin" && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {t("admins.fields.chooseBranch")}
-                </label>
-                <Command className="border rounded-md">
-                  <CommandInput
-                    placeholder={t("admins.dialog.placeholders.typeCity")}
-                    value={query}
-                    onValueChange={(val) => setQuery(val)}
-                  />
-                  <CommandList>
-                    {loading && (
-                      <div className="p-2 text-sm">
-                        {t("admins.dialog.loadingAdmins")}
-                      </div>
-                    )}
-                    {!loading && branches.length === 0 && query.length > 2 && (
-                      <div className="p-2 text-sm">
-                        {t("admins.dialog.noAdminsFound")}
-                      </div>
-                    )}
-                    <CommandGroup>
-                      {branches.map((branch) => (
-                        <CommandItem
-                          key={branch.id}
-                          onSelect={() =>
-                            setNewUser({
-                              ...newUser,
-                              branchId: branch.id,
-                              branchName: branch.name,
-                            })
-                          }
-                        >
-                          {branch.name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-                {newUser.branchName && (
-                  <p className="text-xs text-gray-400">
-                    {t("admins.dialog.selected", {
-                      branch: newUser.branchName,
-                    })}
-                  </p>
-                )}
-              </div>
-            )} */}
 
             {role !== "Admin" && newUser.role === "Admin" && (
               <div className="space-y-2">
@@ -741,52 +624,8 @@ const UserManagement = () => {
                     </CommandList>
                   )}
                 </Command>
-
-                {/* {newUser.branchName && (
-                  <p className="text-xs text-gray-400">
-                    {t("admins.dialog.selected", {
-                      branch: newUser.branchName,
-                    })}
-                  </p>
-                )} */}
               </div>
             )}
-
-
-            {/* <div className="space-y-2">
-              <label className="text-sm font-medium">Permissions</label>
-              <div className="border rounded-md p-4 max-h-48 overflow-y-auto">
-                <div className="space-y-2">
-                  {availablePermissions.map((permission) => {
-                    const isDashboard = permission.id === "reportsAnalytics";
-                    return (
-                      <div
-                        key={permission.id}
-                        className="flex items-center space-x-2"
-                      >
-                        <Checkbox
-                          id={`permission-${permission.id}`}
-                          checked={
-                            isDashboard ||
-                            newUser.permissions.includes(permission.id)
-                          }
-                          disabled={isDashboard}
-                          onCheckedChange={() => {
-                            if (!isDashboard) togglePermission(permission.id);
-                          }}
-                        />
-                        <label
-                          htmlFor={`permission-${permission.id}`}
-                          className="text-sm font-medium leading-none cursor-pointer"
-                        >
-                          {permission.label}
-                        </label>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div> */}
 
             <div className="space-y-2">
               <label className="text-sm font-medium">

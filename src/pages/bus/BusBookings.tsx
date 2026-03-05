@@ -237,7 +237,7 @@ const BusBookings = () => {
         keyExtractor={(item) => item.id}
         onRowClick={handleRowClick}
         searchTerm={searchTerm}
-        searchPlaceholder="Search by name / email"
+        searchPlaceholder={t("common.searchPlaceholder")}
         onSearchChange={setSearchTerm}
       />
 

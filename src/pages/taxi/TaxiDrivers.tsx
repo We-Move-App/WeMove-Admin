@@ -166,7 +166,7 @@ const TaxiDrivers = () => {
           currentPage={currentPage}
           totalItems={totalDrivers}
           onPageChange={(page) => setCurrentPage(page)}
-          searchPlaceholder="Search by name / email"
+          searchPlaceholder={t("common.searchPlaceholder")}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           filters={{ status: selectedStatus }}

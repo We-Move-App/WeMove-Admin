@@ -1,5 +1,12 @@
 {
   "app_name": "WeMove Admin",
+  "common": {
+    "searchPlaceholder": "Search by name / email"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next"
+  },
   "navbar": {
     "yourProfile": "Your Profile",
     "signOut": "Sign out",
@@ -26,6 +33,7 @@
     "userBookings": "User Bookings",
     "adminManagement": "Admin Management",
     "commissionManagement": "Commission Management",
+    "referralManagement": "Referral Management",
     "coupons": "Coupons",
     "wallet": "Wallet"
   },
@@ -72,6 +80,20 @@
       "busUsers": "Bus Users",
       "hotelUsers": "Hotel Users",
       "rideUsers": "Ride Users"
+    },
+
+    "bookingStatistics": {
+      "title": "Booking Statistics",
+      "duration": {
+        "weekly": "weekly",
+        "monthly": "monthly",
+        "yearly": "yearly"
+      }
+    },
+
+    "revenueTrends": {
+      "title": "Revenue Trends",
+      "revenue": "Revenue"
     },
 
     "charts": {
@@ -123,7 +145,6 @@
       "suspended": "Suspended"
     }
   },
-
   "busOperatorDetails": {
     "backButton": "Back to Bus Operators",
     "busNotFound": "Bus Operator not found",
@@ -959,7 +980,8 @@
       "hotel": "Hotel",
       "taxi": "Taxi",
       "bike": "Bike",
-      "user": "User Transfer"
+      "user": "User Transfer",
+      "referral": "Referral"
     },
     "tableHeaders": {
       "serviceType": "Service Type",

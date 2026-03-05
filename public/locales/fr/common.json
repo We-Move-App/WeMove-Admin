@@ -1,4 +1,11 @@
 {
+  "common": {
+    "searchPlaceholder": "Rechercher par nom / e-mail"
+  },
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant"
+  },
   "navbar": {
     "yourProfile": "Votre profil",
     "signOut": "Se déconnecter",
@@ -25,6 +32,7 @@
     "userBookings": "Réservations des utilisateurs",
     "adminManagement": "Gestion des administrateurs",
     "commissionManagement": "Gestion des commissions",
+    "referralManagement": "Gestion des parrainages",
     "coupons": "Coupons",
     "wallet": "Portefeuille"
   },
@@ -71,6 +79,20 @@
       "busUsers": "Opérateurs de bus",
       "hotelUsers": "Gestionnaires d’hôtel",
       "rideUsers": "Chauffeurs"
+    },
+
+    "bookingStatistics": {
+      "title": "Statistiques de réservation",
+      "duration": {
+        "weekly": "hebdomadaire",
+        "monthly": "mensuel",
+        "yearly": "annuel"
+      }
+    },
+
+    "revenueTrends": {
+      "title": "Tendances des revenus",
+      "revenue": "Revenu"
     },
 
     "charts": {
@@ -957,7 +979,8 @@
       "hotel": "Hôtel",
       "taxi": "Taxi",
       "bike": "Moto",
-      "user": "Transfert utilisateur"
+      "user": "Transfert utilisateur",
+      "referral": "Référant"
     },
     "tableHeaders": {
       "serviceType": "Type de service",

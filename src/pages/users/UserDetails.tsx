@@ -41,6 +41,7 @@ const availablePermissions = [
   { id: "roleManagement", label: "Role Management" },
   { id: "commissionManagement", label: "Commission Management" },
   { id: "couponManagement", label: "Coupon Management" },
+  { id: "referralManagement", label: "Referral Management" },
 ];
 
 const UserDetails = () => {
@@ -77,10 +78,10 @@ const UserDetails = () => {
             ...userData,
             branch: userData.branch
               ? {
-                  branchId: userData.branch.branchId,
-                  name: userData.branch.name,
-                  location: userData.branch.location,
-                }
+                branchId: userData.branch.branchId,
+                name: userData.branch.name,
+                location: userData.branch.location,
+              }
               : null,
           };
 
@@ -181,12 +182,12 @@ const UserDetails = () => {
     setEditedUser((prev) =>
       prev
         ? {
-            ...prev,
-            permissions: {
-              ...prev.permissions,
-              [id]: !prev.permissions[id],
-            },
-          }
+          ...prev,
+          permissions: {
+            ...prev.permissions,
+            [id]: !prev.permissions[id],
+          },
+        }
         : prev
     );
   };
@@ -454,8 +455,8 @@ const UserDetails = () => {
                   {user.role === "Admin"
                     ? t("adminManagement.permissionsSection.description.admin")
                     : t(
-                        "adminManagement.permissionsSection.description.subadmin"
-                      )}
+                      "adminManagement.permissionsSection.description.subadmin"
+                    )}
                 </CardDescription>
               </CardHeader>
 

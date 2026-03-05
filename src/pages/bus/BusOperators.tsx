@@ -162,7 +162,7 @@ const BusOperators = () => {
         onRowClick={handleRowClick}
         filterOptions={filterOptions}
         searchTerm={searchTerm}
-        searchPlaceholder="Search by name / email"
+        searchPlaceholder={t("common.searchPlaceholder")}
         onSearchChange={setSearchTerm}
         filters={{ status: selectedStatus }}
         onFilterChange={(filters) => {

@@ -50,6 +50,7 @@ import NotificationsManagement from "@/pages/notifications/NotificationsManageme
 import Settings from "@/pages/settings/Settings";
 import PasswordReset from "@/pages/reset-password/PasswordReset";
 import CustomerBookingDetails from "@/pages/customers/CustomerBookingDetails";
+import ReferralManagement from "@/pages/referral-management/ReferralManagement";
 
 const AppRoutes = () => {
   const navigate = useNavigate();
@@ -130,6 +131,11 @@ const AppRoutes = () => {
         <Route
           path="/commission-management"
           element={<CommissionManagement />}
+        />
+
+        <Route
+          path="/referral-management"
+          element={<ReferralManagement />}
         />
         <Route path="/coupons" element={<Coupons />} />
         <Route path="/wallet" element={<Wallet />} />

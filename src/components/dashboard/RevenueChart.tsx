@@ -11,12 +11,14 @@ import {
 } from "recharts";
 import axiosInstance from "@/api/axiosInstance";
 import CustomerDetailsSkeleton from "../ui/loader-skeleton";
+import { useTranslation } from "react-i18next";
 
 const pastelBlue = "#3b82f6";
 
 const RevenueChart = () => {
   const [formattedData, setFormattedData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation()
 
   useEffect(() => {
     const fetchRevenue = async () => {
@@ -41,18 +43,14 @@ const RevenueChart = () => {
           "Nov",
           "Dec",
         ];
-
-        // Map API data to short month names
         const monthMap: { [key: string]: number } = {};
         revenue.forEach((item: any) => {
           monthMap[item.filter.slice(0, 3)] = item.amount;
         });
-
-        // Prepare chart data for all months up to the current month
         const currentMonthIndex = new Date().getMonth();
         const data = allMonths.slice(0, currentMonthIndex + 1).map((month) => ({
           name: month,
-          revenue: monthMap[month] ?? 0, // fill 0 if no data from API
+          revenue: monthMap[month] ?? 0,
         }));
 
         setFormattedData(data);
@@ -74,11 +72,11 @@ const RevenueChart = () => {
         <>
           <div className="bg-white rounded-lg shadow-md p-4">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-medium">Revenue Trends</h3>
+              <h3 className="text-lg font-medium">{t("dashboard.revenueTrends.title")}</h3>
               <div className="flex items-center space-x-2">
                 <div className="flex items-center">
                   <div className="w-3 h-3 rounded-full bg-blue-500 mr-1"></div>
-                  <span className="text-xs text-gray-500">Revenue</span>
+                  <span className="text-xs text-gray-500">{t("dashboard.revenueTrends.revenue")}</span>
                 </div>
               </div>
             </div>

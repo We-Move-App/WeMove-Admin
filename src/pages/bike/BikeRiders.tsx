@@ -167,7 +167,7 @@ const BikeRiders = () => {
           totalItems={totalDrivers}
           onPageChange={(page) => setCurrentPage(page)}
           searchTerm={searchTerm}
-          searchPlaceholder="Search by name / email"
+          searchPlaceholder={t("common.searchPlaceholder")}
           onSearchChange={setSearchTerm}
           filters={{ status: selectedStatus }}
           onFilterChange={(filters) => {
