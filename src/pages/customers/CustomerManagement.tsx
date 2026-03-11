@@ -172,12 +172,12 @@ const CustomerManagement = () => {
           filterOptions={[
             {
               key: "status" as keyof Customer,
-              label: "Status",
+              label: t("customerStatus.title"),
               options: [
-                { label: "Approved", value: "Approved" },
-                { label: "Submitted", value: "Submitted" },
-                { label: "Blocked", value: "Blocked" },
-                { label: "Rejected", value: "Rejected" },
+                { label: t("customerStatus.approved"), value: "Approved" },
+                { label: t("customerStatus.submitted"), value: "Submitted" },
+                { label: t("customerStatus.blocked"), value: "Blocked" },
+                { label: t("customerStatus.rejected"), value: "Rejected" },
               ],
             },
           ]}

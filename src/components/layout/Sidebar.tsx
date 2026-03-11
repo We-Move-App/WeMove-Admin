@@ -129,12 +129,12 @@ const Sidebar = ({ adminProfile, adminAvatar }: Props) => {
       icon: <Percent size={20} />,
       requiredPermission: "commissionManagement",
     },
-    {
-      path: "/referral-management",
-      label: t("sidebar.referralManagement"),
-      icon: <Percent size={20} />,
-      requiredPermission: "referralManagement",
-    },
+    // {
+    //   path: "/referral-management",
+    //   label: t("sidebar.referralManagement"),
+    //   icon: <Percent size={20} />,
+    //   requiredPermission: "referralManagement",
+    // },
     {
       path: "/coupons",
       label: t("sidebar.coupons"),

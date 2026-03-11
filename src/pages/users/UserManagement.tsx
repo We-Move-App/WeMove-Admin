@@ -35,21 +35,22 @@ import { permission } from "process";
 import { useTranslation } from "react-i18next";
 
 // Available permissions
-const availablePermissions = [
-  { id: "reportsAnalytics", label: "Dashboard" },
-  { id: "busManagement", label: "Manage Bus Operators" },
-  { id: "hotelManagement", label: "Manage Hotels" },
-  { id: "taxiManagement", label: "Manage Taxis" },
-  { id: "bikeManagement", label: "Manage Bikes" },
-  { id: "userManagement", label: "Manage Users" },
-  // { id: 'subadminManagement', label: 'Manage Sub-admins' },
-  { id: "commissionManagement", label: "Manage Commissions" },
-  { id: "referralManagement", label: "Manage Referrals" },
-  { id: "couponManagement", label: "Manage Coupons" },
-  { id: "roleManagement", label: "Manage Roles" },
-  // { id: "notifications", label: "Manage Notifications" },
-  // { id: "walletManagement", label: "Wallet Management" },
-];
+// const availablePermissions = [
+//   { id: "reportsAnalytics", label: "Dashboard" },
+//   { id: "busManagement", label: "Manage Bus Operators" },
+//   { id: "hotelManagement", label: "Manage Hotels" },
+//   { id: "taxiManagement", label: "Manage Taxis" },
+//   { id: "bikeManagement", label: "Manage Bikes" },
+//   { id: "userManagement", label: "Manage Users" },
+//   // { id: 'subadminManagement', label: 'Manage Sub-admins' },
+//   { id: "commissionManagement", label: "Manage Commissions" },
+//   { id: "referralManagement", label: "Manage Referrals" },
+//   { id: "couponManagement", label: "Manage Coupons" },
+//   { id: "roleManagement", label: "Manage Roles" },
+//   // { id: "notifications", label: "Manage Notifications" },
+//   // { id: "walletManagement", label: "Wallet Management" },
+// ];
+
 
 const UserManagement = () => {
   const navigate = useNavigate();
@@ -104,6 +105,19 @@ const UserManagement = () => {
   const [adminProfile, setAdminProfile] = useState<any>(null);
   const { i18n, t } = useTranslation();
   const [isBranchOpen, setIsBranchOpen] = useState(false);
+
+  const availablePermissions = [
+    { id: "userManagement", label: t("permissions.userManagement") },
+    { id: "busManagement", label: t("permissions.busManagement") },
+    { id: "taxiManagement", label: t("permissions.taxiManagement") },
+    { id: "bikeManagement", label: t("permissions.bikeManagement") },
+    { id: "hotelManagement", label: t("permissions.hotelManagement") },
+    { id: "roleManagement", label: t("permissions.roleManagement") },
+    { id: "commissionManagement", label: t("permissions.commissionManagement") },
+    { id: "couponManagement", label: t("permissions.couponManagement") },
+    { id: "referralManagement", label: t("permissions.referralManagement") },
+  ];
+
 
 
   useEffect(() => {

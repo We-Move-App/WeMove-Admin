@@ -122,12 +122,12 @@ const BikeRiders = () => {
   const filterOptions = [
     {
       key: "status" as keyof BikeRider,
-      label: "Status",
+      label: t("status.title"),
       options: [
-        { label: "Approved", value: "approved" },
-        { label: "Pending", value: "pending" },
-        { label: "Blocked", value: "blocked" },
-        { label: "Rejected", value: "rejected" },
+        { label: t("status.approved"), value: "approved" },
+        { label: t("status.pending"), value: "pending" },
+        { label: t("status.rejected"), value: "rejected" },
+        { label: t("status.blocked"), value: "blocked" },
       ],
     },
   ];

@@ -1,64 +1,94 @@
+// interface StatusBadgeProps {
+//   status?: string;
+// }
+
+import { useTranslation } from "react-i18next";
+
+// const StatusBadge = ({ status }: StatusBadgeProps) => {
+//   if (!status) {
+//     return (
+//       <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+//         Unknown
+//       </span>
+//     );
+//   }
+//   const getStatusClass = () => {
+//     const statusLower = status?.toString().trim().toLowerCase();
+
+//     if (
+//       [
+//         "approved",
+//         "active",
+//         "completed",
+//         "confirmed",
+//         "paid",
+//         "success",
+//       ].includes(statusLower)
+//     ) {
+//       return "bg-green-100 text-green-800";
+//     }
+//     if (["pending", "submitted", "upcoming", "booked"].includes(statusLower)) {
+//       return "bg-yellow-100 text-yellow-800";
+//     }
+//     if (["rejected", "blocked", "cancelled", "failed"].includes(statusLower)) {
+//       return "bg-red-100 text-red-800";
+//     }
+//     if (["processing", "in progress"].includes(statusLower)) {
+//       return "bg-blue-100 text-blue-800";
+//     }
+//     return "bg-gray-100 text-gray-800";
+//   };
+
+//   return (
+//     <span
+//       className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClass()}`}
+//     >
+//       {status}
+//     </span>
+//   );
+// };
+
+// export default StatusBadge;
+
+
 interface StatusBadgeProps {
-  status?: string; // allow undefined
+  status?: string;
 }
 
 const StatusBadge = ({ status }: StatusBadgeProps) => {
-  // console.log("StatusBadge received:", status);
+  const { t } = useTranslation();
+
   if (!status) {
     return (
       <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
-        Unknown
+        {t("status.unknown")}
       </span>
     );
   }
 
-  // console.log("StatusBadge input:", JSON.stringify(status));
+  const statusLower = status.toString().trim().toLowerCase();
 
-  // const getStatusClass = () => {
-  //   const statusLower = status.toLowerCase().trim();
-  //   if (
-  //     ["approved", "active", "completed", "confirmed"].includes(statusLower)
-  //   ) {
-  //     return "bg-green-100 text-green-800";
-  //   }
-  //   if (statusLower === "paid") {
-  //     return "bg-green-100 text-green-800";
-  //   }
-  //   if (["pending", "submitted", "upcoming", "booked"].includes(statusLower)) {
-  //     return "bg-yellow-100 text-yellow-800";
-  //   }
-  //   if (["rejected", "blocked", "cancelled", "failed"].includes(statusLower)) {
-  //     return "bg-red-100 text-red-800";
-  //   }
-  //   if (["processing", "in progress"].includes(statusLower)) {
-  //     return "bg-blue-100 text-blue-800";
-  //   }
-  //   return "bg-gray-100 text-gray-800";
-  // };
   const getStatusClass = () => {
-    const statusLower = status?.toString().trim().toLowerCase();
-
     if (
-      [
-        "approved",
-        "active",
-        "completed",
-        "confirmed",
-        "paid",
-        "success",
-      ].includes(statusLower)
+      ["approved", "active", "completed", "confirmed", "paid", "success"].includes(
+        statusLower
+      )
     ) {
       return "bg-green-100 text-green-800";
     }
+
     if (["pending", "submitted", "upcoming", "booked"].includes(statusLower)) {
       return "bg-yellow-100 text-yellow-800";
     }
+
     if (["rejected", "blocked", "cancelled", "failed"].includes(statusLower)) {
       return "bg-red-100 text-red-800";
     }
+
     if (["processing", "in progress"].includes(statusLower)) {
       return "bg-blue-100 text-blue-800";
     }
+
     return "bg-gray-100 text-gray-800";
   };
 
@@ -66,7 +96,7 @@ const StatusBadge = ({ status }: StatusBadgeProps) => {
     <span
       className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClass()}`}
     >
-      {status}
+      {t(`status.${statusLower}`)}
     </span>
   );
 };

@@ -7,6 +7,56 @@
     "previous": "Previous",
     "next": "Next"
   },
+  "status": {
+    "title": "Status",
+    "approved": "Approved",
+    "active": "Active",
+    "processing": "Processing",
+    "pending": "Pending",
+    "submitted": "Submitted",
+    "completed": "Completed",
+    "confirmed": "Confirmed",
+    "paid": "Paid",
+    "success": "Success",
+    "upcoming": "Upcoming",
+    "booked": "Booked",
+    "rejected": "Rejected",
+    "blocked": "Blocked",
+    "cancelled": "Cancelled",
+    "failed": "Failed",
+    "in progress": "In Progress",
+    "unknown": "Unknown"
+  },
+  "taxiBookingStatus": {
+    "title": "Status",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "pending": "Pending"
+  },
+
+  "customerStatus": {
+    "title": "Status",
+    "approved": "Approved",
+    "submitted": "Submitted",
+    "blocked": "Blocked",
+    "rejected": "Rejected"
+  },
+
+  "upload": {
+    "single": "Upload a file",
+    "multiple": "Upload files"
+  },
+  "permissions": {
+    "userManagement": "Manage Users",
+    "busManagement": "Manage Bus Operators",
+    "taxiManagement": "Manage Taxis",
+    "bikeManagement": "Manage Bikes",
+    "hotelManagement": "Manage Hotels",
+    "roleManagement": "Role Management",
+    "commissionManagement": "Commission Management",
+    "couponManagement": "Coupon Management",
+    "referralManagement": "Referral Management"
+  },
   "navbar": {
     "yourProfile": "Your Profile",
     "signOut": "Sign out",

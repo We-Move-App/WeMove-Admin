@@ -113,14 +113,14 @@ const BusOperators = () => {
   const filterOptions = [
     {
       key: "status" as keyof BusOperator,
-      label: "Status",
+      label: t("status.title"),
       options: [
-        { label: "approved", value: "approved" },
-        { label: "processing", value: "processing" },
-        { label: "pending", value: "pending" },
-        { label: "submitted", value: "submitted" },
-        { label: "rejected", value: "rejected" },
-        { label: "blocked", value: "blocked" },
+        { label: t("status.approved"), value: "approved" },
+        { label: t("status.processing"), value: "processing" },
+        { label: t("status.pending"), value: "pending" },
+        { label: t("status.submitted"), value: "submitted" },
+        { label: t("status.rejected"), value: "rejected" },
+        { label: t("status.blocked"), value: "blocked" },
       ],
     },
   ];

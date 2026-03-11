@@ -126,14 +126,14 @@ const HotelManagers = () => {
   const filterOptions = [
     {
       key: "status" as keyof HotelManager,
-      label: "Status",
+      label: t("status.title"),
       options: [
-        { label: "Approved", value: "approved" },
-        { label: "Pending", value: "pending" },
-        { label: "Processing", value: "processing" },
-        { label: "Submitted", value: "submitted" },
-        { label: "Rejected", value: "rejected" },
-        { label: "Blocked", value: "blocked" },
+        { label: t("status.approved"), value: "approved" },
+        { label: t("status.processing"), value: "processing" },
+        { label: t("status.pending"), value: "pending" },
+        { label: t("status.submitted"), value: "submitted" },
+        { label: t("status.rejected"), value: "rejected" },
+        { label: t("status.blocked"), value: "blocked" },
       ],
     },
   ];

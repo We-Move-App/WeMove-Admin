@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Upload, X, FileText } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface UploadFieldProps {
   label: string;
@@ -28,6 +29,7 @@ const UploadField = ({
   showCloseButton = true,
   disabled = false,
 }: UploadFieldProps) => {
+  const { t } = useTranslation()
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>(() => {
     if (typeof value === "string") {
@@ -268,7 +270,7 @@ const UploadField = ({
                     className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 text-center w-full"
                   >
                     <span className="text-center">
-                      {multiple ? "Upload files" : "Upload a file"}
+                      {multiple ? t("upload.multiple") : t("upload.single")}
                     </span>
                     <input
                       ref={fileInputRef}

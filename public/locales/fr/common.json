@@ -6,6 +6,55 @@
     "previous": "Précédent",
     "next": "Suivant"
   },
+  "status": {
+    "title": "Statut",
+    "approved": "Approuvé",
+    "active": "Actif",
+    "processing": "En cours",
+    "pending": "En attente",
+    "submitted": "Soumis",
+    "completed": "Terminé",
+    "confirmed": "Confirmé",
+    "paid": "Payé",
+    "success": "Succès",
+    "upcoming": "À venir",
+    "booked": "Réservé",
+    "rejected": "Rejeté",
+    "blocked": "Bloqué",
+    "cancelled": "Annulé",
+    "failed": "Échoué",
+    "in progress": "En progression",
+    "unknown": "Inconnu"
+  },
+
+  "taxiBookingStatus": {
+    "title": "Statut",
+    "completed": "Terminé",
+    "cancelled": "Annulé",
+    "pending": "En attente"
+  },
+  "customerStatus": {
+    "title": "Statut",
+    "approved": "Approuvé",
+    "submitted": "Soumis",
+    "blocked": "Bloqué",
+    "rejected": "Rejeté"
+  },
+  "upload": {
+    "single": "Télécharger un fichier",
+    "multiple": "Télécharger des fichiers"
+  },
+  "permissions": {
+    "userManagement": "Gérer les utilisateurs",
+    "busManagement": "Gérer les opérateurs de bus",
+    "taxiManagement": "Gérer les taxis",
+    "bikeManagement": "Gérer les motos",
+    "hotelManagement": "Gérer les hôtels",
+    "roleManagement": "Gestion des rôles",
+    "commissionManagement": "Gestion des commissions",
+    "couponManagement": "Gestion des coupons",
+    "referralManagement": "Gestion des parrainages"
+  },
   "navbar": {
     "yourProfile": "Votre profil",
     "signOut": "Se déconnecter",

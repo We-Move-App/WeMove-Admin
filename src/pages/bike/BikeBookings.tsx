@@ -106,11 +106,11 @@ const BikeBookings = () => {
   const filterOptions = [
     {
       key: "status" as keyof TaxiBooking,
-      label: "Status",
+      label: t("taxiBookingStatus.title"),
       options: [
-        { label: "Completed", value: "Completed" },
-        { label: "Cancelled", value: "Cancelled" },
-        { label: "Pending", value: "Pending" },
+        { label: t("taxiBookingStatus.completed"), value: "Completed" },
+        { label: t("taxiBookingStatus.cancelled"), value: "Cancelled" },
+        { label: t("taxiBookingStatus.pending"), value: "Pending" },
       ],
     },
   ];

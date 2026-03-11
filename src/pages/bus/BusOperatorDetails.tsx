@@ -33,8 +33,8 @@ const BusOperatorDetails = () => {
   const mode: "add" | "view" | "edit" = isNewOperator
     ? "add"
     : isEditMode
-    ? "edit"
-    : "view";
+      ? "edit"
+      : "view";
 
   const statusOptions = [
     "approved",
@@ -145,8 +145,8 @@ const BusOperatorDetails = () => {
           name === "numberOfBuses"
             ? parseInt(value)
             : name === "batchVerified"
-            ? value === "Verified"
-            : value,
+              ? value === "Verified"
+              : value,
       });
     }
   };
@@ -445,7 +445,7 @@ const BusOperatorDetails = () => {
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
-                        {operator.status}
+                        {t(`status.${operator.status}`)}
                       </p>
                     ) : (
                       <select
@@ -456,7 +456,7 @@ const BusOperatorDetails = () => {
                       >
                         {statusOptions.map((option) => (
                           <option key={option} value={option}>
-                            {option}
+                            {t(`status.${option}`)}
                           </option>
                         ))}
                       </select>
@@ -465,24 +465,24 @@ const BusOperatorDetails = () => {
 
                   {(operator.status === "rejected" ||
                     operator.status === "blocked") && (
-                    <div className="col-span-full">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {t("busOperatorDetails.basicInfo.remarkLabel")}
-                      </label>
-                      <textarea
-                        name="remark"
-                        value={operator.remark || ""}
-                        onChange={(e) =>
-                          setOperator({ ...operator, remark: e.target.value })
-                        }
-                        className="filter-input w-full h-24"
-                        placeholder={t(
-                          "busOperatorDetails.basicInfo.remarkPlaceholder"
-                        )}
-                        required
-                      />
-                    </div>
-                  )}
+                      <div className="col-span-full">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t("busOperatorDetails.basicInfo.remarkLabel")}
+                        </label>
+                        <textarea
+                          name="remark"
+                          value={operator.remark || ""}
+                          onChange={(e) =>
+                            setOperator({ ...operator, remark: e.target.value })
+                          }
+                          className="filter-input w-full h-24"
+                          placeholder={t(
+                            "busOperatorDetails.basicInfo.remarkPlaceholder"
+                          )}
+                          required
+                        />
+                      </div>
+                    )}
 
                   <div className="">
                     <label className="block text-sm font-medium mb-1">
@@ -671,7 +671,7 @@ const BusOperatorDetails = () => {
                 {t("busOperatorDetails.bankDetails.title")}
               </h2>
 
-              <div className="flex flex-col flex-col-reverse gap-4">
+              <div className="flex flex-col-reverse gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Bank Name */}
                   <div>
