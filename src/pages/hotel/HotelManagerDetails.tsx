@@ -125,20 +125,20 @@ const HotelManagerDetails = () => {
             // Room Type
             standardRooms: standardRoom
               ? {
-                  numberOfRooms: parseInt(standardRoom.numberOfRoom, 10) || 0,
-                  price: standardRoom.roomPrice,
-                  amenities: standardRoom.amenities?.map((a) => a.name) || [],
-                  photos: standardRoom.images?.map((img) => img.url) || [],
-                }
+                numberOfRooms: parseInt(standardRoom.numberOfRoom, 10) || 0,
+                price: standardRoom.roomPrice,
+                amenities: standardRoom.amenities?.map((a) => a.name) || [],
+                photos: standardRoom.images?.map((img) => img.url) || [],
+              }
               : { numberOfRooms: 0, price: 0, amenities: [], photos: [] },
 
             luxuryRooms: luxuryRoom
               ? {
-                  numberOfRooms: parseInt(luxuryRoom.numberOfRoom, 10) || 0,
-                  price: luxuryRoom.roomPrice,
-                  amenities: luxuryRoom.amenities?.map((a) => a.name) || [],
-                  photos: luxuryRoom.images?.map((img) => img.url) || [],
-                }
+                numberOfRooms: parseInt(luxuryRoom.numberOfRoom, 10) || 0,
+                price: luxuryRoom.roomPrice,
+                amenities: luxuryRoom.amenities?.map((a) => a.name) || [],
+                photos: luxuryRoom.images?.map((img) => img.url) || [],
+              }
               : { numberOfRooms: 0, price: 0, amenities: [], photos: [] },
 
             // Policy Info
@@ -366,14 +366,18 @@ const HotelManagerDetails = () => {
         <Card className="max-w-md w-full">
           <CardContent className="p-6 flex flex-col items-center space-y-4">
             <img src={NotFoundImage} alt="Not Found" className="w-32 h-32" />
-            <h2 className="text-xl font-semibold">Hotel Manager Not Found</h2>
+
+            <h2 className="text-xl font-semibold">
+              {t("manager.notFoundTitle")}
+            </h2>
+
             <p className="text-muted-foreground">
-              We couldn’t find the hotel manager you’re looking for. It might
-              have been deleted or the link is incorrect.
+              {t("manager.notFoundDescription")}
             </p>
+
             <Button onClick={() => navigate("/hotel-management/managers")}>
               <ChevronLeft className="mr-2 h-4 w-4" />
-              Back to List
+              {t("manager.backToList")}
             </Button>
           </CardContent>
         </Card>
@@ -529,24 +533,24 @@ const HotelManagerDetails = () => {
 
                 {(manager.status === "rejected" ||
                   manager.status === "blocked") && (
-                  <div className="col-span-full">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("hotelManagerDetails.personalInfo.remark")}
-                    </label>
-                    <textarea
-                      name="remark"
-                      value={manager.remark || ""}
-                      onChange={(e) =>
-                        setManager({ ...manager, remark: e.target.value })
-                      }
-                      className="filter-input w-full h-24"
-                      placeholder={t(
-                        "hotelManagerDetails.personalInfo.remarkPlaceholder"
-                      )}
-                      required
-                    />
-                  </div>
-                )}
+                    <div className="col-span-full">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t("hotelManagerDetails.personalInfo.remark")}
+                      </label>
+                      <textarea
+                        name="remark"
+                        value={manager.remark || ""}
+                        onChange={(e) =>
+                          setManager({ ...manager, remark: e.target.value })
+                        }
+                        className="filter-input w-full h-24"
+                        placeholder={t(
+                          "hotelManagerDetails.personalInfo.remarkPlaceholder"
+                        )}
+                        required
+                      />
+                    </div>
+                  )}
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     {t("hotelManagerDetails.personalInfo.chooseBranch")}
@@ -1062,7 +1066,7 @@ const HotelManagerDetails = () => {
                           typeof manager.bankAccountDetails === "string"
                             ? manager.bankAccountDetails
                             : manager.bankAccountDetails.url ||
-                              manager.bankAccountDetails.fileUrl
+                            manager.bankAccountDetails.fileUrl
                         }
                         target="_blank"
                         rel="noopener noreferrer"
@@ -1073,7 +1077,7 @@ const HotelManagerDetails = () => {
                           {typeof manager.bankAccountDetails === "string"
                             ? "Bank Document"
                             : manager.bankAccountDetails.fileName ||
-                              "Bank Document"}
+                            "Bank Document"}
                         </span>
                       </a>
                     </div>

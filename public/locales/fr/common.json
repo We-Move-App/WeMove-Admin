@@ -1,10 +1,21 @@
 {
   "common": {
-    "searchPlaceholder": "Rechercher par nom / e-mail"
+    "searchPlaceholder": "Rechercher par nom / e-mail",
+    "search": {
+      "default": "Rechercher...",
+      "byTransactionId": "Rechercher par ID de transaction",
+      "byIdName": "Rechercher par ID / nom",
+      "byBookingId": "Rechercher par ID de réservation"
+    }
   },
   "pagination": {
     "previous": "Précédent",
     "next": "Suivant"
+  },
+  "manager": {
+    "notFoundTitle": "Responsable d’hôtel introuvable",
+    "notFoundDescription": "Nous n’avons pas pu trouver le responsable d’hôtel que vous recherchez. Il a peut-être été supprimé ou le lien est incorrect.",
+    "backToList": "Retour à la liste"
   },
   "status": {
     "title": "Statut",
@@ -25,6 +36,26 @@
     "failed": "Échoué",
     "in progress": "En progression",
     "unknown": "Inconnu"
+  },
+  "transport": {
+    "hotel": "Hôtel",
+    "bus": "Bus",
+    "taxi": "Taxi",
+    "bike": "Vélo"
+  },
+  "months": {
+    "jan": "Janv",
+    "feb": "Févr",
+    "mar": "Mars",
+    "apr": "Avr",
+    "may": "Mai",
+    "jun": "Juin",
+    "jul": "Juil",
+    "aug": "Août",
+    "sep": "Sept",
+    "oct": "Oct",
+    "nov": "Nov",
+    "dec": "Déc"
   },
 
   "taxiBookingStatus": {

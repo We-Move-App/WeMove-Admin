@@ -26,11 +26,11 @@ const Navbar = ({ adminProfile, adminAvatar }: Props) => {
       ? JSON.parse(localStorage.getItem("adminProfile")!)._id
       : null;
 
-    // 🔹 Fetch old notifications
+    // Fetch old notifications
     const fetchNotifications = async () => {
       try {
         console.log(
-          "🔑 AccessToken from localStorage:",
+          "AccessToken from localStorage:",
           localStorage.getItem("accessToken")
         );
 
@@ -65,11 +65,11 @@ const Navbar = ({ adminProfile, adminAvatar }: Props) => {
 
     fetchNotifications();
 
-    // 🔹 Setup socket connection
+    // Setup socket connection
     const socket = getSocket();
 
     socket.on("connect", () => {
-      console.log("✅ Connected to admin namespace");
+      console.log("Connected to admin namespace");
     });
 
     socket.off("notification:new");
@@ -159,6 +159,7 @@ const Navbar = ({ adminProfile, adminAvatar }: Props) => {
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
     localStorage.setItem("appLanguage", lng);
+    window.location.reload();
   };
 
   // read stored language (optional)

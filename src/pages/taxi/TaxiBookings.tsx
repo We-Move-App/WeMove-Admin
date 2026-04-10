@@ -167,7 +167,7 @@ const TaxiBookings = () => {
           paginate
           pageSize={pageSize}
           currentPage={currentPage}
-          searchPlaceholder="Search by ID / name"
+          searchPlaceholder={t("common.search.byIdName")}
           totalItems={totalBookings}
           onPageChange={setCurrentPage}
           searchTerm={searchInput}

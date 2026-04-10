@@ -8,10 +8,10 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 5174,
-    allowedHosts: ["volvo-improving-spring-way.trycloudflare.com"],
+    allowedHosts: ["vsnet-desktop-whenever-stadium.trycloudflare.com"],
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(
-    Boolean
+    Boolean,
   ),
   resolve: {
     alias: {

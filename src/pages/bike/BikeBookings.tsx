@@ -203,7 +203,7 @@ const BikeBookings = () => {
           totalItems={totalBookings}
           onPageChange={setCurrentPage}
           searchTerm={searchInput}
-          searchPlaceholder="Search by ID / name"
+          searchPlaceholder={t("common.search.byIdName")}
           onSearchChange={handleSearchChange}
           filterOptions={filterOptions}
         />

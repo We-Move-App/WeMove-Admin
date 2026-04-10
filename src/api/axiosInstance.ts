@@ -1,11 +1,8 @@
 import axios from "axios";
+import i18n from "i18next";
 
 const axiosInstance = axios.create({
-  // Deployed URL
   baseURL: "http://139.59.20.155:8000/api/v1/admin",
-  // // Local URL
-  // baseURL: "https://memphis-polar-station-rfc.trycloudflare.com/api/v1/admin",
-
   headers: {
     "Content-Type": "application/json",
   },
@@ -13,12 +10,14 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  config.headers["Accept-Language"] = i18n.language;
+
   return config;
 });
-
-// console.log("Stored token:", localStorage.getItem("accessToken"));
 
 export default axiosInstance;

@@ -442,7 +442,7 @@ const Wallet = () => {
             // filterable
             // filterOptions={filterOptions}
             searchTerm={searchTerm}
-            searchPlaceholder="Search by Transaction ID"
+            searchPlaceholder={t("common.search.byTransactionId")}
             onSearchChange={setSearchTerm}
             paginate
             pageSize={pageSize}

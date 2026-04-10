@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import Layout from '@/components/layout/Layout';
 import DataTable from "@/components/ui/DataTable";
 import { Eye, Plus, Check, X, ChevronLeft } from "lucide-react";
-import { Commission, User } from "@/types/admin";
+import { Commission, User} from "@/types/admin";
 import {
   Dialog,
   DialogContent,
@@ -31,26 +30,7 @@ import {
 } from "@/components/ui/command";
 import fileUploadInstance from "@/api/fileUploadInstance";
 import axiosInstance from "@/api/axiosInstance";
-import { permission } from "process";
 import { useTranslation } from "react-i18next";
-
-// Available permissions
-// const availablePermissions = [
-//   { id: "reportsAnalytics", label: "Dashboard" },
-//   { id: "busManagement", label: "Manage Bus Operators" },
-//   { id: "hotelManagement", label: "Manage Hotels" },
-//   { id: "taxiManagement", label: "Manage Taxis" },
-//   { id: "bikeManagement", label: "Manage Bikes" },
-//   { id: "userManagement", label: "Manage Users" },
-//   // { id: 'subadminManagement', label: 'Manage Sub-admins' },
-//   { id: "commissionManagement", label: "Manage Commissions" },
-//   { id: "referralManagement", label: "Manage Referrals" },
-//   { id: "couponManagement", label: "Manage Coupons" },
-//   { id: "roleManagement", label: "Manage Roles" },
-//   // { id: "notifications", label: "Manage Notifications" },
-//   // { id: "walletManagement", label: "Wallet Management" },
-// ];
-
 
 const UserManagement = () => {
   const navigate = useNavigate();
@@ -118,8 +98,6 @@ const UserManagement = () => {
     { id: "referralManagement", label: t("permissions.referralManagement") },
   ];
 
-
-
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (query.trim().length > 2) {
@@ -164,7 +142,7 @@ const UserManagement = () => {
     };
 
     fetchAdmins();
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, searchTerm, i18n.language]);
 
   useEffect(() => {
     if (newUser.role === "SubAdmin") {
@@ -391,10 +369,6 @@ const UserManagement = () => {
     }
 
   };
-
-  // const handleRowClick = (user: User) => {
-  //   navigate(`/user-management/${user.id}`);
-  // };
 
   const filteredPermissions = availablePermissions.filter((perm) => {
     // Hide "Manage Roles" if logged-in user is Admin

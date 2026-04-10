@@ -17,6 +17,7 @@ import {
   PaginationLink,
 } from "@/components/ui/pagination";
 import { ChevronDown, ChevronUp, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // Define types
 export type Column<T> = {
@@ -43,7 +44,7 @@ type DataTableProps<T> = {
   exportable?: boolean;
   filterable?: boolean;
   filterOptions?: FilterOption[];
-  onFilterChange?: (filters: Record<string, string | null>) => void; // ✅ new
+  onFilterChange?: (filters: Record<string, string | null>) => void;
   filters?: Record<string, string | null>;
   paginate?: boolean;
   currentPage?: number;
@@ -61,7 +62,7 @@ function DataTable<T>({
   searchable = true,
   searchTerm = "",
   onSearchChange,
-  searchPlaceholder = "Search...",
+  searchPlaceholder,
   filterable = true,
   filterOptions = [],
   onFilterChange,
@@ -72,6 +73,7 @@ function DataTable<T>({
   totalItems = data.length,
   onPageChange,
 }: DataTableProps<T>) {
+  const { t } = useTranslation();
   const [sortConfig, setSortConfig] = useState<{
     key: keyof T | null;
     direction: "asc" | "desc";
@@ -89,9 +91,9 @@ function DataTable<T>({
     };
 
     if (onFilterChange) {
-      onFilterChange(newFilters); // ✅ notify parent
+      onFilterChange(newFilters);
     } else {
-      setInternalFilters(newFilters); // ✅ fallback internal
+      setInternalFilters(newFilters);
     }
 
     onPageChange?.(1); // reset to first page
@@ -195,6 +197,9 @@ function DataTable<T>({
     return pages;
   };
 
+  const finalSearchPlaceholder =
+    searchPlaceholder || t("common.search.default");
+
   return (
     <div className="space-y-4">
       {/* Search and filters */}
@@ -203,7 +208,7 @@ function DataTable<T>({
           <div className="relative w-full sm:w-64 flex items-center gap-20">
             <Search className="absolute top-2.5 left-3 h-4 w-4 text-gray-500" />
             <Input
-              placeholder={searchPlaceholder}
+              placeholder={finalSearchPlaceholder}
               className="pl-10"
               value={searchTerm || ""}
               onChange={(e) => {

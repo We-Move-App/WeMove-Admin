@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Globe, ChevronDown, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import axiosInstance from "@/api/axiosInstance";
 
 const languages = [
   { code: "en", name: "English", flag: "🇺🇸" },
@@ -17,13 +18,6 @@ export default function LanguageSwitcher() {
       ) ?? languages[0]
   );
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (selectedLanguage && i18n.language !== selectedLanguage.code) {
-      i18n.changeLanguage(selectedLanguage.code);
-      localStorage.setItem("appLanguage", selectedLanguage.code);
-    }
-  }, [selectedLanguage]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -44,13 +38,31 @@ export default function LanguageSwitcher() {
       setSelectedLanguage(current);
   }, [i18n.language]);
 
-  const handleLanguageSelect = (languageCode: string) => {
-    const lang = languages.find((l) => l.code === languageCode);
-    if (!lang) return;
-    setSelectedLanguage(lang);
-    setIsOpen(false);
-  };
+  const handleLanguageSelect = async (lang: string) => {
+    try {
+      const selected = languages.find((l) => l.code === lang) || languages[0];
 
+      setSelectedLanguage(selected);
+      setIsOpen(false);
+
+      // ✅ Step 1: Change language
+      await i18n.changeLanguage(lang);
+
+      // ✅ Step 2: Store in localStorage
+      localStorage.setItem("appLanguage", lang);
+
+      // ✅ Step 3: Notify backend
+      await axiosInstance.post("/auth/change-ln", {
+        ln: lang,
+      });
+
+      // ✅ Step 4: HARD REFRESH
+      window.location.reload();
+
+    } catch (error) {
+      console.error("Language change failed:", error);
+    }
+  };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setIsOpen(false);
@@ -58,6 +70,8 @@ export default function LanguageSwitcher() {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, []);
+
+
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -73,9 +87,8 @@ export default function LanguageSwitcher() {
           {selectedLanguage.code}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
         />
       </button>
 
@@ -93,11 +106,10 @@ export default function LanguageSwitcher() {
                 role="menuitemradio"
                 aria-checked={isSelected}
                 onClick={() => handleLanguageSelect(language.code)}
-                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors duration-150 text-left ${
-                  isSelected
-                    ? "bg-green-50 border-l-4 border-green-900"
-                    : "border-l-4 border-transparent"
-                }`}
+                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors duration-150 text-left ${isSelected
+                  ? "bg-green-50 border-l-4 border-green-900"
+                  : "border-l-4 border-transparent"
+                  }`}
               >
                 <span className="text-2xl">{language.flag}</span>
                 <div className="flex flex-col items-start flex-1">

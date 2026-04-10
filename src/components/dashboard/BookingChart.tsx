@@ -29,7 +29,6 @@ const BookingChart = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  // Whenever timeRange changes, fetch new data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,18 +39,18 @@ const BookingChart = () => {
 
         let labels: string[] = [];
         const monthMap: { [key: string]: string } = {
-          January: "Jan",
-          February: "Feb",
-          March: "Mar",
-          April: "Apr",
-          May: "May",
-          June: "Jun",
-          July: "Jul",
-          August: "Aug",
-          September: "Sep",
-          October: "Oct",
-          November: "Nov",
-          December: "Dec",
+          January: "months.jan",
+          February: "months.feb",
+          March: "months.mar",
+          April: "months.apr",
+          May: "months.may",
+          June: "months.jun",
+          July: "months.jul",
+          August: "months.aug",
+          September: "months.sep",
+          October: "months.oct",
+          November: "months.nov",
+          December: "months.dec",
         };
 
         // Set chart labels based on timeRange
@@ -59,18 +58,18 @@ const BookingChart = () => {
           labels = ["week1", "week2", "week3", "week4"];
         } else if (timeRange === "monthly") {
           labels = [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
+            t("months.jan"),
+            t("months.feb"),
+            t("months.mar"),
+            t("months.apr"),
+            t("months.may"),
+            t("months.jun"),
+            t("months.jul"),
+            t("months.aug"),
+            t("months.sep"),
+            t("months.oct"),
+            t("months.nov"),
+            t("months.dec"),
           ];
         } else if (timeRange === "yearly") {
           labels = Array.from(
@@ -79,17 +78,17 @@ const BookingChart = () => {
         }
 
         // Map data for each type
-        const datasets = ["hotel", "bus", "taxi", "bike"].map((type, idx) => ({
-          label: type.charAt(0).toUpperCase() + type.slice(1),
+        const types = ["hotel", "bus", "taxi", "bike"];
+
+        const datasets = types.map((type, idx) => ({
+          label: t(`transport.${type}`),
           data: labels.map((label) => {
             if (timeRange === "monthly") {
-              // map full month names to 3-letter abbreviations
               const item = data[type].find(
-                (d: any) => monthMap[d.filter] === label
+                (d: any) => t(monthMap[d.filter]) === label
               );
               return item ? item.bookings : 0;
             } else {
-              // weekly and yearly: match directly
               const item = data[type].find((d: any) => d.filter === label);
               return item ? item.bookings : 0;
             }
@@ -98,7 +97,6 @@ const BookingChart = () => {
           borderColor: pastelColors[idx],
           borderWidth: 1,
         }));
-
         setChartData({ labels, datasets });
       } catch (error) {
         console.error("Error fetching chart data:", error);

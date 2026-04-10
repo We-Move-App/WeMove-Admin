@@ -20,38 +20,89 @@ const RevenueChart = () => {
   const [loading, setLoading] = useState(true);
   const { t, i18n } = useTranslation()
 
+  // useEffect(() => {
+  //   const fetchRevenue = async () => {
+  //     try {
+  //       const response = await axiosInstance.get(
+  //         "/dashboard/top-analytics?filter=monthly"
+  //       );
+  //       const revenue = response.data.data.revenue.totalRevenue;
+  //       const allMonths = [
+  //         "Jan",
+  //         "Feb",
+  //         "Mar",
+  //         "Apr",
+  //         "May",
+  //         "Jun",
+  //         "Jul",
+  //         "Aug",
+  //         "Sep",
+  //         "Oct",
+  //         "Nov",
+  //         "Dec",
+  //       ];
+  //       const monthMap: { [key: string]: number } = {};
+  //       revenue.forEach((item: any) => {
+  //         monthMap[item.filter.slice(0, 3)] = item.amount;
+  //       });
+  //       const currentMonthIndex = new Date().getMonth();
+  //       const data = allMonths.slice(0, currentMonthIndex + 1).map((month) => ({
+  //         name: month,
+  //         revenue: monthMap[month] ?? 0,
+  //       }));
+
+  //       setFormattedData(data);
+  //     } catch (error) {
+  //       console.error("Error fetching revenue data:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchRevenue();
+  // }, []);
   useEffect(() => {
     const fetchRevenue = async () => {
       try {
         const response = await axiosInstance.get(
           "/dashboard/top-analytics?filter=monthly"
         );
+
         const revenue = response.data.data.revenue.totalRevenue;
 
-        // All months
-        const allMonths = [
-          "Jan",
-          "Feb",
-          "Mar",
-          "Apr",
-          "May",
-          "Jun",
-          "Jul",
-          "Aug",
-          "Sep",
-          "Oct",
-          "Nov",
-          "Dec",
-        ];
-        const monthMap: { [key: string]: number } = {};
+        // ✅ Step 1: map API months → index (0–11)
+        const monthMap: { [key: number]: number } = {};
+
         revenue.forEach((item: any) => {
-          monthMap[item.filter.slice(0, 3)] = item.amount;
+          const monthIndex = new Date(`${item.filter} 1, 2024`).getMonth();
+          monthMap[monthIndex] = item.amount;
         });
+
+        // ✅ Step 2: translation keys in order
+        const monthKeys = [
+          "months.jan",
+          "months.feb",
+          "months.mar",
+          "months.apr",
+          "months.may",
+          "months.jun",
+          "months.jul",
+          "months.aug",
+          "months.sep",
+          "months.oct",
+          "months.nov",
+          "months.dec",
+        ];
+
         const currentMonthIndex = new Date().getMonth();
-        const data = allMonths.slice(0, currentMonthIndex + 1).map((month) => ({
-          name: month,
-          revenue: monthMap[month] ?? 0,
-        }));
+
+        // ✅ Step 3: build localized data
+        const data = monthKeys
+          .slice(0, currentMonthIndex + 1)
+          .map((key, index) => ({
+            name: t(key), // ✅ translated month
+            revenue: monthMap[index] ?? 0,
+          }));
 
         setFormattedData(data);
       } catch (error) {
@@ -62,8 +113,7 @@ const RevenueChart = () => {
     };
 
     fetchRevenue();
-  }, []);
-
+  }, [i18n.language]);
   return (
     <>
       {loading ? (
@@ -87,8 +137,8 @@ const RevenueChart = () => {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="name" />
                   <YAxis />
-                  <Tooltip />
-                  <Legend />
+                  <Tooltip formatter={(value) => [value, t("dashboard.revenueTrends.revenue")]} />
+                  <Legend formatter={() => t("dashboard.revenueTrends.revenue")} />
                   <Line
                     type="monotone"
                     dataKey="revenue"

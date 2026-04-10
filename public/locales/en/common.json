@@ -1,11 +1,42 @@
 {
   "app_name": "WeMove Admin",
   "common": {
-    "searchPlaceholder": "Search by name / email"
+    "searchPlaceholder": "Search by name / email",
+    "search": {
+      "default": "Search...",
+      "byTransactionId": "Search by Transaction ID",
+      "byIdName": "Search by ID / name",
+      "byBookingId": "Search by Booking ID"
+    }
   },
   "pagination": {
     "previous": "Previous",
     "next": "Next"
+  },
+  "manager": {
+    "notFoundTitle": "Hotel Manager Not Found",
+    "notFoundDescription": "We couldn’t find the hotel manager you’re looking for. It might have been deleted or the link is incorrect.",
+    "backToList": "Back to List"
+  },
+  "months": {
+    "jan": "Jan",
+    "feb": "Feb",
+    "mar": "Mar",
+    "apr": "Apr",
+    "may": "May",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Aug",
+    "sep": "Sep",
+    "oct": "Oct",
+    "nov": "Nov",
+    "dec": "Dec"
+  },
+  "transport": {
+    "hotel": "Hotel",
+    "bus": "Bus",
+    "taxi": "Taxi",
+    "bike": "Bike"
   },
   "status": {
     "title": "Status",

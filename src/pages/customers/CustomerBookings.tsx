@@ -188,7 +188,7 @@ const CustomerBookings = () => {
           keyExtractor={(item) => item.id}
           // onRowClick={handleRowClick}
           searchTerm={searchInput}
-          searchPlaceholder="Search by Booking ID"
+          searchPlaceholder={t("common.search.byBookingId")}
           onSearchChange={handleSearchChange}
           loading={loading}
         />
