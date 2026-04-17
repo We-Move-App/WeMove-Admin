@@ -134,9 +134,9 @@ const CustomerDetails = () => {
             email: user.email || "",
             dob: user.dob ? user.dob.split("T")[0] : "",
             gender: user.gender || "",
-            zoneCode: user.zoneCode || "",
-            area: user.area || "",
-            city: user.city || "",
+            zoneCode: user.address.zoneCode || "",
+            area: user.address.area || "",
+            city: user.address.townCity || "",
             remarks: user.remarks || "",
             status: user.verificationStatus || "",
             nationality: user.nationality
