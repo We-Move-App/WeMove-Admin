@@ -1217,10 +1217,16 @@
   "commonBranch": {
     "selectBranch": "-- Select Branch --"
   },
-   "commonPagination": {
+  "commonPagination": {
     "pagination": {
       "prev": "Prev",
       "next": "Next"
+    }
+  },
+  "commonEmpty": {
+    "emptyStates": {
+      "noData": "No data found",
+      "tryChangingFilters": "Try changing filters or search"
     }
   }
 }

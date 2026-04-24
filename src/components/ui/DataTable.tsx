@@ -303,8 +303,10 @@ function DataTable<T>({
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" />
                       </svg>
-                      <div>No data found</div>
-                      <div className="text-xs text-muted-foreground/70">Try changing filters or search</div>
+                      <div>{t("commonEmpty.emptyStates.noData")}</div>
+                      <div className="text-xs text-muted-foreground/70">
+                        {t("commonEmpty.emptyStates.tryChangingFilters")}
+                      </div>
                     </div>
                   </td>
                 </tr>

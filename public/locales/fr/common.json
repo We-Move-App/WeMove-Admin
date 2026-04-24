@@ -1219,5 +1219,11 @@
       "prev": "Précédent",
       "next": "Suivant"
     }
+  },
+  "commonEmpty": {
+    "emptyStates": {
+      "noData": "Aucune donnée trouvée",
+      "tryChangingFilters": "Essayez de modifier les filtres ou la recherche"
+    }
   }
 }
