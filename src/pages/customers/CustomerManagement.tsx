@@ -96,13 +96,32 @@ const CustomerManagement = () => {
   }, [currentPage, pageSize, searchTerm, status]);
 
   const columns = [
-    { key: "name", header: t("customerManagement.tableHeaders.name") },
-    { key: "mobile", header: t("customerManagement.tableHeaders.mobile") },
-    { key: "email", header: t("customerManagement.tableHeaders.email") },
+    {
+      key: "name",
+      header: t("customerManagement.tableHeaders.name"),
+      render: (customer: Customer) =>
+        customer.name ?? t("commonEmpty.notAvailable"),
+    },
+    {
+      key: "mobile",
+      header: t("customerManagement.tableHeaders.mobile"),
+      render: (customer: Customer) =>
+        customer.mobile ?? t("commonEmpty.notAvailable"),
+    },
+    {
+      key: "email",
+      header: t("customerManagement.tableHeaders.email"),
+      render: (customer: Customer) =>
+        customer.email ?? t("commonEmpty.notAvailable"),
+    },
     {
       key: "status",
       header: t("customerManagement.tableHeaders.status"),
-      render: (customer: Customer) => <StatusBadge status={customer.status} />,
+      render: (customer: Customer) => (
+        <StatusBadge
+          status={customer.status ?? "inactive"} // keep enum, translate inside badge
+        />
+      ),
     },
     {
       key: "actions",
@@ -112,6 +131,7 @@ const CustomerManagement = () => {
           type="button"
           onClick={(e) => {
             e.stopPropagation();
+            if (!customer.id) return;
             navigate(`/customer-management/${customer.id}`);
           }}
           className="action-button flex items-center text-sm"
@@ -129,6 +149,7 @@ const CustomerManagement = () => {
           type="button"
           onClick={(e) => {
             e.stopPropagation();
+            if (!customer.id) return;
             navigate(`/customer-management/bookings/${customer.id}`);
           }}
           className="action-button flex items-center text-sm text-green-700"
@@ -137,7 +158,7 @@ const CustomerManagement = () => {
           {t("customerManagement.labels.bookingHistory")}
         </button>
       ),
-    }
+    },
   ];
 
   return (

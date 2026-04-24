@@ -1227,6 +1227,7 @@
     "emptyStates": {
       "noData": "No data found",
       "tryChangingFilters": "Try changing filters or search"
-    }
+    },
+    "notAvailable": "N/A"
   }
 }

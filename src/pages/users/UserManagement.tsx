@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DataTable from "@/components/ui/DataTable";
 import { Eye, Plus, Check, X, ChevronLeft } from "lucide-react";
-import { Commission, User} from "@/types/admin";
+import { Commission, User } from "@/types/admin";
 import {
   Dialog,
   DialogContent,
@@ -123,13 +123,13 @@ const UserManagement = () => {
         const total = res.data?.data?.total || res.data?.total || 0;
         setUsers(
           usersData.map((user: any) => ({
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            permissionsCount: user.permissionsCount,
-            createdAt: user.createdAt,
-            branch: user.branch,
+            id: user?._id ?? "",
+            name: user?.name ?? "N/A",
+            email: user?.email ?? "N/A",
+            role: user?.role ?? "user",
+            permissionsCount: user?.permissionsCount ?? 0,
+            createdAt: user?.createdAt ?? null,
+            branch: user?.branch ?? "Unknown",
           }))
         );
         setTotalBookings(total);
