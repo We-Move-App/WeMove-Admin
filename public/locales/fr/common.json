@@ -871,6 +871,27 @@
       "hotel": "Réservations d'hôtel",
       "ride": "Réservations de trajets"
     },
+    "tableHeaders": {
+      "id": "ID",
+      "transactionId": "ID de transaction",
+      "transaction": "Transaction",
+      "type": "Type de réservation",
+      "date": "Date de création",
+      "from": "De",
+      "checkIn": "Arrivée",
+      "checkOut": "Départ",
+      "rooms": "Chambres",
+      "to": "À",
+      "journeyDate": "Date du voyage",
+      "amount": "Montant",
+      "status": "Statut",
+      "vehicle": "Véhicule",
+      "pickup": "Prise en charge",
+      "drop": "Dépose",
+      "fare": "Tarif",
+      "rideStatus": "Statut du trajet",
+      "paymentStatus": "Statut du paiement"
+    },
 
     "tabs": {
       "all": "Toutes les réservations",
@@ -886,6 +907,7 @@
     },
 
     "tables": {
+      "noTransactions": "Aucune transaction trouvée",
       "common": {
         "id": "ID",
         "date": "Date",
@@ -1171,6 +1193,31 @@
       "pending": "En attente",
       "completed": "Terminé",
       "failed": "Échoué"
+    }
+  },
+  "adminPermissions": {
+    "manageUsers": "Gérer les utilisateurs",
+    "manageBusOperators": "Gérer les opérateurs de bus",
+    "manageTaxis": "Gérer les taxis",
+    "manageBikes": "Gérer les vélos",
+    "manageHotels": "Gérer les hôtels",
+    "roleManagement": "Gestion des rôles",
+    "commissionManagement": "Gestion des commissions",
+    "couponManagement": "Gestion des coupons",
+    "referralManagement": "Gestion des parrainages"
+  },
+  "noBankDetails": "Aucun détail de compte bancaire téléchargé",
+  "commonStatus": {
+    "verified": "Vérifié",
+    "notVerified": "Non vérifié"
+  },
+  "commonBranch": {
+    "selectBranch": "-- Sélectionner une agence --"
+  },
+  "commonPagination": {
+    "pagination": {
+      "prev": "Précédent",
+      "next": "Suivant"
     }
   }
 }

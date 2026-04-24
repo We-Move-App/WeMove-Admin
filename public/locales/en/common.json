@@ -874,6 +874,28 @@
       "ride": "Ride Bookings"
     },
 
+    "tableHeaders": {
+      "id": "ID",
+      "from": "From",
+      "type": "Type",
+      "date": "Date",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "rooms": "Rooms",
+      "transactionId": "Transaction ID",
+      "transaction": "Transaction",
+      "to": "To",
+      "journeyDate": "Journey Date",
+      "amount": "Amount",
+      "status": "Status",
+      "vehicle": "Vehicle",
+      "pickup": "Pickup",
+      "drop": "Drop",
+      "fare": "Fare",
+      "rideStatus": "Ride Status",
+      "paymentStatus": "Payment Status"
+    },
+
     "tabs": {
       "all": "All Bookings",
       "bus": "Bus Bookings",
@@ -888,6 +910,7 @@
     },
 
     "tables": {
+      "noTransactions": "No transactions found",
       "common": {
         "id": "ID",
         "date": "Date",
@@ -1173,6 +1196,31 @@
       "pending": "Pending",
       "completed": "Completed",
       "failed": "Failed"
+    }
+  },
+  "adminPermissions": {
+    "manageUsers": "Manage Users",
+    "manageBusOperators": "Manage Bus Operators",
+    "manageTaxis": "Manage Taxis",
+    "manageBikes": "Manage Bikes",
+    "manageHotels": "Manage Hotels",
+    "roleManagement": "Role Management",
+    "commissionManagement": "Commission Management",
+    "couponManagement": "Coupon Management",
+    "referralManagement": "Referral Management"
+  },
+  "noBankDetails": "No Bank Account Details uploaded",
+  "commonStatus": {
+    "verified": "Verified",
+    "notVerified": "Not Verified"
+  },
+  "commonBranch": {
+    "selectBranch": "-- Select Branch --"
+  },
+   "commonPagination": {
+    "pagination": {
+      "prev": "Prev",
+      "next": "Next"
     }
   }
 }

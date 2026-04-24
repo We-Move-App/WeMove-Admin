@@ -94,7 +94,7 @@ const TaxiDriverDetails = () => {
             accountHolderName: apiData.bankDetails?.holderName || "",
             bankAccountDetails:
               apiData?.bankDetails?.document?.fileUrl ||
-              "No Bank Account Details uploaded",
+              t("noBankDetails"),
           };
           setDriver(mappedDriver);
         })
@@ -158,10 +158,10 @@ const TaxiDriverDetails = () => {
         const uploaded = await uploadFiles(file);
         return uploaded
           ? {
-              documentType,
-              fileUrl: uploaded.fileUrl, // ✅ backend expects "fileUrl"
-              fileName: uploaded.fileName || file.name,
-            }
+            documentType,
+            fileUrl: uploaded.fileUrl, // ✅ backend expects "fileUrl"
+            fileName: uploaded.fileName || file.name,
+          }
           : null;
       }
 
@@ -214,9 +214,9 @@ const TaxiDriverDetails = () => {
 
     const vehicleRegistrationCertificate = driver.vehicleRegistrationCertificate
       ? await uploadOrReturn(
-          driver.vehicleRegistrationCertificate,
-          "registration"
-        )
+        driver.vehicleRegistrationCertificate,
+        "registration"
+      )
       : null;
 
     const bankAccountDetails = driver.bankAccountDetails
@@ -280,10 +280,10 @@ const TaxiDriverDetails = () => {
         const uploaded = await uploadFiles(file);
         return uploaded
           ? {
-              fileUrl: uploaded.fileUrl,
-              fileName: uploaded.fileName || file.name,
-              documentType,
-            }
+            fileUrl: uploaded.fileUrl,
+            fileName: uploaded.fileName || file.name,
+            documentType,
+          }
           : null;
       }
 
@@ -319,9 +319,9 @@ const TaxiDriverDetails = () => {
 
     const vehicleRegistrationCertificate = driver.vehicleRegistrationCertificate
       ? await uploadOrReturn(
-          driver.vehicleRegistrationCertificate,
-          "registration"
-        )
+        driver.vehicleRegistrationCertificate,
+        "registration"
+      )
       : null;
 
     const bankAccountDetails = driver.bankAccountDetails
@@ -617,7 +617,7 @@ const TaxiDriverDetails = () => {
                         onValueChange={(value: string) =>
                           handleChange("status", value)
                         }
-                        // disabled={mode === "view"}
+                      // disabled={mode === "view"}
                       >
                         <SelectTrigger className="w-[180px]">
                           <SelectValue placeholder="Select status" />
@@ -637,25 +637,25 @@ const TaxiDriverDetails = () => {
                 {/* Remark Field (conditionally rendered) */}
                 {(driver.status === "rejected" ||
                   driver.status === "blocked") && (
-                  <div className="col-span-full">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("taxiDriversDetails.fields.remark")}
-                    </label>
-                    <textarea
-                      name="remark"
-                      value={driver.remark || ""}
-                      onChange={(e) =>
-                        setDriver({ ...driver, remark: e.target.value })
-                      }
-                      className="filter-input w-full h-24"
-                      placeholder={t(
-                        "taxiDriversDetails.placeholders.remarkPlaceholder"
-                      )}
-                      required
-                      disabled={mode === "view"}
-                    />
-                  </div>
-                )}
+                    <div className="col-span-full">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t("taxiDriversDetails.fields.remark")}
+                      </label>
+                      <textarea
+                        name="remark"
+                        value={driver.remark || ""}
+                        onChange={(e) =>
+                          setDriver({ ...driver, remark: e.target.value })
+                        }
+                        className="filter-input w-full h-24"
+                        placeholder={t(
+                          "taxiDriversDetails.placeholders.remarkPlaceholder"
+                        )}
+                        required
+                        disabled={mode === "view"}
+                      />
+                    </div>
+                  )}
 
                 <div>
                   <label className="block text-sm font-medium mb-1">

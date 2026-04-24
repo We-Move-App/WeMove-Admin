@@ -205,7 +205,7 @@ const BikeBookings = () => {
           searchTerm={searchInput}
           searchPlaceholder={t("common.search.byIdName")}
           onSearchChange={handleSearchChange}
-          filterOptions={filterOptions}
+        // filterOptions={filterOptions}
         />
       </div>
 

@@ -513,11 +513,11 @@ const CustomerBookingDetails = () => {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.id")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.type")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.date")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.amount")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.status")}</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -578,12 +578,12 @@ const CustomerBookingDetails = () => {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>From</TableHead>
-                            <TableHead>To</TableHead>
-                            <TableHead>Journey Date</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.id")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.from")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.to")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.journeyDate")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.amount")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.status")}</TableHead>
                           </TableRow>
                         </TableHeader>
 
@@ -644,12 +644,12 @@ const CustomerBookingDetails = () => {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>Check-in</TableHead>
-                            <TableHead>Check-out</TableHead>
-                            <TableHead>Rooms</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.id")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.checkIn")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.checkOut")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.rooms")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.amount")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.status")}</TableHead>
                           </TableRow>
                         </TableHeader>
 
@@ -718,13 +718,13 @@ const CustomerBookingDetails = () => {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>Vehicle</TableHead>
-                            <TableHead>Pickup</TableHead>
-                            <TableHead>Drop</TableHead>
-                            <TableHead>Fare</TableHead>
-                            <TableHead>Ride Status</TableHead>
-                            <TableHead>Payment Status</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.id")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.vehicle")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.pickup")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.drop")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.fare")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.rideStatus")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.paymentStatus")}</TableHead>
                           </TableRow>
                         </TableHeader>
 
@@ -770,7 +770,7 @@ const CustomerBookingDetails = () => {
             <TabsContent value="transactions">
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <CardTitle>Transactions</CardTitle>
+                  <CardTitle>{t("customerBookingsDetails.tableHeaders.transaction")}</CardTitle>
 
                   <input
                     type="text"
@@ -785,21 +785,21 @@ const CustomerBookingDetails = () => {
                   {filterData(customerData.paymentTransactions, searchPayment)
                     .length === 0 ? (
                     <p className="text-center py-4 text-sm text-gray-500">
-                      No transactions found
+                      {t("customerBookingsDetails.tables.noTransactions")}
                     </p>
                   ) : (
                     <>
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Transaction ID</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Transaction</TableHead>
-                            <TableHead>From</TableHead>
-                            <TableHead>To</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.transactionId")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.date")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.amount")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.type")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.transaction")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.from")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.to")}</TableHead>
+                            <TableHead>{t("customerBookingsDetails.tableHeaders.status")}</TableHead>
                           </TableRow>
                         </TableHeader>
 

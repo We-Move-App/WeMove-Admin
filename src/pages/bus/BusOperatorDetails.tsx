@@ -507,13 +507,13 @@ const BusOperatorDetails = () => {
 
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
-                        {operator.batchVerified ? "Verified" : "Not Verified"}
+                        {operator.batchVerified ? t("commonStatus.verified") : t("commonStatus.notVerified")}
                       </p>
                     ) : (
                       <select
                         name="batchVerified"
                         value={
-                          operator.batchVerified ? "Verified" : "Not Verified"
+                          operator.batchVerified ? t("commonStatus.verified") : t("commonStatus.notVerified")
                         }
                         onChange={handleInputChange}
                         className="filter-select w-full"

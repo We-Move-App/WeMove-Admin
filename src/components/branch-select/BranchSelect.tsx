@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "react-i18next";
 
 interface Branch {
   _id: string;
@@ -23,6 +24,7 @@ interface BranchSelectProps {
 const BranchSelect: React.FC<BranchSelectProps> = ({ value, onChange }) => {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -46,12 +48,12 @@ const BranchSelect: React.FC<BranchSelectProps> = ({ value, onChange }) => {
         value={value}
         disabled={loading}
         onValueChange={(id) => {
-          console.log("✅ Selected Branch ID:", id);
+          console.log("Selected Branch ID:", id);
           onChange(id);
         }}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="-- Select Branch --" />
+          <SelectValue placeholder={t("commonBranch.selectBranch")} />
         </SelectTrigger>
         <SelectContent>
           {branches.map((branch) => (

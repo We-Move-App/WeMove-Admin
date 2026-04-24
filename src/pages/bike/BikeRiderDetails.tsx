@@ -94,7 +94,7 @@ const BikeRiderDetails = () => {
             accountHolderName: apiData.bankDetails?.holderName || "",
             bankAccountDetails:
               apiData?.bankDetails?.document?.fileUrl ||
-              "No Bank Account Details uploaded",
+              t("noBankDetails"),
           };
           setDriver(mappedDriver);
           console.log("Branch name:", apiData.BikeDriverDetails?.branch?.name);
@@ -170,10 +170,10 @@ const BikeRiderDetails = () => {
         const uploaded = await uploadFiles(file);
         return uploaded
           ? {
-              documentType,
-              fileUrl: uploaded.url,
-              fileName: uploaded.fileName,
-            }
+            documentType,
+            fileUrl: uploaded.url,
+            fileName: uploaded.fileName,
+          }
           : null;
       }
 
@@ -209,9 +209,9 @@ const BikeRiderDetails = () => {
 
     const vehicleRegistrationCertificate = driver.vehicleRegistrationCertificate
       ? await uploadOrReturn(
-          driver.vehicleRegistrationCertificate,
-          "registration"
-        )
+        driver.vehicleRegistrationCertificate,
+        "registration"
+      )
       : null;
 
     const bankAccountDetails = driver.bankAccountDetails
@@ -272,10 +272,10 @@ const BikeRiderDetails = () => {
         const uploaded = await uploadFiles(file);
         return uploaded
           ? {
-              fileUrl: uploaded.fileUrl,
-              fileName: uploaded.fileName || file.name,
-              documentType,
-            }
+            fileUrl: uploaded.fileUrl,
+            fileName: uploaded.fileName || file.name,
+            documentType,
+          }
           : null;
       }
 
@@ -323,9 +323,9 @@ const BikeRiderDetails = () => {
 
     const vehicleRegistrationCertificate = driver.vehicleRegistrationCertificate
       ? await uploadOrReturn(
-          driver.vehicleRegistrationCertificate,
-          "registration"
-        )
+        driver.vehicleRegistrationCertificate,
+        "registration"
+      )
       : null;
 
     const bankAccountDetails = driver.bankAccountDetails
@@ -619,7 +619,7 @@ const BikeRiderDetails = () => {
                         onValueChange={(value: string) =>
                           handleChange("status", value)
                         }
-                        // disabled={mode === "view"}
+                      // disabled={mode === "view"}
                       >
                         <SelectTrigger className="w-[180px]">
                           <SelectValue placeholder="Select status" />
@@ -638,25 +638,25 @@ const BikeRiderDetails = () => {
                 {/* Remark Field (conditionally rendered) */}
                 {(driver.status === "rejected" ||
                   driver.status === "blocked") && (
-                  <div className="col-span-full">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("bikeDriversDetails.fields.remark")}
-                    </label>
-                    <textarea
-                      name="remark"
-                      value={driver.remark || ""}
-                      onChange={(e) =>
-                        setDriver({ ...driver, remark: e.target.value })
-                      }
-                      className="filter-input w-full h-24"
-                      placeholder={t(
-                        "bikeDriversDetails.placeholders.remarkPlaceholder"
-                      )}
-                      required
-                      disabled={mode === "view"}
-                    />
-                  </div>
-                )}
+                    <div className="col-span-full">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t("bikeDriversDetails.fields.remark")}
+                      </label>
+                      <textarea
+                        name="remark"
+                        value={driver.remark || ""}
+                        onChange={(e) =>
+                          setDriver({ ...driver, remark: e.target.value })
+                        }
+                        className="filter-input w-full h-24"
+                        placeholder={t(
+                          "bikeDriversDetails.placeholders.remarkPlaceholder"
+                        )}
+                        required
+                        disabled={mode === "view"}
+                      />
+                    </div>
+                  )}
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     {t("bikeDriversDetails.fields.chooseBranch")}
@@ -687,11 +687,11 @@ const BikeRiderDetails = () => {
                   ) : (
                     <select
                       name="batchVerified"
-                      value={driver.batchVerified ? "Verified" : "Not Verified"}
+                      value={driver.batchVerified ? t("status.verified") : t("status.notVerified")}
                       onChange={(e) =>
                         handleChange(
                           "batchVerified",
-                          e.target.value === "Verified"
+                          e.target.value === t("status.verified")
                         )
                       }
                       className="filter-select w-full"

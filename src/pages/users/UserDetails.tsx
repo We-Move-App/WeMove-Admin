@@ -29,20 +29,20 @@ import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 import { useTranslation } from "react-i18next";
 
 // Available permissions
-const availablePermissions = [
-  { id: "userManagement", label: "Manage Users" },
-  { id: "busManagement", label: "Manage Bus Operators" },
-  { id: "taxiManagement", label: "Manage Taxis" },
-  { id: "bikeManagement", label: "Manage Bikes" },
-  { id: "hotelManagement", label: "Manage Hotels" },
-  // { id: "walletManagement", label: "Wallet Management" },
-  // { id: "reportsAnalytics", label: "Dashboard" },
-  // { id: "notifications", label: "Notifications" },
-  { id: "roleManagement", label: "Role Management" },
-  { id: "commissionManagement", label: "Commission Management" },
-  { id: "couponManagement", label: "Coupon Management" },
-  { id: "referralManagement", label: "Referral Management" },
-];
+// const availablePermissions = [
+//   { id: "userManagement", label: "Manage Users" },
+//   { id: "busManagement", label: "Manage Bus Operators" },
+//   { id: "taxiManagement", label: "Manage Taxis" },
+//   { id: "bikeManagement", label: "Manage Bikes" },
+//   { id: "hotelManagement", label: "Manage Hotels" },
+//   // { id: "walletManagement", label: "Wallet Management" },
+//   // { id: "reportsAnalytics", label: "Dashboard" },
+//   // { id: "notifications", label: "Notifications" },
+//   { id: "roleManagement", label: "Role Management" },
+//   { id: "commissionManagement", label: "Commission Management" },
+//   { id: "couponManagement", label: "Coupon Management" },
+//   { id: "referralManagement", label: "Referral Management" },
+// ];
 
 const UserDetails = () => {
   const navigate = useNavigate();
@@ -64,6 +64,18 @@ const UserDetails = () => {
   const [branches, setBranches] = useState<any[]>([]);
   const [searchAddress, setSearchAddress] = useState("");
   const { i18n, t } = useTranslation();
+
+  const availablePermissions = [
+    { id: "userManagement", label: t("adminPermissions.manageUsers") },
+    { id: "busManagement", label: t("adminPermissions.manageBusOperators") },
+    { id: "taxiManagement", label: t("adminPermissions.manageTaxis") },
+    { id: "bikeManagement", label: t("adminPermissions.manageBikes") },
+    { id: "hotelManagement", label: t("adminPermissions.manageHotels") },
+    { id: "roleManagement", label: t("adminPermissions.roleManagement") },
+    { id: "commissionManagement", label: t("adminPermissions.commissionManagement") },
+    { id: "couponManagement", label: t("adminPermissions.couponManagement") },
+    { id: "referralManagement", label: t("adminPermissions.referralManagement") },
+  ];
 
   useEffect(() => {
     if (!userId) return;
