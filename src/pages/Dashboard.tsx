@@ -101,7 +101,6 @@ const Dashboard = () => {
     drivers: 0,
   });
   const { i18n, t } = useTranslation();
-  // const [totalCounts, setTotalCounts] = useState();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -164,16 +163,6 @@ const Dashboard = () => {
         };
 
         setBookingSummary(summary);
-
-        // ✅ Log individual values
-        // console.log("Total Bookings:", summary.totalBookings.bookings);
-        // console.log("Hotel Bookings:", summary.hotelBookings.bookings);
-        // console.log("Bus Bookings:", summary.busBookings.bookings);
-        // console.log("Taxi Bookings:", summary.taxiBookings.bookings);
-        // console.log("Bike Bookings:", summary.bikeBookings.bookings);
-        // console.log("Completed Bookings:", summary.completedBookings.bookings);
-        // console.log("Cancelled Bookings:", summary.cancelledBookings.bookings);
-        // console.log("Revenue:", summary.revenue.amount);
       } catch (error) {
         console.error("Error fetching dashboard data", error);
       } finally {
@@ -183,34 +172,6 @@ const Dashboard = () => {
 
     fetchDashboardData();
   }, []);
-
-  // useEffect(() => {
-  //   const fetchTransactions = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const accessToken = localStorage.getItem("accessToken");
-
-  //       const response = await axiosInstance.get(
-  //         `/wallet/transactions/admin?page=${currentPage}&limit=${pageSize}`,
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${accessToken}`,
-  //           },
-  //         }
-  //       );
-
-  //       const { transactions, totalCount } = response.data.data;
-  //       setTransactions(transactions);
-  //       setTotalItems(totalCount);
-  //     } catch (error) {
-  //       console.error("Error fetching transactions:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchTransactions();
-  // }, [currentPage]);
 
   useEffect(() => {
     const fetchTransactions = async () => {

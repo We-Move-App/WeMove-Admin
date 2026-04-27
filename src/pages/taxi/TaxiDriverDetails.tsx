@@ -46,6 +46,47 @@ const TaxiDriverDetails = () => {
 
   const { t, i18n } = useTranslation();
 
+  type Status =
+    | "active"
+    | "inactive"
+    | "pending"
+    | "approved"
+    | "rejected"
+    | "submitted"
+    | "blocked";
+
+  const normalizeStatus = (status?: string): Status => {
+    const map: Record<string, Status> = {
+      // English
+      approved: "approved",
+      rejected: "rejected",
+      blocked: "blocked",
+      submitted: "submitted",
+      processing: "pending", // ⚠️ map to closest valid type
+
+      // French
+      approuvé: "approved",
+      rejeté: "rejected",
+      bloqué: "blocked",
+      soumis: "submitted",
+      "en cours": "pending",
+    };
+
+    if (!status) return "pending"; // fallback must be valid
+
+    const normalized = status.trim().toLowerCase();
+
+    return map[normalized] || "pending";
+  };
+
+  const statusOptions = [
+    "approved",
+    "processing",
+    "submitted",
+    "rejected",
+    "blocked",
+  ];
+
   useEffect(() => {
     if (id && id !== "new") {
       axiosInstance
@@ -65,7 +106,7 @@ const TaxiDriverDetails = () => {
               "",
             branch: apiData.TaxiDriverDetails?.branch?.name || "",
             batchVerified: apiData.TaxiDriverDetails?.batchVerified || "",
-            status: apiData.TaxiDriverDetails?.status || "",
+            status: normalizeStatus(apiData.TaxiDriverDetails?.status),
             remark: apiData.TaxiDriverDetails?.remarks || "",
             age: apiData.TaxiDriverDetails?.age || null,
             profilePhoto: apiData.documents?.avatarPhotos || null,
@@ -159,7 +200,7 @@ const TaxiDriverDetails = () => {
         return uploaded
           ? {
             documentType,
-            fileUrl: uploaded.fileUrl, // ✅ backend expects "fileUrl"
+            fileUrl: uploaded.fileUrl,
             fileName: uploaded.fileName || file.name,
           }
           : null;
@@ -381,9 +422,9 @@ const TaxiDriverDetails = () => {
             payload
           );
 
-          console.log("✅ Driver details updated");
+          console.log("Driver details updated");
         } catch (error) {
-          console.error("❌ Error updating driver:", error);
+          console.error("Error updating driver:", error);
         }
 
         // 2. Independently try updating driver status
@@ -397,12 +438,12 @@ const TaxiDriverDetails = () => {
                 batchVerified: driver?.batchVerified,
               }
             );
-            console.log("✅ Driver status updated");
+            console.log("Driver status updated");
           } else {
-            console.warn("⚠️ Skipping verify API: missing driverId");
+            console.warn("Skipping verify API: missing driverId");
           }
         } catch (error) {
-          console.error("❌ Error verifying driver status:", error);
+          console.error("Error verifying driver status:", error);
         }
 
         console.log("Editing driver", {
@@ -413,8 +454,13 @@ const TaxiDriverDetails = () => {
         });
       }
       toast({
-        title: mode === "post" ? "Driver Created" : "Driver Updated",
-        description: driver.name,
+        title:
+          mode === "post"
+            ? t("toast.driverCreatedTitle")
+            : t("toast.driverUpdatedTitle"),
+        description: t("toast.driverDesc", {
+          name: driver.name,
+        }),
       });
       navigate("/taxi-management/drivers");
     } catch (error) {
@@ -424,13 +470,6 @@ const TaxiDriverDetails = () => {
 
   const isReadOnly = mode === "view";
 
-  const statusOptions = [
-    "approved",
-    "processing",
-    "submitted",
-    "rejected",
-    "blocked",
-  ];
 
   const verificationOptions = ["Not Verified", "Verified"];
 
@@ -452,22 +491,6 @@ const TaxiDriverDetails = () => {
             : t("taxiDriversDetails.titleDriver", { name: driver.name })}
         </h1>
         <div className="flex gap-2">
-          {/* {mode !== "post" && (
-            <Select
-              value={driver.status}
-              disabled={mode === "view"}
-              onValueChange={(value: any) => handleChange("status", value)}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-              </SelectContent>
-            </Select>
-          )} */}
-
           {/* action buttons */}
           {mode === "view" && (
             <div className="flex gap-2">
@@ -625,7 +648,7 @@ const TaxiDriverDetails = () => {
                         <SelectContent>
                           {statusOptions.map((option) => (
                             <SelectItem key={option} value={option}>
-                              {option.charAt(0).toUpperCase() + option.slice(1)}
+                              {t(`status.${option}`)}
                             </SelectItem>
                           ))}
                         </SelectContent>

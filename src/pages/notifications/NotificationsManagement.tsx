@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
 // Mock data for email templates
 type EmailTemplate = {
@@ -135,6 +136,7 @@ const NotificationsManagement = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
+  const { t } = useTranslation()
 
   // New scheduled email state
   const [newScheduledEmail, setNewScheduledEmail] = useState<{
@@ -181,8 +183,8 @@ const NotificationsManagement = () => {
       !currentTemplate?.body
     ) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
+        title: t("toast.validationError"),
+        description: t("toast.fillRequiredFields"),
         variant: "destructive",
       });
       return;
@@ -200,8 +202,10 @@ const NotificationsManagement = () => {
         )
       );
       toast({
-        title: "Template Updated",
-        description: `Template "${currentTemplate.name}" has been updated`,
+        title: t("toast.updatedTitle", { entity: "Template" }),
+        description: t("toast.templateUpdatedDesc", {
+          name: currentTemplate.name,
+        }),
       });
     } else {
       // Create new template
@@ -210,8 +214,10 @@ const NotificationsManagement = () => {
         { ...currentTemplate, lastEdited: now },
       ]);
       toast({
-        title: "Template Created",
-        description: `New template "${currentTemplate.name}" has been created`,
+        title: t("toast.templateCreatedTitle"),
+        description: t("toast.templateCreatedDesc", {
+          name: currentTemplate.name,
+        }),
       });
     }
 
@@ -366,19 +372,18 @@ const NotificationsManagement = () => {
       header: "Status",
       render: (email: ScheduledEmail) => (
         <span
-          className={`px-2 py-1 rounded-full text-xs font-medium ${
-            email.status === "sent"
-              ? "bg-green-100 text-green-800"
-              : email.status === "failed"
+          className={`px-2 py-1 rounded-full text-xs font-medium ${email.status === "sent"
+            ? "bg-green-100 text-green-800"
+            : email.status === "failed"
               ? "bg-red-100 text-red-800"
               : "bg-blue-100 text-blue-800"
-          }`}
+            }`}
         >
           {email.status === "sent"
             ? "Sent"
             : email.status === "failed"
-            ? "Failed"
-            : "Pending"}
+              ? "Failed"
+              : "Pending"}
         </span>
       ),
     },
@@ -496,7 +501,7 @@ const NotificationsManagement = () => {
             <DialogHeader>
               <DialogTitle>
                 {currentTemplate?.id &&
-                templates.some((t) => t.id === currentTemplate.id)
+                  templates.some((t) => t.id === currentTemplate.id)
                   ? "Edit Email Template"
                   : "Create Email Template"}
               </DialogTitle>

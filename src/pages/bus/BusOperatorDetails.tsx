@@ -18,6 +18,7 @@ import axios from "axios";
 import BranchSelect from "@/components/branch-select/BranchSelect";
 import fileUploadInstance from "@/api/fileUploadInstance";
 import { useTranslation } from "react-i18next";
+import { normalizeStatus } from "@/types/status";
 
 const BusOperatorDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +27,6 @@ const BusOperatorDetails = () => {
   const [operator, setOperator] = useState<BusOperator | null>(null);
   const [loading, setLoading] = useState(true);
   const { i18n, t } = useTranslation();
-
   const isNewOperator = id === "new";
   const pageTitle = isNewOperator ? "Add Bus Operator" : "Edit Bus Operator";
   const [isEditMode, setIsEditMode] = useState(isNewOperator);
@@ -44,11 +44,12 @@ const BusOperatorDetails = () => {
     "blocked",
   ];
 
-  const verificationOptions = ["Not Verified", "Verified"];
+  // const verificationOptions = ["Not Verified", "Verified"];
 
   const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
     undefined
   );
+
   useEffect(() => {
     const fetchOperator = async () => {
       if (isNewOperator) {
@@ -59,7 +60,7 @@ const BusOperatorDetails = () => {
           mobile: "",
           email: "",
           branch: "",
-          status: "Pending",
+          status: "pending",
           remark: "",
           numberOfBuses: 0,
           profilePhoto: null,
@@ -99,7 +100,7 @@ const BusOperatorDetails = () => {
             mobile: user.phoneNumber || "",
             email: user.email || "",
             branch: user.branch?.name || "",
-            status: user.verificationStatus || "Pending",
+            status: normalizeStatus(user.verificationStatus),
             remark: user.remarks || "",
             numberOfBuses: 0,
             profilePhoto: user.avatar?.url || dummyProfile,
@@ -120,8 +121,8 @@ const BusOperatorDetails = () => {
         console.error("Failed to fetch bus operator:", error);
         setOperator(null);
         toast({
-          title: "Error",
-          description: "Failed to fetch bus operator details.",
+          title: t("toast.errorTitle"),
+          description: t("toast.fetchBusOperatorFailed"),
           variant: "destructive",
         });
       } finally {
@@ -176,12 +177,14 @@ const BusOperatorDetails = () => {
       (operator.status === "rejected" || operator.status === "blocked") &&
       !operator.remark
     ) {
-      toast({ title: "Error", description: "Remark is required." });
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("toast.remarkRequired"),
+      });
       return;
     }
 
     try {
-      // Upload files only if they are new (File instance)
       const avatarFile =
         operator?.profilePhoto instanceof File
           ? await uploadToServer(operator.profilePhoto)
@@ -239,8 +242,10 @@ const BusOperatorDetails = () => {
         );
 
         toast({
-          title: "Bus Operator Added",
-          description: `${operator?.name} has been added successfully.`,
+          title: t("toast.busOperatorAddedTitle"),
+          description: t("toast.busOperatorAddedDesc", {
+            name: operator?.name,
+          }),
         });
       } else {
         const putPayload = {
@@ -273,8 +278,6 @@ const BusOperatorDetails = () => {
           `/bus-management/bus-operators/updateBusOperator/${id}`,
           putPayload
         );
-
-        // ✅ PUT request to update status
         if (operator?.status) {
           await axiosInstance.put(
             `/bus-management/bus-operators/verify/${id}`,
@@ -287,8 +290,8 @@ const BusOperatorDetails = () => {
         }
 
         toast({
-          title: "Bus Operator Updated",
-          description: `${operator?.name} has been updated successfully.`,
+          title: t("toast.updatedTitle", { entity: "Bus Operator" }),
+          description: t("toast.updatedDesc", { name: operator?.name }),
         });
       }
 
@@ -296,8 +299,8 @@ const BusOperatorDetails = () => {
     } catch (error: any) {
       console.error("Form submission failed:", error);
       toast({
-        title: "Error",
-        description: error?.response?.data?.message || "Failed to submit form.",
+        title: t("toast.errorTitle"),
+        description: t("toast.updateCouponStatusFailed"),
         variant: "destructive",
       });
     }
@@ -305,7 +308,6 @@ const BusOperatorDetails = () => {
 
   const handleEdit = () => {
     if (isEditMode) {
-      // Trigger form submission
       const form = document.querySelector("form");
       if (form) {
         form.dispatchEvent(
@@ -316,8 +318,6 @@ const BusOperatorDetails = () => {
       setIsEditMode(true);
     }
   };
-
-  // console.log("profilePhoto", operator?.profilePhoto);
 
   if (loading) {
     return <Loader />;

@@ -5,7 +5,6 @@ import { Eye } from "lucide-react";
 import { Customer } from "@/types/admin";
 import axiosInstance from "@/api/axiosInstance";
 import StatusBadge from "@/components/ui/StatusBadge";
-import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 import { useTranslation } from "react-i18next";
 import Loader from "@/components/ui/loader";
 
@@ -17,13 +16,49 @@ const CustomerManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalUsers, setTotalUsers] = useState(0);
-
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState<string>("");
   const { t } = useTranslation();
-
   const debounceRef = useRef<number | null>(null);
+
+  const STATUS_OPTIONS = [
+    "approved",
+    "processing",
+    "submitted",
+    "rejected",
+    "blocked",
+    "active",
+    "inactive",
+    "pending",
+  ] as const;
+
+  type Status = (typeof STATUS_OPTIONS)[number];
+
+  const normalizeStatus = (status?: string): Status => {
+    const map: Record<string, Status> = {
+      approved: "approved",
+      rejected: "rejected",
+      blocked: "blocked",
+      submitted: "submitted",
+      processing: "processing",
+      pending: "pending",
+
+      approuvé: "approved",
+      rejeté: "rejected",
+      bloqué: "blocked",
+      soumis: "submitted",
+      "en cours": "processing",
+      "en attente": "pending",
+    };
+
+    if (!status) return "pending";
+
+    const normalized = status.trim().toLowerCase();
+
+    return map[normalized] || "pending";
+  };
+
   const handleSearchChange = (val: string) => {
     setSearchInput(val);
     if (debounceRef.current) {
@@ -61,7 +96,7 @@ const CustomerManagement = () => {
             name: u.fullName,
             mobile: u.phoneNumber,
             email: u.email,
-            status: u.verificationStatus,
+            status: normalizeStatus(u.verificationStatus),
           }));
 
           if (!mounted) return;
@@ -119,7 +154,7 @@ const CustomerManagement = () => {
       header: t("customerManagement.tableHeaders.status"),
       render: (customer: Customer) => (
         <StatusBadge
-          status={customer.status ?? "inactive"} // keep enum, translate inside badge
+          status={customer.status ?? "inactive"}
         />
       ),
     },

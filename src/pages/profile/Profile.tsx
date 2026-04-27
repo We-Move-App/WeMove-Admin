@@ -96,21 +96,21 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
         }
 
         toast({
-          title: "Profile updated",
-          description: "Your avatar has been updated successfully!",
+          title: t("toast.profileUpdatedTitle"),
+          description: t("toast.avatarUpdatedDesc"),
         });
       } else {
         toast({
-          title: "No new avatar",
-          description: "Please upload a valid avatar file before saving.",
+          title: t("toast.noAvatarTitle"),
+          description: t("toast.noAvatarDesc"),
           variant: "destructive",
         });
       }
     } catch (error: any) {
       console.error("Error updating profile:", error);
       toast({
-        title: "Update failed",
-        description: "Something went wrong. Please try again.",
+        title: t("toast.updateFailedTitle"),
+        description: t("toast.genericError"),
         variant: "destructive",
       });
     }

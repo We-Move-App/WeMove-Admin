@@ -87,23 +87,26 @@ const CustomerDetails = () => {
 
       if (response.data?.success) {
         toast({
-          title: "Success",
-          description: "User verification status updated successfully!",
+          title: t("toast.successTitle"),
+          description: t("toast.verificationStatusUpdated"),
         });
         setIsEditMode(false);
       } else {
         toast({
-          title: "Error",
-          description: response.data?.message || "Failed to update status.",
+          title: t("toast.errorTitle"),
+          description:
+            response.data?.message || t("toast.updateStatusFailed"),
           variant: "destructive",
         });
       }
     } catch (error: any) {
       console.error("Error updating verification status:", error);
+
       toast({
-        title: "Error",
+        title: t("toast.errorTitle"),
         description:
-          error.response?.data?.message || "Something went wrong. Try again!",
+          error.response?.data?.message ||
+          t("toast.genericErrorRetry"),
         variant: "destructive",
       });
     }

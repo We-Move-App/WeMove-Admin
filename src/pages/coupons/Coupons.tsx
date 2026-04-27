@@ -123,8 +123,8 @@ const Coupons = () => {
               filters.isActive === "true"
                 ? "Active"
                 : filters.isActive === "false"
-                ? "Inactive"
-                : undefined,
+                  ? "Inactive"
+                  : undefined,
           },
         });
 
@@ -223,12 +223,6 @@ const Coupons = () => {
     setIsDialogOpen(true);
   };
 
-  // const handleEditCoupon = (coupon: Coupon) => {
-  //   setIsEditing(true);
-  //   setCurrentCoupon({ ...coupon });
-  //   setIsDialogOpen(true);
-  // };
-
   const handleEditCoupon = async (couponId: string) => {
     try {
       const res = await axiosInstance.get(`/auth/get-coupon/${couponId}`);
@@ -302,54 +296,6 @@ const Coupons = () => {
     });
   };
 
-  // const handleSaveCoupon = async () => {
-  //   try {
-  //     if (isEditing) {
-  //       // Call PUT update API (you can implement later)
-  //       return;
-  //     }
-
-  //     const payload = {
-  //       couponName: currentCoupon.name,
-  //       couponCode: currentCoupon.code,
-  //       // minOrderAmount: currentCoupon.minOrderAmount || 0,
-  //       serviceType: currentCoupon.serviceType,
-  //       discountType: currentCoupon.discountType === "percentage" ? "Percentage" : "Fixed Amount",
-  //       discountPercentage: currentCoupon.discountType === "percentage" ? currentCoupon.discountPercentage : undefined,
-  //       discountAmount: currentCoupon.discountType === "fixed" ? currentCoupon.discountAmount : undefined,
-  //       startDate: new Date(currentCoupon.startDate).toISOString(),
-  //       expiryDate: new Date(currentCoupon.expiryDate).toISOString(),
-  //       status: currentCoupon.isActive ? "Active" : "Inactive",
-  //       // maxUsage: currentCoupon.maxUsage || 1,
-  //     };
-
-  //     const res = await axiosInstance.post("/auth/create-coupon", payload);
-
-  //     if (res.status === 200 || res.status === 201) {
-  //       toast({
-  //         title: "Coupon Created",
-  //         description: `${res.data.data.couponName} has been added successfully.`,
-  //       });
-
-  //       setIsDialogOpen(false);
-  //       // fetchCoupons();
-  //     }
-  //   } catch (error: any) {
-  //     const message =
-  //       error.response?.data?.message ||
-  //       error.message ||
-  //       "Failed to create coupon.";
-
-  //     toast({
-  //       title: "Error",
-  //       description: message,
-  //       variant: "destructive",
-  //     });
-
-  //     console.error("Coupon creation failed:", error.response || error);
-  //   }
-  // };
-
   const handleSaveCoupon = async () => {
     try {
       const payload = {
@@ -371,14 +317,11 @@ const Coupons = () => {
         startDate: new Date(currentCoupon.startDate).toISOString(),
         expiryDate: new Date(currentCoupon.expiryDate).toISOString(),
         status: currentCoupon.isActive ? "Active" : "Inactive",
-        // minOrderAmount: currentCoupon.minOrderAmount || 0,
-        // maxUsage: currentCoupon.maxUsage || 1,
       };
 
       let res;
 
       if (isEditing) {
-        // Assuming you have currentCoupon.id
         res = await axiosInstance.put(
           `/auth/update-coupon/${currentCoupon.id}`,
           payload
@@ -386,8 +329,10 @@ const Coupons = () => {
 
         if (res.status === 200) {
           toast({
-            title: "Coupon Updated",
-            description: `${res.data.data.couponName} has been updated successfully.`,
+            title: t("toast.updatedTitle", { entity: "Coupon" }),
+            description: t("toast.updatedDesc", {
+              name: res.data.data.couponName,
+            }),
           });
         }
       } else {
@@ -402,7 +347,6 @@ const Coupons = () => {
       }
 
       setIsDialogOpen(false);
-      // fetchCoupons(); // Refresh after update or create
     } catch (error: any) {
       const message =
         error.response?.data?.message ||
@@ -428,12 +372,11 @@ const Coupons = () => {
       const response = await axiosInstance.put(
         `/auth/update-couponStatus/${id}`,
         {
-          status: coupon.isActive ? "Inactive" : "Active", // sending new status
+          status: coupon.isActive ? "Inactive" : "Active",
         }
       );
 
       if (response.data.success) {
-        // Update UI state only if API succeeds
         setCoupons((prev) =>
           prev.map((item) =>
             item.id === id ? { ...item, isActive: !item.isActive } : item
@@ -441,17 +384,20 @@ const Coupons = () => {
         );
 
         toast({
-          title: coupon.isActive ? "Coupon Deactivated" : "Coupon Activated",
-          description: `Coupon ${coupon.name} has been ${
-            coupon.isActive ? "deactivated" : "activated"
-          }.`,
+          title: coupon.isActive
+            ? t("toast.couponDeactivatedTitle")
+            : t("toast.couponActivatedTitle"),
+
+          description: coupon.isActive
+            ? t("toast.couponDeactivatedDesc", { name: coupon.name })
+            : t("toast.couponActivatedDesc", { name: coupon.name }),
         });
       }
     } catch (error) {
       console.error("Failed to update coupon status:", error);
       toast({
-        title: "Error",
-        description: "Failed to update coupon status. Please try again.",
+        title: t("toast.errorTitle"),
+        description: t("toast.updateCouponStatusFailed"),
         variant: "destructive",
       });
     }
@@ -498,11 +444,10 @@ const Coupons = () => {
       header: t("coupons.tableHeaders.status"),
       render: (coupon: Coupon) => (
         <span
-          className={`px-2 py-1 rounded-full text-xs font-medium ${
-            coupon.isActive
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
+          className={`px-2 py-1 rounded-full text-xs font-medium ${coupon.isActive
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+            }`}
         >
           {coupon.isActive
             ? t("coupons.statusLabels.active")
@@ -522,11 +467,10 @@ const Coupons = () => {
             {t("coupons.actions.edit")}
           </button>
           <button
-            className={`action-button ${
-              coupon.isActive
-                ? "bg-red-50 text-red-600"
-                : "bg-green-50 text-green-600"
-            }`}
+            className={`action-button ${coupon.isActive
+              ? "bg-red-50 text-red-600"
+              : "bg-green-50 text-green-600"
+              }`}
             onClick={() => toggleCouponStatus(coupon.id)}
           >
             {coupon.isActive

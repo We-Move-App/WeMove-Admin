@@ -28,21 +28,6 @@ import fileUploadInstance from "@/api/fileUploadInstance";
 import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 import { useTranslation } from "react-i18next";
 
-// Available permissions
-// const availablePermissions = [
-//   { id: "userManagement", label: "Manage Users" },
-//   { id: "busManagement", label: "Manage Bus Operators" },
-//   { id: "taxiManagement", label: "Manage Taxis" },
-//   { id: "bikeManagement", label: "Manage Bikes" },
-//   { id: "hotelManagement", label: "Manage Hotels" },
-//   // { id: "walletManagement", label: "Wallet Management" },
-//   // { id: "reportsAnalytics", label: "Dashboard" },
-//   // { id: "notifications", label: "Notifications" },
-//   { id: "roleManagement", label: "Role Management" },
-//   { id: "commissionManagement", label: "Commission Management" },
-//   { id: "couponManagement", label: "Coupon Management" },
-//   { id: "referralManagement", label: "Referral Management" },
-// ];
 
 const UserDetails = () => {
   const navigate = useNavigate();
@@ -64,6 +49,34 @@ const UserDetails = () => {
   const [branches, setBranches] = useState<any[]>([]);
   const [searchAddress, setSearchAddress] = useState("");
   const { i18n, t } = useTranslation();
+
+  const normalizePermissions = (permissions: Record<string, boolean>) => {
+    const map: Record<string, string> = {
+      "User Management": "userManagement",
+      "Bus Management": "busManagement",
+      "Taxi Management": "taxiManagement",
+      "Bike Management": "bikeManagement",
+      "Hotel Management": "hotelManagement",
+      "Wallet Management": "walletManagement",
+      "Reports & Analytics": "reportsAnalytics",
+      "Notifications": "notifications",
+      "Role Management": "roleManagement",
+      "Commission Management": "commissionManagement",
+      "Coupon Management": "couponManagement",
+      "Referral Management": "referralManagement",
+    };
+
+    const result: Record<string, boolean> = {};
+
+    Object.entries(permissions || {}).forEach(([key, value]) => {
+      const mappedKey = map[key];
+      if (mappedKey) {
+        result[mappedKey] = value;
+      }
+    });
+
+    return result;
+  };
 
   const availablePermissions = [
     { id: "userManagement", label: t("adminPermissions.manageUsers") },
@@ -88,6 +101,7 @@ const UserDetails = () => {
           const userData = res.data.data;
           const formattedUser = {
             ...userData,
+            permissions: normalizePermissions(userData.permissions),
             branch: userData.branch
               ? {
                 branchId: userData.branch.branchId,

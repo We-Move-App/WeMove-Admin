@@ -1,5 +1,7 @@
 // Admin related types
 
+import { Status } from "./status";
+
 export interface Branch {
   branchId: string;
   name: string;
@@ -50,14 +52,14 @@ export interface BusOperator {
   remark?: string;
   state?: string;
   status:
+    | "approved"
+    | "processing"
+    | "submitted"
+    | "rejected"
+    | "blocked"
     | "active"
     | "inactive"
-    | "pending"
-    | "approved"
-    | "rejected"
-    | "Submitted"
-    | "blocked"
-    | "Pending";
+    | "pending";
   batchVerified: boolean;
   numberOfBuses?: number;
   balance?: number;
@@ -135,15 +137,7 @@ export interface HotelManager {
   remark?: string;
   balance?: string;
   state?: string;
-  status:
-    | "active"
-    | "inactive"
-    | "pending"
-    | "approved"
-    | "rejected"
-    | "Submitted"
-    | "blocked"
-    | "Pending";
+  status: Status;
   roomCount?: number;
   joinDate?: string;
   batchVerified: boolean;
@@ -318,14 +312,14 @@ export interface Customer {
   mobile: string;
   email: string;
   status:
+    | "approved"
+    | "processing"
+    | "submitted"
+    | "rejected"
+    | "blocked"
     | "active"
     | "inactive"
-    | "pending"
-    | "Approved"
-    | "Rejected"
-    | "Submitted"
-    | "Blocked"
-    | "Pending";
+    | "pending";
 }
 
 // User related types
@@ -364,8 +358,6 @@ export interface Commission {
   percentage: number | null;
   fixedRate: number | null;
   commissionType: "percentage" | "fixed";
-  // effectiveFrom: string;
-  // effectiveTo?: string;
   isActive: boolean;
 }
 

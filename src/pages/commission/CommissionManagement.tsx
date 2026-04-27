@@ -25,6 +25,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import axiosInstance from "@/api/axiosInstance";
 import { useTranslation } from "react-i18next";
+import { normalizeStatus } from "@/types/status";
 
 // Modified mock data to include commission type
 const mockCommissions: Commission[] = [
@@ -102,29 +103,36 @@ const CommissionManagement = () => {
       const capitalizeFirstLetter = (str: string) =>
         str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
-      const formatStatus = (status: string) => {
-        switch (status) {
-          case "in_active":
-            return "Inactive";
-          case "active":
-            return "Active";
-          default:
-            return capitalizeFirstLetter(status);
-        }
-      };
+      // const formatStatus = (status: string) => {
+      //   switch (status) {
+      //     case "in_active":
+      //       return "Inactive";
+      //     case "active":
+      //       return "Active";
+      //     default:
+      //       return capitalizeFirstLetter(status);
+      //   }
+      // };
 
-      const mapped = response.data.data.map((item: any) => ({
-        id: item._id,
-        serviceType: capitalizeFirstLetter(item.serviceType),
-        commissionType: item.commissionType,
-        percentage:
-          item.commissionType === "percentage"
-            ? item.commissionPercentage
-            : null,
-        fixedRate: item.commissionType === "fixed" ? item.commissionRate : null,
-        status: formatStatus(item.status),
-        isActive: item.status === "active",
-      }));
+      const mapped = response.data.data.map((item: any) => {
+        const normalizedStatus = normalizeStatus(item.status);
+
+        return {
+          id: item._id,
+          serviceType: capitalizeFirstLetter(item.serviceType),
+          commissionType: item.commissionType,
+          percentage:
+            item.commissionType === "percentage"
+              ? item.commissionPercentage
+              : null,
+          fixedRate:
+            item.commissionType === "fixed"
+              ? item.commissionRate
+              : null,
+          status: normalizedStatus,
+          isActive: normalizedStatus === "active",
+        };
+      });
 
       setCommissions(mapped);
     } catch (error) {
@@ -238,33 +246,23 @@ const CommissionManagement = () => {
         );
       }
 
-      // if (res.status === 200 || res.status === 201) {
-      //   toast({
-      //     title: "Success",
-      //     description: "Commission saved successfully",
-      //   });
-      //   setIsDialogOpen(false);
-      // }
       if (res.status === 200 || res.status === 201) {
         toast({
-          title: "Success",
-          description: "Commission saved successfully",
+          title: t("toast.successTitle"),
+          description: t("toast.commissionSaved"),
         });
         setIsDialogOpen(false);
-
-        // 🔹 Refresh the table
         fetchCommissions();
       }
     } catch (error: any) {
       console.error("Error saving commission:", error);
 
-      // extract backend message if available
       const message =
-        error.response?.data?.message || "Failed to save commission";
+        error.response?.data?.message || t("toast.saveCommissionFailed");
 
       toast({
         variant: "destructive",
-        title: "Error",
+        title: t("toast.errorTitle"),
         description: message,
       });
     }
@@ -272,38 +270,36 @@ const CommissionManagement = () => {
 
   const toggleCommissionStatus = async (id: string) => {
     try {
-      // find the commission
       const commission = commissions.find((c) => c.id === id);
       if (!commission) return;
-
-      // prepare payload with only status
       const newStatus = commission.isActive ? "in_active" : "active";
       const payload = { status: newStatus };
-
-      // call API
       await axiosInstance.put(`/commission-management/update/${id}`, payload);
-
-      // update local state
       setCommissions((prev) =>
         prev.map((item) =>
           item.id === id ? { ...item, isActive: newStatus === "active" } : item
         )
       );
-
-      // toast message
       toast({
         title:
           newStatus === "active"
-            ? "Commission Activated"
-            : "Commission Deactivated",
-        description: `${commission.serviceType} commission has been ${newStatus === "active" ? "activated" : "deactivated"
-          }.`,
+            ? t("toast.commissionActivatedTitle")
+            : t("toast.commissionDeactivatedTitle"),
+
+        description:
+          newStatus === "active"
+            ? t("toast.commissionActivatedDesc", {
+              service: commission.serviceType,
+            })
+            : t("toast.commissionDeactivatedDesc", {
+              service: commission.serviceType,
+            }),
       });
     } catch (error: any) {
       console.error("Error toggling commission status:", error);
       toast({
-        title: "Error",
-        description: "Failed to update commission status. Please try again.",
+        title: t("toast.errorTitle"),
+        description: t("toast.updateCommissionStatusFailed"),
         variant: "destructive",
       });
     }

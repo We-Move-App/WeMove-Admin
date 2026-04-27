@@ -7,13 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { HotelManager } from "@/types/admin";
 import UploadField from "@/components/ui/UploadField";
@@ -25,6 +18,7 @@ import AmenitiesMultiSelect from "@/components/ui/amenitiesMultiSelect";
 import { FileText } from "lucide-react";
 import BranchSelect from "@/components/branch-select/BranchSelect";
 import { useTranslation } from "react-i18next";
+import { normalizeStatus } from "@/types/status";
 
 const HotelManagerDetails = () => {
   const { id } = useParams();
@@ -46,18 +40,13 @@ const HotelManagerDetails = () => {
   const [loading, setLoading] = useState(true);
   const { i18n, t } = useTranslation();
 
-  const toTitleCaseStatus = (status: string): HotelManager["status"] => {
-    const map: Record<string, HotelManager["status"]> = {
-      active: "active",
-      inactive: "inactive",
-      pending: "Pending",
-      approved: "approved",
-      rejected: "rejected",
-      submitted: "Submitted",
-      blocked: "blocked",
-    };
-    return map[status.toLowerCase()] ?? "Pending";
-  };
+  const statusOptions = [
+    "approved",
+    "processing",
+    "submitted",
+    "rejected",
+    "blocked",
+  ];
 
   useEffect(() => {
     const fetchOperator = async () => {
@@ -69,7 +58,7 @@ const HotelManagerDetails = () => {
           branch: "",
           mobile: "",
           email: "",
-          status: "Pending",
+          status: "pending",
           remark: "",
           bankAccountNumber: "",
           bankAccountDetails: "",
@@ -108,7 +97,7 @@ const HotelManagerDetails = () => {
             branch: managerData?.branch?.name || "",
             companyName: managerData.companyName || "",
             companyAddress: managerData.companyAddress || "",
-            status: toTitleCaseStatus(apiStatus),
+            status: normalizeStatus(apiStatus),
             remark: managerData.remarks || "",
             batchVerified: managerData?.batchVerified ?? false,
             // Hotel Details
@@ -160,8 +149,8 @@ const HotelManagerDetails = () => {
         console.error("Failed to fetch hotel manager:", error);
         setManager(null);
         toast({
-          title: "Error",
-          description: "Failed to fetch hotel manager details.",
+          title: t("toast.errorTitle"),
+          description: t("toast.fetchHotelManagerFailed"),
           variant: "destructive",
         });
       } finally {
@@ -225,7 +214,6 @@ const HotelManagerDetails = () => {
       batchVerified: manager?.batchVerified,
     };
 
-    // call the verify endpoint (adjust URL if different)
     return axiosInstance.put(
       `/hotel-management/hotel-managers/verify/${id}`,
       payload
@@ -311,35 +299,40 @@ const HotelManagerDetails = () => {
         try {
           await updateStatusApi(manager.status);
           toast({
-            title: "Status Updated",
-            description: `Hotel manager status changed to ${manager.status}`,
+            title: t("toast.statusUpdatedTitle"),
+            description: t("toast.hotelManagerStatusChanged", {
+              status: manager.status,
+            }),
           });
         } catch (statusErr) {
           // status update failed — notify user but do not throw away the main save
           console.error("Status update failed", statusErr);
           toast({
-            title: "Status update failed",
-            description:
-              "Manager saved, but failed to update status. Try again.",
+            title: t("toast.statusUpdateFailedTitle"),
+            description: t("toast.managerStatusPartialFail"),
             variant: "destructive",
           });
         }
       }
 
       toast({
-        title: mode === "post" ? "Manager Created" : "Manager Updated",
+        title:
+          mode === "post"
+            ? t("toast.managerCreatedTitle")
+            : t("toast.managerUpdatedTitle"),
+
         description:
           mode === "post"
-            ? `The manager ${manager.name} has been successfully added.`
-            : `The details for ${manager.name} have been successfully updated.`,
+            ? t("toast.managerCreatedDesc", { name: manager.name })
+            : t("toast.managerUpdatedDesc", { name: manager.name }),
       });
 
       navigate("/hotel-management/managers");
     } catch (error) {
       console.error(error);
       toast({
-        title: "Error",
-        description: "Save failed",
+        title: t("toast.errorTitle"),
+        description: t("toast.saveFailed"),
         variant: "destructive",
       });
     }
@@ -348,16 +341,6 @@ const HotelManagerDetails = () => {
   const handleStatusChange = (value: HotelManager["status"]) => {
     setManager((prev) => ({ ...prev!, status: value }));
   };
-
-  const statusOptions = [
-    "approved",
-    "processing",
-    "submitted",
-    "rejected",
-    "blocked",
-  ];
-
-  const verificationOptions = ["Not Verified", "Verified"];
 
   if (loading) return <Loader />;
   if (!manager) {
@@ -509,7 +492,7 @@ const HotelManagerDetails = () => {
                   </label>
                   {mode === "view" ? (
                     <p className="filter-input w-full bg-gray-100">
-                      {manager.status}
+                      <p>{t(`status.${manager.status}`)}</p>
                     </p>
                   ) : (
                     <select
@@ -524,7 +507,7 @@ const HotelManagerDetails = () => {
                     >
                       {statusOptions.map((option) => (
                         <option key={option} value={option}>
-                          {option}
+                          {t(`status.${option}`)}
                         </option>
                       ))}
                     </select>
@@ -1075,9 +1058,8 @@ const HotelManagerDetails = () => {
                         <FileText className="w-5 h-5" />
                         <span>
                           {typeof manager.bankAccountDetails === "string"
-                            ? "Bank Document"
-                            : manager.bankAccountDetails.fileName ||
-                            "Bank Document"}
+                            ? t("bank.document")
+                            : manager.bankAccountDetails.fileName || t("bank.document")}
                         </span>
                       </a>
                     </div>

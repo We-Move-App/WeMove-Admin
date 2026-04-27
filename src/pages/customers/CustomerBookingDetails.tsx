@@ -774,7 +774,7 @@ const CustomerBookingDetails = () => {
 
                   <input
                     type="text"
-                    placeholder="Search transactions"
+                    placeholder={t("customerBookingsDetails.search.transactions")}
                     value={searchPayment}
                     onChange={(e) => setSearchPayment(e.target.value)}
                     className="mt-3 sm:mt-0 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"

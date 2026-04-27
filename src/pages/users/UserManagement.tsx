@@ -254,7 +254,7 @@ const UserManagement = () => {
 
   const handleAddUser = async () => {
     if (!newUser.name || !newUser.email || !newUser.phoneNumber) {
-      toast({ title: "Please fill in all required fields.." });
+      toast({ title: t("toast.fillRequiredFields") });
       return;
     }
 
@@ -296,7 +296,7 @@ const UserManagement = () => {
       // SuperAdmin → Admin
       if (role === "SuperAdmin" && newUser.role === "Admin") {
         if (!newUser.branchName) {
-          toast({ title: "Please select a branch for Admin" });
+          toast({ title: t("toast.selectBranchAdmin") });
           return;
         }
 
@@ -305,7 +305,7 @@ const UserManagement = () => {
         const branchId = branchRes.data?.data?._id;
 
         if (!branchId) {
-          toast({ title: "Branch creation failed" });
+          toast({ title: t("toast.branchCreationFailed") });
           return;
         }
 
@@ -318,7 +318,7 @@ const UserManagement = () => {
       // SuperAdmin → SubAdmin
       else if (role === "SuperAdmin" && newUser.role === "SubAdmin") {
         if (!newUser.adminId) {
-          toast({ title: "Please assign an Admin for the Sub-Admin" });
+          toast({ title: t("toast.assignAdminSubAdmin") });
           return;
         }
 
@@ -337,7 +337,9 @@ const UserManagement = () => {
         throw new Error("Invalid role combination for user creation");
       }
 
-      toast({ title: `${userPayload.role} created successfully!` });
+      toast({
+        title: t("toast.userCreated", { role: userPayload.role }),
+      });
 
       // Update local state
       setUsers((prev) => [
@@ -361,7 +363,8 @@ const UserManagement = () => {
     } catch (error: any) {
       console.error(error);
       const backendMessage =
-        error?.response?.data?.message || `Failed to create ${newUser.role}.`;
+        error?.response?.data?.message ||
+        t("toast.createUserFailed", { role: newUser.role });
       toast({
         title: backendMessage,
         variant: "destructive",

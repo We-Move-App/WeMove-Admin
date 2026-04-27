@@ -416,8 +416,13 @@ const BikeRiderDetails = () => {
         });
       }
       toast({
-        title: mode === "post" ? "Driver Created" : "Driver Updated",
-        description: driver.name,
+        title:
+          mode === "post"
+            ? t("toast.driverCreatedTitle")
+            : t("toast.driverUpdatedTitle"),
+        description: t("toast.driverDesc", {
+          name: driver.name,
+        }),
       });
       navigate("/bike-management/riders");
     } catch (error) {

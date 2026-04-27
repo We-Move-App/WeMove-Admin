@@ -32,7 +32,6 @@ export function StatusDropdown({ value, onChange }: StatusDropdownProps) {
         }
     }, [open]);
 
-    // close on outside click
     useEffect(() => {
         const onDocClick = (e: MouseEvent) => {
             if (!buttonRef.current?.contains(e.target as Node)) setOpen(false);
@@ -71,7 +70,7 @@ export function StatusDropdown({ value, onChange }: StatusDropdownProps) {
                                 key={opt}
                                 type="button"
                                 onClick={() => {
-                                    console.log("✅ Sending status:", opt);
+                                    console.log("Sending status:", opt);
                                     onChange(opt);
                                     setOpen(false);
                                 }}
