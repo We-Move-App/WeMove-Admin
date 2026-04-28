@@ -1,7 +1,9 @@
+import i18n from "@/i18n";
 import { io, Socket } from "socket.io-client";
 
 const SOCKET_URL = "http://139.59.20.155:8000";
-// const SOCKET_URL = "https://volvo-improving-spring-way.trycloudflare.com";
+// const SOCKET_URL =
+//   "https://advise-control-menu-revolutionary.trycloudflare.com";
 
 let socket: Socket | null = null;
 
@@ -12,6 +14,7 @@ export const getSocket = (): Socket => {
       withCredentials: true,
       auth: {
         token: localStorage.getItem("accessToken"),
+        ln: i18n.language,
       },
     });
 

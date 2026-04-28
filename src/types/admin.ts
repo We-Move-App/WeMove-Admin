@@ -209,15 +209,16 @@ export interface TaxiDriver {
   vehicleNumber?: string;
   vehicleType?: string;
   city?: string;
-  status:
-    | "active"
-    | "inactive"
-    | "pending"
-    | "approved"
-    | "rejected"
-    | "submitted"
-    | "blocked"
-    | "pending";
+  // status:
+  //   | "active"
+  //   | "inactive"
+  //   | "pending"
+  //   | "approved"
+  //   | "rejected"
+  //   | "submitted"
+  //   | "blocked"
+  //   | "pending";
+  status: Status;
   joinDate?: string;
   batchVerified: boolean;
 

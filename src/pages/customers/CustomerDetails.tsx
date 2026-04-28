@@ -11,6 +11,7 @@ import axiosInstance from "@/api/axiosInstance";
 import CustomerDetailsSkeleton from "@/components/ui/loader-skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { normalizeStatus } from "@/types/status";
 
 const CustomerDetails = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const CustomerDetails = () => {
     area: "",
     city: "",
     remarks: "",
-    status: "",
+    status: "pending",
     nationality: "Cameroon",
     nationalIdExpiry: "",
     profilePicture: dummyProfile,
@@ -64,9 +65,6 @@ const CustomerDetails = () => {
     }
   };
 
-  // const handleFileChange = (field: string, file: File) => {
-  //   setOperator({ ...operator, [field]: file });
-  // };
 
   const handleFileChange = (field: string, file: File | File[]) => {
     const selectedFile = Array.isArray(file) ? file[0] : file;
@@ -128,7 +126,6 @@ const CustomerDetails = () => {
 
         if (response.data?.success) {
           const user = response.data.data;
-
           // Map API response to your local state structure
           setOperator({
             id: user._id || "",
@@ -137,11 +134,11 @@ const CustomerDetails = () => {
             email: user.email || "",
             dob: user.dob ? user.dob.split("T")[0] : "",
             gender: user.gender || "",
-            zoneCode: user.address.zoneCode || "",
-            area: user.address.area || "",
-            city: user.address.townCity || "",
+            zoneCode: user.address?.zoneCode || "",
+            area: user.address?.area || "",
+            city: user.address?.townCity || "",
             remarks: user.remarks || "",
-            status: user.verificationStatus || "",
+            status: normalizeStatus(user.verificationStatus),
             nationality: user.nationality
               ? user.nationality.charAt(0).toUpperCase() +
               user.nationality.slice(1)
@@ -168,7 +165,9 @@ const CustomerDetails = () => {
       }
     };
 
+
     fetchCustomerDetails();
+
   }, [id]);
 
   if (loading) {
@@ -317,14 +316,19 @@ const CustomerDetails = () => {
                   </label>
                   <select
                     name="status"
-                    value={operator.status}
+                    // value={operator.status}
+                    value={
+                      statusOptions.includes(operator.status as any)
+                        ? operator.status
+                        : ""
+                    }
                     onChange={handleInputChange}
                     className="filter-select w-full"
                     disabled={!isEditMode}
                   >
                     {statusOptions.map((option) => (
                       <option key={option} value={option}>
-                        {option}
+                        {t(`status.${option}`)}
                       </option>
                     ))}
                   </select>

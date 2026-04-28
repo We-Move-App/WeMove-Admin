@@ -8,6 +8,7 @@ import { Notification } from "@/types/admin";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../language-select/LanguageSwitcher";
+import axiosInstance from "@/api/axiosInstance";
 
 type Props = {
   adminProfile?: any;
@@ -26,21 +27,14 @@ const Navbar = ({ adminProfile, adminAvatar }: Props) => {
       ? JSON.parse(localStorage.getItem("adminProfile")!)._id
       : null;
 
-    // Fetch old notifications
     const fetchNotifications = async () => {
       try {
         console.log(
           "AccessToken from localStorage:",
           localStorage.getItem("accessToken")
         );
-
-        const res = await axios.get(
-          "http://139.59.20.155:8000/api/v1/notification/admin-get",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-          }
+        const res = await axiosInstance.get(
+          "/notification/admin-get"
         );
 
         if (res.data?.data?.notifications) {
@@ -65,7 +59,6 @@ const Navbar = ({ adminProfile, adminAvatar }: Props) => {
 
     fetchNotifications();
 
-    // Setup socket connection
     const socket = getSocket();
 
     socket.on("connect", () => {
@@ -107,12 +100,11 @@ const Navbar = ({ adminProfile, adminAvatar }: Props) => {
     };
   }, []);
 
-  // 🔹 Mark as read (API + local state)
   const handleMarkAsRead = async (id: string) => {
     try {
-      await axios.post(
-        `http://139.59.20.155:8000/api/v1/notification/admin-read/${id}`,
-        {}, // empty body
+      await axiosInstance.post(
+        `/notification/admin-read/${id}`,
+        {},
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -128,11 +120,11 @@ const Navbar = ({ adminProfile, adminAvatar }: Props) => {
     }
   };
 
-  // 🔹 Clear all
+  // Clear all
   const handleClearAll = async () => {
     try {
-      await axios.delete(
-        "http://139.59.20.155:8000/api/v1/notification/admin-delete-all",
+      await axiosInstance.delete(
+        "/notification/admin-delete-all",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

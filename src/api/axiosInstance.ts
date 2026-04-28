@@ -4,7 +4,7 @@ import i18n from "i18next";
 const axiosInstance = axios.create({
   baseURL: "http://139.59.20.155:8000/api/v1/admin",
   // baseURL:
-  //   "https://camps-tablet-expanding-supporting.trycloudflare.com/api/v1/admin",
+  //   "https://advise-control-menu-revolutionary.trycloudflare.com/api/v1/admin",
   headers: {
     "Content-Type": "application/json",
   },

@@ -20,6 +20,7 @@ import axiosInstance from "@/api/axiosInstance";
 import fileUploadInstance from "@/api/fileUploadInstance";
 import BranchSelect from "@/components/branch-select/BranchSelect";
 import { useTranslation } from "react-i18next";
+import { normalizeStatus } from "@/types/status";
 
 const BikeRiderDetails = () => {
   const { id } = useParams();
@@ -64,7 +65,7 @@ const BikeRiderDetails = () => {
               apiData.BikeDriverDetails?.branch?.id ||
               "",
             branch: apiData.BikeDriverDetails?.branch?.name || "",
-            status: apiData.BikeDriverDetails?.status || "",
+            status: normalizeStatus(apiData.BikeDriverDetails?.status || ""),
             remark: apiData.BikeDriverDetails?.remarks || "",
             batchVerified: apiData.BikeDriverDetails?.batchVerified || "",
             age: apiData.BikeDriverDetails?.age || null,
@@ -291,7 +292,7 @@ const BikeRiderDetails = () => {
       // Case 3: Object from backend (fileUrl or url)
       if (typeof file === "object") {
         return {
-          fileUrl: file.fileUrl || file.url, // ✅ supports both keys
+          fileUrl: file.fileUrl || file.url,
           fileName:
             file.fileName ||
             file.fileUrl?.split("/").pop() ||
@@ -384,9 +385,9 @@ const BikeRiderDetails = () => {
             payload
           );
 
-          console.log("✅ Driver details updated");
+          console.log("Driver details updated");
         } catch (error) {
-          console.error("❌ Error updating driver:", error);
+          console.error("Error updating driver:", error);
         }
 
         // 2. Independently try updating driver status
@@ -400,12 +401,12 @@ const BikeRiderDetails = () => {
                 batchVerified: driver?.batchVerified,
               }
             );
-            console.log("✅ Driver status updated");
+            console.log("Driver status updated");
           } else {
-            console.warn("⚠️ Skipping verify API: missing driverId");
+            console.warn("Skipping verify API: missing driverId");
           }
         } catch (error) {
-          console.error("❌ Error verifying driver status:", error);
+          console.error("Error verifying driver status:", error);
         }
 
         console.log("Editing driver", {
@@ -632,7 +633,7 @@ const BikeRiderDetails = () => {
                         <SelectContent>
                           {statusOptions.map((option) => (
                             <SelectItem key={option} value={option}>
-                              {option.charAt(0).toUpperCase() + option.slice(1)}
+                              {t(`status.${option}`)}
                             </SelectItem>
                           ))}
                         </SelectContent>
