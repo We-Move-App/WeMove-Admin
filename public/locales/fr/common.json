@@ -1289,5 +1289,11 @@
   },
   "bank": {
     "document": "Document bancaire"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "clearAll": "Tout effacer",
+    "empty": "Aucune notification pour le moment",
+    "markAsRead": "Marquer comme lu"
   }
 }

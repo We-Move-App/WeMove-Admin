@@ -63,7 +63,7 @@ const UserDetails = () => {
       "Role Management": "roleManagement",
       "Commission Management": "commissionManagement",
       "Coupon Management": "couponManagement",
-      "Referral Management": "referralManagement",
+      // "Referral Management": "referralManagement",
     };
 
     const result: Record<string, boolean> = {};
@@ -87,7 +87,7 @@ const UserDetails = () => {
     { id: "roleManagement", label: t("adminPermissions.roleManagement") },
     { id: "commissionManagement", label: t("adminPermissions.commissionManagement") },
     { id: "couponManagement", label: t("adminPermissions.couponManagement") },
-    { id: "referralManagement", label: t("adminPermissions.referralManagement") },
+    // { id: "referralManagement", label: t("adminPermissions.referralManagement") },
   ];
 
   useEffect(() => {

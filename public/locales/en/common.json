@@ -1292,5 +1292,11 @@
   },
   "bank": {
     "document": "Bank Document"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "clearAll": "Clear all",
+    "empty": "No notifications yet",
+    "markAsRead": "Mark as read"
   }
 }

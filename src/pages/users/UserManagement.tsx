@@ -95,7 +95,7 @@ const UserManagement = () => {
     { id: "roleManagement", label: t("permissions.roleManagement") },
     { id: "commissionManagement", label: t("permissions.commissionManagement") },
     { id: "couponManagement", label: t("permissions.couponManagement") },
-    { id: "referralManagement", label: t("permissions.referralManagement") },
+    // { id: "referralManagement", label: t("permissions.referralManagement") },
   ];
 
   useEffect(() => {

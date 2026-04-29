@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2, Save } from "lucide-react";
 // import Layout from '@/components/layout/Layout';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,7 +31,7 @@ const HotelManagerDetails = () => {
   const isReadOnly = mode === "view";
   const navigate = useNavigate();
   const isNewManager = id === "new";
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [manager, setManager] = useState<Partial<HotelManager> | null>(null);
   const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
     undefined
@@ -221,6 +221,9 @@ const HotelManagerDetails = () => {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     try {
       const payload = {
         profileInfo: {
@@ -328,13 +331,22 @@ const HotelManagerDetails = () => {
       });
 
       navigate("/hotel-management/managers");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        t("toast.saveFailed");
+
       toast({
         title: t("toast.errorTitle"),
-        description: t("toast.saveFailed"),
+        description: backendMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -409,7 +421,15 @@ const HotelManagerDetails = () => {
           )}
 
           {(mode === "edit" || mode === "post") && (
-            <Button onClick={handleSubmit}>
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="flex items-center gap-2"
+            >
+              {isSubmitting && (
+                <Loader2 className="animate-spin" size={18} />
+              )}
+
               {mode === "post"
                 ? t("hotelManagerDetails.create")
                 : t("hotelManagerDetails.saveChanges")}

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 // import Layout from "@/components/layout/Layout";
 import UploadField from "@/components/ui/UploadField";
-import { ArrowLeft, Save, SquarePen } from "lucide-react";
+import { ArrowLeft, Loader2, Save, SquarePen } from "lucide-react";
 import { busOperators } from "@/data/mockData";
 import { BusOperator } from "@/types/admin";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +28,7 @@ const BusOperatorDetails = () => {
   const [loading, setLoading] = useState(true);
   const { i18n, t } = useTranslation();
   const isNewOperator = id === "new";
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const pageTitle = isNewOperator ? "Add Bus Operator" : "Edit Bus Operator";
   const [isEditMode, setIsEditMode] = useState(isNewOperator);
   const mode: "add" | "view" | "edit" = isNewOperator
@@ -183,27 +184,51 @@ const BusOperatorDetails = () => {
       });
       return;
     }
+    setIsSubmitting(true);
 
     try {
-      const avatarFile =
+      // const avatarFile =
+      //   operator?.profilePhoto instanceof File
+      //     ? await uploadToServer(operator.profilePhoto)
+      //     : operator?.profilePhoto || null;
+
+      // const idFrontFile =
+      //   operator?.idCardFront instanceof File
+      //     ? await uploadToServer(operator.idCardFront)
+      //     : operator?.idCardFront || null;
+
+      // const idBackFile =
+      //   operator?.idCardBack instanceof File
+      //     ? await uploadToServer(operator.idCardBack)
+      //     : operator?.idCardBack || null;
+
+      // const bankDocFile =
+      //   operator?.bankAccountDetails instanceof File
+      //     ? await uploadToServer(operator.bankAccountDetails)
+      //     : operator?.bankAccountDetails || null;
+
+      const [
+        avatarFile,
+        idFrontFile,
+        idBackFile,
+        bankDocFile,
+      ] = await Promise.all([
         operator?.profilePhoto instanceof File
-          ? await uploadToServer(operator.profilePhoto)
-          : operator?.profilePhoto || null;
+          ? uploadToServer(operator.profilePhoto)
+          : operator?.profilePhoto || null,
 
-      const idFrontFile =
         operator?.idCardFront instanceof File
-          ? await uploadToServer(operator.idCardFront)
-          : operator?.idCardFront || null;
+          ? uploadToServer(operator.idCardFront)
+          : operator?.idCardFront || null,
 
-      const idBackFile =
         operator?.idCardBack instanceof File
-          ? await uploadToServer(operator.idCardBack)
-          : operator?.idCardBack || null;
+          ? uploadToServer(operator.idCardBack)
+          : operator?.idCardBack || null,
 
-      const bankDocFile =
         operator?.bankAccountDetails instanceof File
-          ? await uploadToServer(operator.bankAccountDetails)
-          : operator?.bankAccountDetails || null;
+          ? uploadToServer(operator.bankAccountDetails)
+          : operator?.bankAccountDetails || null,
+      ]);
 
       if (isNewOperator) {
         const postPayload = {
@@ -298,11 +323,20 @@ const BusOperatorDetails = () => {
       navigate("/bus-management/operators");
     } catch (error: any) {
       console.error("Form submission failed:", error);
+
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.errors?.join(", ") ||
+        error?.message ||
+        t("toast.updateCouponStatusFailed");
+
       toast({
         title: t("toast.errorTitle"),
-        description: t("toast.updateCouponStatusFailed"),
+        description: backendMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -790,12 +824,32 @@ const BusOperatorDetails = () => {
               )}
 
               {(mode === "add" || mode === "edit") && (
+                // <button
+                //   type="submit"
+                //   className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
+                // >
+                //   <Save size={18} className="mr-2" />
+                //   {t("busOperatorDetails.actions.save")}
+                // </button>
                 <button
                   type="submit"
-                  className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
+                  disabled={isSubmitting}
+                  className={`flex items-center px-4 py-2 rounded-md shadow-sm text-sm font-medium
+    ${isSubmitting
+                      ? "bg-green-500 cursor-not-allowed text-white"
+                      : "bg-green-700 hover:bg-green-900 text-white"}
+  `}
                 >
-                  <Save size={18} className="mr-2" />
-                  {t("busOperatorDetails.actions.save")}
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={18} className="mr-2 animate-spin" />
+                    </>
+                  ) : (
+                    <>
+                      <Save size={18} className="mr-2" />
+                      {t("busOperatorDetails.actions.save")}
+                    </>
+                  )}
                 </button>
               )}
             </div>

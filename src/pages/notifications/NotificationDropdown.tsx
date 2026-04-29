@@ -10,6 +10,7 @@ import {
   User,
 } from "lucide-react";
 import { Notification } from "@/types/admin";
+import { useTranslation } from "react-i18next";
 
 interface NotificationDropdownProps {
   notifications: Notification[];
@@ -24,6 +25,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -92,14 +94,14 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <h3 className="text-lg font-semibold text-gray-800">
-              Notifications
+              {t("notifications.title")}
             </h3>
             {notifications.length > 0 && (
               <button
                 onClick={onClearAll}
                 className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
               >
-                Clear all
+                {t("notifications.clearAll")}
               </button>
             )}
           </div>
@@ -109,15 +111,14 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             {notifications.length === 0 ? (
               <div className="px-6 py-8 text-center">
                 <Bell className="mx-auto text-gray-300 mb-3" size={48} />
-                <p className="text-gray-500">No notifications yet</p>
+                <p className="text-gray-500">{t("notifications.empty")}</p>
               </div>
             ) : (
               notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`px-6 py-4 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-50 last:border-b-0 ${
-                    !notification.read ? "bg-blue-50" : ""
-                  }`}
+                  className={`px-6 py-4 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-50 last:border-b-0 ${!notification.read ? "bg-blue-50" : ""
+                    }`}
                 >
                   <div className="flex items-start space-x-3">
                     {/* Profile Image */}
@@ -157,7 +158,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                           className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200 flex items-center space-x-1"
                         >
                           <Check size={12} />
-                          <span>Mark as read</span>
+                          <span>{t("notifications.markAsRead")}</span>
                         </button>
                       )}
                     </div>

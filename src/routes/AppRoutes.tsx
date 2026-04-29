@@ -133,10 +133,10 @@ const AppRoutes = () => {
           element={<CommissionManagement />}
         />
 
-        <Route
+        {/* <Route
           path="/referral-management"
           element={<ReferralManagement />}
-        />
+        /> */}
         <Route path="/coupons" element={<Coupons />} />
         <Route path="/wallet" element={<Wallet />} />
         {/* <Route path="/notifications" element={<NotificationsManagement />} />
