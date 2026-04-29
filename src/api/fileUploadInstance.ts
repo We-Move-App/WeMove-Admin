@@ -2,6 +2,7 @@ import axios from "axios";
 
 const fileUploadInstance = axios.create({
   baseURL: "http://139.59.20.155:8000/api/v1",
+  // baseURL: "https://cost-closest-herb-elephant.trycloudflare.com/api/v1",
 });
 
 fileUploadInstance.interceptors.request.use((config) => {

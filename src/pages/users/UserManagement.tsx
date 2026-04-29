@@ -85,6 +85,7 @@ const UserManagement = () => {
   const [adminProfile, setAdminProfile] = useState<any>(null);
   const { i18n, t } = useTranslation();
   const [isBranchOpen, setIsBranchOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const availablePermissions = [
     { id: "userManagement", label: t("permissions.userManagement") },
@@ -108,39 +109,80 @@ const UserManagement = () => {
     return () => clearTimeout(delayDebounce);
   }, [query]);
 
+  // useEffect(() => {
+  //   const fetchAdmins = async () => {
+  //     setLoading(true);
+  //     setError(null);
+
+  //     try {
+  //       const res = await axiosInstance.get("/auth/all-admins", {
+  //         params: { page: currentPage, limit: pageSize, search: searchTerm },
+  //       });
+
+  //       console.log("Fetched admins:", res.data);
+  //       const usersData = res.data?.data?.data || [];
+  //       const total = res.data?.data?.total || res.data?.total || 0;
+  //       setUsers(
+  //         usersData.map((user: any) => ({
+  //           id: user?._id ?? "",
+  //           name: user?.name ?? "N/A",
+  //           email: user?.email ?? "N/A",
+  //           role: user?.role ?? "user",
+  //           permissionsCount: user?.permissionsCount ?? 0,
+  //           createdAt: user?.createdAt ?? null,
+  //           branch: user?.branch ?? "Unknown",
+  //         }))
+  //       );
+  //       setTotalBookings(total);
+  //     } catch (err: any) {
+  //       console.error("Failed to fetch users:", err);
+  //       setError(err?.response?.data?.message || "Failed to fetch users");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchAdmins();
+  // }, [currentPage, pageSize, searchTerm, i18n.language]);
+
+  const fetchAdmins = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await axiosInstance.get("/auth/all-admins", {
+        params: {
+          page: currentPage,
+          limit: pageSize,
+          search: searchTerm,
+        },
+      });
+
+      const usersData = res.data?.data?.data || [];
+      const total = res.data?.data?.total || res.data?.total || 0;
+
+      setUsers(
+        usersData.map((user: any) => ({
+          id: user?._id ?? "",
+          name: user?.name ?? "N/A",
+          email: user?.email ?? "N/A",
+          role: user?.role ?? "user",
+          permissionsCount: user?.permissionsCount ?? 0,
+          createdAt: user?.createdAt ?? null,
+          branch: user?.branch ?? "Unknown",
+        }))
+      );
+
+      setTotalBookings(total);
+    } catch (err: any) {
+      console.error("Failed to fetch users:", err);
+      setError(err?.response?.data?.message || "Failed to fetch users");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchAdmins = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const res = await axiosInstance.get("/auth/all-admins", {
-          params: { page: currentPage, limit: pageSize, search: searchTerm },
-        });
-
-        console.log("Fetched admins:", res.data);
-        const usersData = res.data?.data?.data || [];
-        const total = res.data?.data?.total || res.data?.total || 0;
-        setUsers(
-          usersData.map((user: any) => ({
-            id: user?._id ?? "",
-            name: user?.name ?? "N/A",
-            email: user?.email ?? "N/A",
-            role: user?.role ?? "user",
-            permissionsCount: user?.permissionsCount ?? 0,
-            createdAt: user?.createdAt ?? null,
-            branch: user?.branch ?? "Unknown",
-          }))
-        );
-        setTotalBookings(total);
-      } catch (err: any) {
-        console.error("Failed to fetch users:", err);
-        setError(err?.response?.data?.message || "Failed to fetch users");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAdmins();
   }, [currentPage, pageSize, searchTerm, i18n.language]);
 
@@ -238,7 +280,6 @@ const UserManagement = () => {
         `/google-search?address=${address}`
       );
       if (res.data?.data) {
-        // Convert string[] → {id, name}[]
         const formatted = res.data.data.map((item: string) => ({
           id: item,
           name: item,
@@ -253,10 +294,14 @@ const UserManagement = () => {
   };
 
   const handleAddUser = async () => {
+    if (isSubmitting) return;
+
     if (!newUser.name || !newUser.email || !newUser.phoneNumber) {
       toast({ title: t("toast.fillRequiredFields") });
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       let branchId = newUser.branchId;
@@ -341,11 +386,13 @@ const UserManagement = () => {
         title: t("toast.userCreated", { role: userPayload.role }),
       });
 
+      await fetchAdmins();
+
       // Update local state
-      setUsers((prev) => [
-        ...prev,
-        { ...userRes!.data, id: userRes!.data.id || Date.now().toString() },
-      ]);
+      // setUsers((prev) => [
+      //   ...prev,
+      //   { ...userRes!.data, id: userRes!.data.id || Date.now().toString() },
+      // ]);
 
       // Reset form
       setNewUser({
@@ -369,12 +416,13 @@ const UserManagement = () => {
         title: backendMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
 
   };
 
   const filteredPermissions = availablePermissions.filter((perm) => {
-    // Hide "Manage Roles" if logged-in user is Admin
     if (role === "Admin" && perm.id === "roleManagement") {
       return false;
     }

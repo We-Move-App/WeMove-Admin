@@ -467,10 +467,9 @@ const CommissionManagement = () => {
                   <SelectItem value="User">
                     {t("commissionManagement.serviceTypes.user")}
                   </SelectItem>
-                  <SelectItem value="Referral">
-                    {/* {t("commissionManagement.serviceTypes.referral")} */}
-                    Referral
-                  </SelectItem>
+                  {/* <SelectItem value="Referral">
+                    {t("commissionManagement.serviceTypes.referral")}
+                  </SelectItem> */}
                 </SelectContent>
               </Select>
             </div>

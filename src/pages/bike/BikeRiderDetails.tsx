@@ -42,6 +42,8 @@ const BikeRiderDetails = () => {
   const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
     undefined
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const { t, i18n } = useTranslation();
 
@@ -365,7 +367,52 @@ const BikeRiderDetails = () => {
     };
   };
 
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+
+    if (!driver.name?.trim()) {
+      errors.name = t("validation.nameRequired");
+    }
+
+    if (!driver.age || driver.age <= 0) {
+      errors.age = t("validation.ageInvalid");
+    }
+
+    if (!driver.mobile) {
+      errors.mobile = t("validation.mobileRequired");
+    } else if (!/^[0-9]{10}$/.test(driver.mobile.replace(/\D/g, ""))) {
+      errors.mobile = t("validation.mobileInvalid");
+    }
+
+    if (!driver.email) {
+      errors.email = t("validation.emailRequired");
+    } else if (!/^\S+@\S+\.\S+$/.test(driver.email)) {
+      errors.email = t("validation.emailInvalid");
+    }
+
+    if (!driver.address?.trim()) {
+      errors.address = t("validation.addressRequired");
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async () => {
+    // console.log("Submit clicked", { isSubmitting, isUploading });
+    if (isSubmitting || isUploading) return;
+
+    const errors = validateForm();
+
+    if (Object.keys(errors).length > 0) {
+      toast({
+        title: t("toast.validationError"),
+        description: Object.values(errors)[0],
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       if (mode === "post") {
         const payload = await buildDriverPayload(driver);
@@ -426,8 +473,20 @@ const BikeRiderDetails = () => {
         }),
       });
       navigate("/bike-management/riders");
-    } catch (error) {
-      console.error("Error saving driver:", error);
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        t("toast.saveFailed");
+
+      toast({
+        title: t("toast.errorTitle"),
+        description: backendMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

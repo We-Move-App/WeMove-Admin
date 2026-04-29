@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,7 +28,8 @@ const TaxiDriverDetails = () => {
   // modes: post, view, edit
   const initialMode = id === "new" ? "post" : "view";
   const [mode, setMode] = useState<"post" | "view" | "edit">(initialMode);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [driver, setDriver] = useState<TaxiDriver>({
     id: "",
     name: "",
@@ -401,7 +402,51 @@ const TaxiDriverDetails = () => {
     };
   };
 
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+
+    if (!driver.name?.trim()) {
+      errors.name = t("validation.nameRequired");
+    }
+
+    if (!driver.age || driver.age <= 0) {
+      errors.age = t("validation.ageInvalid");
+    }
+
+    if (!driver.mobile) {
+      errors.mobile = t("validation.mobileRequired");
+    } else if (!/^[0-9]{10}$/.test(driver.mobile.replace(/\D/g, ""))) {
+      errors.mobile = t("validation.mobileInvalid");
+    }
+
+    if (!driver.email) {
+      errors.email = t("validation.emailRequired");
+    } else if (!/^\S+@\S+\.\S+$/.test(driver.email)) {
+      errors.email = t("validation.emailInvalid");
+    }
+
+    if (!driver.address?.trim()) {
+      errors.address = t("validation.addressRequired");
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async () => {
+    console.log("Submit clicked", { isSubmitting, isUploading });
+    if (isSubmitting || isUploading) return;
+
+    const errors = validateForm();
+
+    if (Object.keys(errors).length > 0) {
+      toast({
+        title: t("toast.validationError"),
+        description: Object.values(errors)[0],
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsSubmitting(true);
     try {
       if (mode === "post") {
         const payload = await buildDriverPayload(driver);
@@ -463,8 +508,20 @@ const TaxiDriverDetails = () => {
         }),
       });
       navigate("/taxi-management/drivers");
-    } catch (error) {
-      console.error("Error saving driver:", error);
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        t("toast.saveFailed");
+
+      toast({
+        title: t("toast.errorTitle"),
+        description: backendMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -507,7 +564,7 @@ const TaxiDriverDetails = () => {
               </Button>
             </div>
           )}
-          {(mode === "post" || mode === "edit") && (
+          {/* {(mode === "post" || mode === "edit") && (
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -521,6 +578,33 @@ const TaxiDriverDetails = () => {
                 {mode === "post"
                   ? t("taxiDriversDetails.buttons.create")
                   : t("taxiDriversDetails.buttons.saveChanges")}
+              </Button>
+            </div>
+          )} */}
+
+          {(mode === "post" || mode === "edit") && (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="default"
+                className="bg-gray-300 text-gray-800 border-gray-300 hover:bg-gray-300 hover:text-gray-900"
+                onClick={() => navigate("/taxi-management/drivers")}
+              >
+                {t("taxiDriversDetails.buttons.cancel")}
+              </Button>
+
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="flex items-center justify-center"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="animate-spin" size={18} />
+                ) : (
+                  mode === "post"
+                    ? t("taxiDriversDetails.buttons.create")
+                    : t("taxiDriversDetails.buttons.saveChanges")
+                )}
               </Button>
             </div>
           )}

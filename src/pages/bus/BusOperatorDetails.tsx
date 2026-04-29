@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-// import Layout from "@/components/layout/Layout";
 import UploadField from "@/components/ui/UploadField";
 import { ArrowLeft, Loader2, Save, SquarePen } from "lucide-react";
 import { busOperators } from "@/data/mockData";
 import { BusOperator } from "@/types/admin";
 import { useToast } from "@/hooks/use-toast";
-// import { axiosFileUpload } from "@/api/axiosInstance";
 import axiosInstance from "@/api/axiosInstance";
 import dummyProfile from "@/assets/dummy-data/user-image.jpg";
 import dummyIdFront from "@/assets/dummy-data/id-front.jpg";
@@ -29,6 +27,7 @@ const BusOperatorDetails = () => {
   const { i18n, t } = useTranslation();
   const isNewOperator = id === "new";
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const pageTitle = isNewOperator ? "Add Bus Operator" : "Edit Bus Operator";
   const [isEditMode, setIsEditMode] = useState(isNewOperator);
   const mode: "add" | "view" | "edit" = isNewOperator
@@ -140,17 +139,19 @@ const BusOperatorDetails = () => {
   ) => {
     const { name, value } = e.target;
 
-    if (operator) {
-      setOperator({
-        ...operator,
+    setOperator((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
         [name]:
           name === "numberOfBuses"
             ? parseInt(value)
             : name === "batchVerified"
               ? value === "Verified"
               : value,
-      });
-    }
+      };
+    });
   };
 
   const handleFileChange = (field: string, file: File) => {
@@ -185,28 +186,9 @@ const BusOperatorDetails = () => {
       return;
     }
     setIsSubmitting(true);
+    setIsUploading(true);
 
     try {
-      // const avatarFile =
-      //   operator?.profilePhoto instanceof File
-      //     ? await uploadToServer(operator.profilePhoto)
-      //     : operator?.profilePhoto || null;
-
-      // const idFrontFile =
-      //   operator?.idCardFront instanceof File
-      //     ? await uploadToServer(operator.idCardFront)
-      //     : operator?.idCardFront || null;
-
-      // const idBackFile =
-      //   operator?.idCardBack instanceof File
-      //     ? await uploadToServer(operator.idCardBack)
-      //     : operator?.idCardBack || null;
-
-      // const bankDocFile =
-      //   operator?.bankAccountDetails instanceof File
-      //     ? await uploadToServer(operator.bankAccountDetails)
-      //     : operator?.bankAccountDetails || null;
-
       const [
         avatarFile,
         idFrontFile,
@@ -229,6 +211,7 @@ const BusOperatorDetails = () => {
           ? uploadToServer(operator.bankAccountDetails)
           : operator?.bankAccountDetails || null,
       ]);
+      setIsUploading(false);
 
       if (isNewOperator) {
         const postPayload = {
@@ -322,13 +305,17 @@ const BusOperatorDetails = () => {
 
       navigate("/bus-management/operators");
     } catch (error: any) {
+      setIsUploading(false);
       console.error("Form submission failed:", error);
 
       const backendMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.errors?.join(", ") ||
-        error?.message ||
-        t("toast.updateCouponStatusFailed");
+        error?.response?.data?.message ??
+        (Array.isArray(error?.response?.data?.errors) &&
+          error.response.data.errors.length
+          ? error.response.data.errors.join(", ")
+          : undefined) ??
+        error?.message ??
+        "Something went wrong";
 
       toast({
         title: t("toast.errorTitle"),
@@ -673,7 +660,6 @@ const BusOperatorDetails = () => {
                     "busOperatorDetails.identityVerification.idCardFront"
                   )}
                   value={operator.idCardFront}
-                  // onChange={(file) => handleFileChange("idCardFront", file)}
                   onChange={(file) =>
                     handleFileChange(
                       "idCardFront",
@@ -688,7 +674,6 @@ const BusOperatorDetails = () => {
                     "busOperatorDetails.identityVerification.idCardBack"
                   )}
                   value={operator.idCardBack}
-                  // onChange={(file) => handleFileChange("idCardBack", file)}
                   onChange={(file) =>
                     handleFileChange(
                       "idCardBack",
@@ -760,9 +745,6 @@ const BusOperatorDetails = () => {
                       "busOperatorDetails.bankDetails.bankAccountDetailsLabel"
                     )}
                     value={operator.bankAccountDetails}
-                    // onChange={(file) =>
-                    //   handleFileChange("bankAccountDetails", file)
-                    // }
                     onChange={(file) =>
                       handleFileChange(
                         "bankAccountDetails",
@@ -782,9 +764,6 @@ const BusOperatorDetails = () => {
                     <UploadField
                       label="ID Card Back"
                       value={operator.bankAccountDetails}
-                      // onChange={(file) =>
-                      //   handleFileChange("bankAccountDetails", file)
-                      // }
                       onChange={(file) =>
                         handleFileChange(
                           "bankAccountDetails",
@@ -824,26 +803,17 @@ const BusOperatorDetails = () => {
               )}
 
               {(mode === "add" || mode === "edit") && (
-                // <button
-                //   type="submit"
-                //   className="flex items-center px-4 py-2 bg-green-700 text-white rounded-md shadow-sm text-sm font-medium hover:bg-green-900"
-                // >
-                //   <Save size={18} className="mr-2" />
-                //   {t("busOperatorDetails.actions.save")}
-                // </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isUploading}
                   className={`flex items-center px-4 py-2 rounded-md shadow-sm text-sm font-medium
     ${isSubmitting
                       ? "bg-green-500 cursor-not-allowed text-white"
                       : "bg-green-700 hover:bg-green-900 text-white"}
   `}
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 size={18} className="mr-2 animate-spin" />
-                    </>
+                  {(isSubmitting || isUploading) ? (
+                    <Loader2 size={18} className="mr-2 animate-spin" />
                   ) : (
                     <>
                       <Save size={18} className="mr-2" />

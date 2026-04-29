@@ -18,11 +18,12 @@ import AmenitiesMultiSelect from "@/components/ui/amenitiesMultiSelect";
 import { FileText } from "lucide-react";
 import BranchSelect from "@/components/branch-select/BranchSelect";
 import { useTranslation } from "react-i18next";
-import { normalizeStatus } from "@/types/status";
+import { normalizeStatus, Status } from "@/types/status";
 
 const HotelManagerDetails = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
+  const [initialStatus, setInitialStatus] = useState<Status | null>(null);
 
   const modeParam = searchParams.get("mode");
   const mode =
@@ -32,6 +33,7 @@ const HotelManagerDetails = () => {
   const navigate = useNavigate();
   const isNewManager = id === "new";
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [manager, setManager] = useState<Partial<HotelManager> | null>(null);
   const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
     undefined
@@ -77,12 +79,10 @@ const HotelManagerDetails = () => {
         const hotelData = response.data?.data?.hotel || null;
         const managerData = response.data?.data?.manager || null;
         const hotelAddress = response.data?.data?.hotel?.address || {};
-        // const roomType = response.data?.data?.roomTypes || {};
-        // const roomTypeRaw = response.data?.data?.roomTypes;
-        // const roomType = Array.isArray(roomTypeRaw) ? roomTypeRaw : roomTypeRaw ? [roomTypeRaw] : [];
         const bankData = response.data?.data?.bankAccount || null;
 
-        const apiStatus = managerData?.verificationStatus || "pending";
+        // const apiStatus = managerData?.verificationStatus || "pending";
+        const apiStatus = normalizeStatus(managerData?.verificationStatus);
         const standardRoom = response.data?.data?.standardRoom || null;
         const luxuryRoom = response.data?.data?.luxuryRoom || null;
         const hotelPolicy = response.data?.data?.policy || null;
@@ -221,10 +221,26 @@ const HotelManagerDetails = () => {
   };
 
   const handleSubmit = async () => {
-    if (isSubmitting) return;
+    if (isSubmitting || isUploading) return;
 
     setIsSubmitting(true);
+
+    const getUrl = (file: any) => {
+      if (!file) return null;
+      if (typeof file === "string") return file;
+      if (file.url) return file.url;
+      return null;
+    };
+
+    const normalizeArray = (arr: any[]) => {
+      if (!Array.isArray(arr)) return [];
+      return arr.map((item) =>
+        typeof item === "string" ? item : item?.url
+      ).filter(Boolean);
+    };
+
     try {
+      const bankDoc = manager.bankAccountDetails;
       const payload = {
         profileInfo: {
           fullName: manager.name,
@@ -233,11 +249,26 @@ const HotelManagerDetails = () => {
           branch: selectedBranch,
           companyName: manager.companyName,
           companyAddress: manager.companyAddress,
-          avatar: manager.profilePhoto ? { url: manager.profilePhoto } : null,
+          avatar: getUrl(manager.profilePhoto)
+            ? { url: getUrl(manager.profilePhoto) }
+            : null,
         },
         bankInfo: {
           accountNumber: manager.bankAccountNumber,
-          bankDocs: manager.bankAccountDetails,
+          bankDocs:
+            bankDoc && typeof bankDoc !== "string"
+              ? {
+                url: bankDoc.url,
+                fileName: bankDoc.fileName,
+                fileType: bankDoc.fileType,
+              }
+              : bankDoc
+                ? {
+                  url: bankDoc,
+                  fileName: "",
+                  fileType: "",
+                }
+                : null,
           bankName: manager.bankName,
           accountHolderName: manager.accountHolderName,
         },
@@ -245,7 +276,7 @@ const HotelManagerDetails = () => {
           hotelName: manager.hotelName,
           businessLicense: manager.businessLicense,
           totalRoom: manager.totalRooms,
-          hotelImages: manager.hotelPhotos || [],
+          hotelImages: normalizeArray(manager.hotelPhotos),
         },
         addressInfo: {
           address: manager.address,
@@ -259,19 +290,16 @@ const HotelManagerDetails = () => {
           standardRoomCount: manager.standardRooms?.numberOfRooms || 0,
           standardRoomPrice: manager.standardRooms?.price || 0,
           standardAmenities: (manager.standardRooms?.amenities || []).map(
-            (a) => ({
-              name: a,
-              status: true,
-            })
+            (a) => ({ name: a, status: true })
           ),
-          standardImages: manager.standardRooms?.photos || [],
+          standardImages: normalizeArray(manager.standardRooms?.photos || []),
           luxuryRoomCount: manager.luxuryRooms?.numberOfRooms || 0,
           luxuryRoomPrice: manager.luxuryRooms?.price || 0,
           luxuryAmenities: (manager.luxuryRooms?.amenities || []).map((a) => ({
             name: a,
             status: true,
           })),
-          luxuryImages: manager.luxuryRooms?.photos || [],
+          luxuryImages: normalizeArray(manager.luxuryRooms?.photos || []),
         },
         policyInfo: {
           checkInTime: manager.checkInTime,
@@ -284,56 +312,23 @@ const HotelManagerDetails = () => {
         },
       };
 
-      console.log("Payload being sent:", JSON.stringify(payload, null, 2));
-
       if (mode === "post") {
         await axiosInstance.post(
           "/hotel-management/hotel-managers/register",
           payload
         );
-      } else if (mode === "edit") {
+      } else {
         await axiosInstance.put(
           `/hotel-management/hotel-manager/update/${id}`,
           payload
         );
       }
-
-      if (manager.status) {
-        try {
-          await updateStatusApi(manager.status);
-          toast({
-            title: t("toast.statusUpdatedTitle"),
-            description: t("toast.hotelManagerStatusChanged", {
-              status: manager.status,
-            }),
-          });
-        } catch (statusErr) {
-          // status update failed — notify user but do not throw away the main save
-          console.error("Status update failed", statusErr);
-          toast({
-            title: t("toast.statusUpdateFailedTitle"),
-            description: t("toast.managerStatusPartialFail"),
-            variant: "destructive",
-          });
-        }
+      if (!isNewManager && manager.status && manager.status !== initialStatus) {
+        await updateStatusApi(manager.status);
       }
-
-      toast({
-        title:
-          mode === "post"
-            ? t("toast.managerCreatedTitle")
-            : t("toast.managerUpdatedTitle"),
-
-        description:
-          mode === "post"
-            ? t("toast.managerCreatedDesc", { name: manager.name })
-            : t("toast.managerUpdatedDesc", { name: manager.name }),
-      });
 
       navigate("/hotel-management/managers");
     } catch (error: any) {
-      console.error(error);
-
       const backendMessage =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
@@ -349,6 +344,7 @@ const HotelManagerDetails = () => {
       setIsSubmitting(false);
     }
   };
+
 
   const handleStatusChange = (value: HotelManager["status"]) => {
     setManager((prev) => ({ ...prev!, status: value }));
@@ -423,10 +419,10 @@ const HotelManagerDetails = () => {
           {(mode === "edit" || mode === "post") && (
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isUploading}
               className="flex items-center gap-2"
             >
-              {isSubmitting && (
+              {(isSubmitting || isUploading) && (
                 <Loader2 className="animate-spin" size={18} />
               )}
 
@@ -454,7 +450,7 @@ const HotelManagerDetails = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="personal" className="space-y-4">
+        <TabsContent value="personal" className="space-y-4 data-[state=inactive]:hidden" forceMount>
           <Card>
             <CardContent className="pt-6 space-y-4">
               <h3 className="text-lg font-semibold mb-4">
@@ -642,7 +638,7 @@ const HotelManagerDetails = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="hotel" className="space-y-4">
+        <TabsContent value="hotel" className="space-y-4 data-[state=inactive]:hidden" forceMount>
           <Card>
             <CardContent className="pt-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -678,6 +674,7 @@ const HotelManagerDetails = () => {
                         ? null
                         : manager.hotelPhotos
                     }
+                    // value={manager.hotelPhotos || []}
                     onChange={async (files) => {
                       if (
                         Array.isArray(files) &&
@@ -751,7 +748,7 @@ const HotelManagerDetails = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="rooms" className="space-y-4">
+        <TabsContent value="rooms" className="space-y-4 data-[state=inactive]:hidden" forceMount>
           <Card>
             <CardContent className="pt-6">
               <h3 className="text-lg font-semibold mb-4">
@@ -816,6 +813,7 @@ const HotelManagerDetails = () => {
                         ? null
                         : manager.standardRooms?.photos
                     }
+                    // value={manager.standardRooms?.photos || []}
                     onChange={async (files) => {
                       if (
                         Array.isArray(files) &&
@@ -1018,7 +1016,7 @@ const HotelManagerDetails = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="banking" className="space-y-4">
+        <TabsContent value="banking" className="space-y-4 data-[state=inactive]:hidden" forceMount>
           <Card>
             <CardContent className="pt-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

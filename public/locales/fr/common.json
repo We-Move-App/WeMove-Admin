@@ -1287,6 +1287,15 @@
     "userCreated": "{{role}} créé avec succès !",
     "createUserFailed": "Échec de la création de {{role}}."
   },
+  "validation": {
+    "nameRequired": "Le nom est requis",
+    "ageInvalid": "Veuillez saisir un âge valide",
+    "mobileRequired": "Le numéro de téléphone est requis",
+    "mobileInvalid": "Veuillez saisir un numéro de téléphone valide à 10 chiffres",
+    "emailRequired": "L'email est requis",
+    "emailInvalid": "Format d'email invalide",
+    "addressRequired": "L'adresse est requise"
+  },
   "bank": {
     "document": "Document bancaire"
   },

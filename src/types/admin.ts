@@ -51,15 +51,7 @@ export interface BusOperator {
   city?: string;
   remark?: string;
   state?: string;
-  status:
-    | "approved"
-    | "processing"
-    | "submitted"
-    | "rejected"
-    | "blocked"
-    | "active"
-    | "inactive"
-    | "pending";
+  status: Status;
   batchVerified: boolean;
   numberOfBuses?: number;
   balance?: number;
@@ -209,15 +201,6 @@ export interface TaxiDriver {
   vehicleNumber?: string;
   vehicleType?: string;
   city?: string;
-  // status:
-  //   | "active"
-  //   | "inactive"
-  //   | "pending"
-  //   | "approved"
-  //   | "rejected"
-  //   | "submitted"
-  //   | "blocked"
-  //   | "pending";
   status: Status;
   joinDate?: string;
   batchVerified: boolean;
@@ -232,7 +215,6 @@ export interface TaxiDriver {
   vehicleRegistrationNumber?: string;
   accountNumber?: string;
   accountHolderName?: string;
-
   profilePhoto?: string | FileObject;
   idProofs?: string[];
   driverLicense?: string;
@@ -275,15 +257,7 @@ export interface BikeRider {
   vehicleRegistrationCertificate?: string;
   vehiclePhotos?: string[];
   city?: string;
-  status:
-    | "active"
-    | "inactive"
-    | "pending"
-    | "approved"
-    | "Rejected"
-    | "Submitted"
-    | "Blocked"
-    | "Pending";
+  status: Status;
   joinDate?: string;
   batchVerified: boolean;
   age?: number;
