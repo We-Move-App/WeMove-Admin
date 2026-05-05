@@ -65,7 +65,6 @@ const CustomerDetails = () => {
     }
   };
 
-
   const handleFileChange = (field: string, file: File | File[]) => {
     const selectedFile = Array.isArray(file) ? file[0] : file;
     setOperator({ ...operator, [field]: selectedFile });
@@ -75,7 +74,23 @@ const CustomerDetails = () => {
     e.preventDefault();
 
     try {
-      const response = await axiosInstance.put(
+      // Update email & phone
+      const updateResponse = await axiosInstance.put(
+        `/user-management/users/update/${id}`,
+        {
+          email: operator.email,
+          phoneNumber: operator.phone,
+        }
+      );
+
+      if (!updateResponse.data?.success) {
+        throw new Error(
+          updateResponse.data?.message || "Failed to update user details"
+        );
+      }
+
+      // Update verification status
+      const verifyResponse = await axiosInstance.put(
         `/user-management/users/verify/${id}`,
         {
           status: operator.status,
@@ -83,27 +98,26 @@ const CustomerDetails = () => {
         }
       );
 
-      if (response.data?.success) {
+      if (verifyResponse.data?.success) {
         toast({
           title: t("toast.successTitle"),
           description: t("toast.verificationStatusUpdated"),
         });
         setIsEditMode(false);
       } else {
-        toast({
-          title: t("toast.errorTitle"),
-          description:
-            response.data?.message || t("toast.updateStatusFailed"),
-          variant: "destructive",
-        });
+        throw new Error(
+          verifyResponse.data?.message || "Failed to update verification"
+        );
       }
+
     } catch (error: any) {
-      console.error("Error updating verification status:", error);
+      console.error("Error updating user:", error);
 
       toast({
         title: t("toast.errorTitle"),
         description:
           error.response?.data?.message ||
+          error.message ||
           t("toast.genericErrorRetry"),
         variant: "destructive",
       });
@@ -249,8 +263,8 @@ const CustomerDetails = () => {
                     value={operator.phone}
                     onChange={handleInputChange}
                     className="filter-input w-full"
-                    // disabled={!isEditMode}
-                    disabled={true}
+                    disabled={!isEditMode}
+                    // disabled={true}
                     style={{ outline: "none" }}
                     required
                   />
@@ -266,8 +280,8 @@ const CustomerDetails = () => {
                     value={operator.email}
                     onChange={handleInputChange}
                     className="filter-input w-full"
-                    // disabled={!isEditMode}
-                    disabled={true}
+                    disabled={!isEditMode}
+                    // disabled={true}
                     style={{ outline: "none" }}
                     required
                   />

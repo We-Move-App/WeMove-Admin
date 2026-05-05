@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-// import Layout from '@/components/layout/Layout';
 import { busBookings } from "@/data/mockData";
 import { BusBooking } from "@/types/admin";
 import { ArrowLeft, Loader } from "lucide-react";
@@ -22,53 +21,6 @@ const BusBookingDetails = () => {
       setBooking(foundBooking);
     }
   }, [bookingId]);
-
-  // useEffect(() => {
-  //   const fetchBookingDetails = async () => {
-  //     try {
-  //       const response = await axiosInstance.get(
-  //         `/bus-management/bus-booking-details/${bookingId}`
-  //       );
-
-  //       const booking = response.data?.data;
-  //       console.log(booking);
-
-  //       if (!booking) return;
-
-  //       const passenger = booking.passengers?.[0] || {};
-
-  //       const formattedBooking = {
-  //         // id: booking._id,
-  //         id: booking._id,
-  //         bookingId: booking.bookingId, // add this
-  //         busRegistrationNumber: booking.busId?.busRegNumber || "N/A",
-  //         from: booking.from,
-  //         to: booking.to,
-  //         journeyDate: booking.journeyDate
-  //           ? new Date(booking.journeyDate).toLocaleDateString("en-GB", {
-  //               day: "2-digit",
-  //               month: "short",
-  //               year: "numeric",
-  //             })
-  //           : "N/A",
-  //         status: booking.status,
-  //         amount: booking.price,
-  //         customerName: passenger.name || "N/A",
-  //         customerPhone: passenger.contactNumber || "N/A",
-  //         customerEmail: passenger.email || "N/A",
-  //         paymentStatus: booking.paymentStatus,
-  //       };
-
-  //       setBooking(formattedBooking);
-  //     } catch (error) {
-  //       console.error("Error fetching booking details:", error);
-  //     }
-  //   };
-
-  //   if (bookingId) {
-  //     fetchBookingDetails();
-  //   }
-  // }, [bookingId]);
 
   useEffect(() => {
     const fetchBookingDetails = async () => {
@@ -92,10 +44,10 @@ const BusBookingDetails = () => {
           to: booking.to,
           journeyDate: booking.journeyDate
             ? new Date(booking.journeyDate).toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })
             : "N/A",
           status: booking.status,
           amount: booking.price,
@@ -114,15 +66,6 @@ const BusBookingDetails = () => {
     fetchBookingDetails();
   }, [bookingId]);
 
-  // if (!booking) {
-  //   return (
-  //     <>
-  //       <div className="flex justify-center items-center h-64">
-  //         <p className="text-gray-500">Booking not found</p>
-  //       </div>
-  //     </>
-  //   );
-  // }
   if (loading) {
     return <CustomerDetailsSkeleton />;
   }

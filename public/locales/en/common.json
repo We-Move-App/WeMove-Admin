@@ -2,6 +2,7 @@
   "app_name": "WeMove Admin",
   "common": {
     "searchPlaceholder": "Search by name / email",
+    "searchPlaceholderById": "Search by name / email / ID",
     "search": {
       "default": "Search...",
       "byTransactionId": "Search by Transaction ID",
@@ -763,6 +764,7 @@
     "pageSubtitle": "View and manage all users",
 
     "tableHeaders": {
+      "userId": "User ID",
       "name": "Name",
       "mobile": "Mobile",
       "email": "Email ID",
@@ -829,8 +831,8 @@
 
     "buttons": {
       "cancel": "Cancel",
-      "editStatus": "Edit Status",
-      "saveStatus": "Save Status"
+      "editStatus": "Edit",
+      "saveStatus": "Save"
     },
 
     "messages": {
@@ -1307,5 +1309,20 @@
     "clearAll": "Clear all",
     "empty": "No notifications yet",
     "markAsRead": "Mark as read"
+  },
+  "busValidation": {
+    "profilePhotoRequired": "Profile photo is required",
+    "nameRequired": "Full name is required",
+    "nameInvalid": "Name should contain only alphabets",
+    "phoneRequired": "Mobile number is required",
+    "phoneInvalid": "Mobile number must be exactly 9 digits",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email format",
+    "addressRequired": "Company address is required",
+    "branchRequired": "Branch is required",
+    "companyNameRequired": "Company name is required",
+    "idFrontRequired": "ID Card Front is required",
+    "idBackRequired": "ID Card Back is required",
+    "remarkRequired": "Remarks are required for rejection or blocking"
   }
 }

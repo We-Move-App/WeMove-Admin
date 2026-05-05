@@ -44,8 +44,6 @@ const BusOperatorDetails = () => {
     "blocked",
   ];
 
-  // const verificationOptions = ["Not Verified", "Verified"];
-
   const [selectedBranch, setSelectedBranch] = useState<string | undefined>(
     undefined
   );
@@ -139,17 +137,44 @@ const BusOperatorDetails = () => {
   ) => {
     const { name, value } = e.target;
 
+    let updatedValue: string | number | boolean = value;
+
+    // Full Name → only alphabets + space
+    if (name === "name") {
+      updatedValue = value.replace(/[^a-zA-Z\s]/g, "");
+    }
+
+    // Mobile → only digits, max 9 digits
+    if (name === "mobile") {
+      updatedValue = value.replace(/\D/g, "").slice(0, 9);
+    }
+
+    // Account Number → only digits
+    if (name === "bankAccountNumber") {
+      updatedValue = value.replace(/\D/g, "");
+    }
+
+    // Account Holder → only letters
+    if (name === "accountHolderName") {
+      updatedValue = value.replace(/[^a-zA-Z\s]/g, "");
+    }
+
+    // Number of buses → numeric
+    if (name === "numberOfBuses") {
+      updatedValue = value ? parseInt(value) : "";
+    }
+
+    // Verified flag
+    if (name === "batchVerified") {
+      updatedValue = value === "Verified";
+    }
+
     setOperator((prev) => {
       if (!prev) return prev;
 
       return {
         ...prev,
-        [name]:
-          name === "numberOfBuses"
-            ? parseInt(value)
-            : name === "batchVerified"
-              ? value === "Verified"
-              : value,
+        [name]: updatedValue,
       };
     });
   };
@@ -174,6 +199,113 @@ const BusOperatorDetails = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!operator.profilePhoto) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.profilePhotoRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!operator.name?.trim()) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.nameRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!/^[A-Za-z\s]+$/.test(operator.name)) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.nameInvalid"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!operator.mobile) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.phoneRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!/^\d{9}$/.test(operator.mobile)) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.phoneInvalid"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!operator.email?.trim()) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.emailRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(operator.email)) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.emailInvalid"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!operator.address?.trim()) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.addressRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedBranch) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.branchRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!operator.companyName?.trim()) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.companyNameRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!operator.idCardFront) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.idFrontRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!operator.idCardBack) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.idBackRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (
       (operator.status === "rejected" || operator.status === "blocked") &&
@@ -376,7 +508,7 @@ const BusOperatorDetails = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <div className="grid grid-cols-1 gap-6">
             {/* Basic Information */}
             <div className="form-section col-span-full">
@@ -387,7 +519,6 @@ const BusOperatorDetails = () => {
                 <UploadField
                   label={t("busOperatorDetails.basicInfo.profilePhoto")}
                   value={operator?.profilePhoto ?? null}
-                  // onChange={(file) => handleFileChange("profilePhoto", file)}
                   onChange={(file) =>
                     handleFileChange(
                       "profilePhoto",
@@ -395,12 +526,14 @@ const BusOperatorDetails = () => {
                     )
                   }
                   showCloseButton={mode === "edit" || mode === "add"}
+                  required
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("busOperatorDetails.basicInfo.fullNameLabel")}
+                      <span className="text-red-500 ml-1">*</span>
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
@@ -412,15 +545,18 @@ const BusOperatorDetails = () => {
                         name="name"
                         value={operator.name}
                         onChange={handleInputChange}
-                        className="filter-input w-full"
+                        pattern="[A-Za-z\s]+"
                         style={{ outline: "none" }}
-                        required
+                        title="Only alphabets allowed"
+                        className="filter-input w-full"
+
                       />
                     )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("busOperatorDetails.basicInfo.mobileLabel")}
+                      <span className="text-red-500 ml-1">*</span>
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
@@ -432,9 +568,12 @@ const BusOperatorDetails = () => {
                         name="mobile"
                         value={operator.mobile}
                         onChange={handleInputChange}
-                        className="filter-input w-full"
+                        maxLength={9}
+                        pattern="\d{9}"
+                        inputMode="numeric"
                         style={{ outline: "none" }}
-                        required
+                        className="filter-input w-full"
+
                       />
                     )}
                   </div>
@@ -442,6 +581,7 @@ const BusOperatorDetails = () => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("busOperatorDetails.basicInfo.emailLabel")}
+                      <span className="text-red-500 ml-1">*</span>
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
@@ -455,7 +595,7 @@ const BusOperatorDetails = () => {
                         onChange={handleInputChange}
                         className="filter-input w-full"
                         style={{ outline: "none" }}
-                        required
+
                       />
                     )}
                   </div>
@@ -505,9 +645,10 @@ const BusOperatorDetails = () => {
                       </div>
                     )}
 
-                  <div className="">
+                  <div>
                     <label className="block text-sm font-medium mb-1">
                       {t("busOperatorDetails.basicInfo.chooseBranchLabel")}
+                      <span className="text-red-500 ml-1">*</span>
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
@@ -578,6 +719,7 @@ const BusOperatorDetails = () => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("busOperatorDetails.companyInfo.companyNameLabel")}
+                      <span className="text-red-500 ml-1">*</span>
                     </label>
                     {mode === "view" ? (
                       <p className="filter-input w-full bg-gray-100">
@@ -591,18 +733,17 @@ const BusOperatorDetails = () => {
                         onChange={handleInputChange}
                         className="filter-input w-full"
                         style={{ outline: "none" }}
-                        required
+
                       />
                     )}
                   </div>
-                  {/* <div className="form-section col-span-full"> */}
-                  <div className="">
-                    {/* <h2 className="form-section-title">Address</h2> */}
+                  <div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         {t(
                           "busOperatorDetails.companyInfo.companyAddressLabel"
                         )}
+                        <span className="text-red-500 ml-1">*</span>
                       </label>
                       {mode === "view" ? (
                         <p className="filter-input w-full bg-gray-100 whitespace-pre-wrap">
@@ -667,6 +808,7 @@ const BusOperatorDetails = () => {
                     )
                   }
                   showCloseButton={mode === "edit" || mode === "add"}
+                  required
                 />
 
                 <UploadField
@@ -681,6 +823,7 @@ const BusOperatorDetails = () => {
                     )
                   }
                   showCloseButton={mode === "edit" || mode === "add"}
+                  required
                 />
               </div>
             </div>

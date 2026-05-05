@@ -132,6 +132,12 @@ const CustomerManagement = () => {
 
   const columns = [
     {
+      key: "userId",
+      header: t("customerManagement.tableHeaders.userId"),
+      render: (customer: Customer) =>
+        customer.userId ?? t("commonEmpty.notAvailable"),
+    },
+    {
       key: "name",
       header: t("customerManagement.tableHeaders.name"),
       render: (customer: Customer) =>
@@ -221,7 +227,7 @@ const CustomerManagement = () => {
           currentPage={currentPage}
           totalItems={totalUsers}
           onPageChange={(page) => setCurrentPage(page)}
-          searchPlaceholder={t("common.searchPlaceholder")}
+          searchPlaceholder={t("common.searchPlaceholderById")}
           searchTerm={searchInput}
           onSearchChange={handleSearchChange}
           filterable

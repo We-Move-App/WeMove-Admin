@@ -18,6 +18,7 @@ interface UploadFieldProps {
   multiple?: boolean;
   showCloseButton?: boolean;
   disabled?: boolean;
+  required?: boolean;
 }
 
 const UploadField = ({
@@ -25,6 +26,7 @@ const UploadField = ({
   accept = "image/jpeg, image/png, application/pdf",
   onChange,
   value,
+  required,
   multiple = false,
   showCloseButton = true,
   disabled = false,
@@ -247,6 +249,7 @@ const UploadField = ({
     <div className="mb-4">
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       {/* {previews.length > 0  */}
       {previews.length > 0 &&

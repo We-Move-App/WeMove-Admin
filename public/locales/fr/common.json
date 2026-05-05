@@ -1,6 +1,7 @@
 {
   "common": {
     "searchPlaceholder": "Rechercher par nom / e-mail",
+    "searchPlaceholderById": "Rechercher par nom / e-mail / identifiant",
     "search": {
       "default": "Rechercher...",
       "byTransactionId": "Rechercher par ID de transaction",
@@ -761,6 +762,7 @@
     "pageSubtitle": "Afficher et gérer tous les utilisateurs",
 
     "tableHeaders": {
+      "userId": "Identifiant utilisateur",
       "name": "Nom",
       "mobile": "Téléphone portable",
       "email": "E-mail",
@@ -1304,5 +1306,20 @@
     "clearAll": "Tout effacer",
     "empty": "Aucune notification pour le moment",
     "markAsRead": "Marquer comme lu"
+  },
+  "busValidation": {
+    "profilePhotoRequired": "La photo de profil est requise",
+    "nameRequired": "Le nom complet est requis",
+    "nameInvalid": "Le nom ne doit contenir que des lettres",
+    "phoneRequired": "Le numéro de téléphone est requis",
+    "phoneInvalid": "Le numéro doit contenir exactement 9 chiffres",
+    "emailRequired": "L'email est requis",
+    "emailInvalid": "Format d'email invalide",
+    "addressRequired": "L'adresse de l'entreprise est requise",
+    "branchRequired": "La branche est requise",
+    "companyNameRequired": "Le nom de l'entreprise est requis",
+    "idFrontRequired": "La carte d'identité (recto) est requise",
+    "idBackRequired": "La carte d'identité (verso) est requise",
+    "remarkRequired": "Un commentaire est requis pour le rejet ou le blocage"
   }
 }

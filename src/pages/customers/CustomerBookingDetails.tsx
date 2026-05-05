@@ -349,8 +349,6 @@ const CustomerBookingDetails = () => {
     setCurrentPageAll(1);
   }, [searchAll, searchRide, searchPayment]);
 
-
-
   const personalInfo = customerData
     ? {
       id: customerData.id,

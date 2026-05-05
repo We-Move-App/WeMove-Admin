@@ -221,6 +221,39 @@ const HotelManagerDetails = () => {
   };
 
   const handleSubmit = async () => {
+    if (!/^[A-Za-z\s]+$/.test(manager.name)) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.nameInvalid"),
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!/^\d{9}$/.test(manager.mobile)) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.phoneInvalid"),
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!manager.email?.trim()) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.emailRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(manager.email)) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("busValidation.emailInvalid"),
+        variant: "destructive",
+      });
+      return;
+    }
     if (isSubmitting || isUploading) return;
 
     setIsSubmitting(true);
@@ -474,26 +507,46 @@ const HotelManagerDetails = () => {
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     {t("hotelManagerDetails.personalInfo.name")}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
+
                   <Input
                     disabled={isReadOnly}
                     value={manager.name}
-                    onChange={(e) => handleChange("name", e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value
+                        .replace(/[^A-Za-z\s]/g, "")
+                        .replace(/\s{2,}/g, " ");
+
+                      handleChange("name", value);
+                    }}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     {t("hotelManagerDetails.personalInfo.mobile")}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
+
                   <Input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={9}
                     disabled={isReadOnly}
                     value={manager.mobile}
-                    onChange={(e) => handleChange("mobile", e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 9);
+
+                      handleChange("mobile", value);
+                    }}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     {t("hotelManagerDetails.personalInfo.email")}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <Input
                     disabled={isReadOnly}
