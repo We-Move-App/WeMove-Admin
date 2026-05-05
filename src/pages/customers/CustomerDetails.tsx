@@ -20,6 +20,8 @@ const CustomerDetails = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
+  const [initialOperator, setInitialOperator] = useState<any>(null);
+  const [initialRemarks, setInitialRemarks] = useState("");
 
   const [operator, setOperator] = useState({
     id: "",
@@ -74,41 +76,84 @@ const CustomerDetails = () => {
     e.preventDefault();
 
     try {
-      // Update email & phone
-      const updateResponse = await axiosInstance.put(
-        `/user-management/users/update/${id}`,
-        {
-          email: operator.email,
-          phoneNumber: operator.phone,
-        }
-      );
+      let hasUpdated = false;
 
-      if (!updateResponse.data?.success) {
-        throw new Error(
-          updateResponse.data?.message || "Failed to update user details"
-        );
+      // =========================
+      // CONTACT UPDATE (dynamic payload)
+      // =========================
+      const contactPayload: any = {};
+
+      if (operator.email !== initialOperator?.email) {
+        contactPayload.email = operator.email;
       }
 
-      // Update verification status
-      const verifyResponse = await axiosInstance.put(
-        `/user-management/users/verify/${id}`,
-        {
-          status: operator.status,
-          remarks: remarks || "",
-        }
-      );
+      if (operator.phone !== initialOperator?.phone) {
+        contactPayload.phoneNumber = operator.phone;
+      }
 
-      if (verifyResponse.data?.success) {
+      if (Object.keys(contactPayload).length > 0) {
+        const updateResponse = await axiosInstance.put(
+          `/user-management/users/update/${id}`,
+          contactPayload
+        );
+
+        if (!updateResponse.data?.success) {
+          throw new Error(
+            updateResponse.data?.message || "Failed to update user details"
+          );
+        }
+
+        hasUpdated = true;
+      }
+
+      // =========================
+      // STATUS UPDATE (dynamic payload)
+      // =========================
+      const verifyPayload: any = {};
+
+      if (operator.status !== initialOperator?.status) {
+        verifyPayload.status = operator.status;
+      }
+
+      if (remarks !== initialRemarks) {
+        verifyPayload.remarks = remarks || "";
+      }
+
+      if (Object.keys(verifyPayload).length > 0) {
+        const verifyResponse = await axiosInstance.put(
+          `/user-management/users/verify/${id}`,
+          verifyPayload
+        );
+
+        if (!verifyResponse.data?.success) {
+          throw new Error(
+            verifyResponse.data?.message || "Failed to update verification"
+          );
+        }
+
+        hasUpdated = true;
+      }
+
+      // =========================
+      // NO CHANGES
+      // =========================
+      if (!hasUpdated) {
         toast({
-          title: t("toast.successTitle"),
-          description: t("toast.verificationStatusUpdated"),
+          title: "No changes",
+          description: "Nothing was updated",
         });
-        setIsEditMode(false);
-      } else {
-        throw new Error(
-          verifyResponse.data?.message || "Failed to update verification"
-        );
+        return;
       }
+
+      // =========================
+      // SUCCESS
+      // =========================
+      toast({
+        title: t("toast.successTitle"),
+        description: t("toast.verificationStatusUpdated"),
+      });
+
+      setIsEditMode(false);
 
     } catch (error: any) {
       console.error("Error updating user:", error);
@@ -140,8 +185,38 @@ const CustomerDetails = () => {
 
         if (response.data?.success) {
           const user = response.data.data;
-          // Map API response to your local state structure
-          setOperator({
+          // setOperator({
+          //   id: user._id || "",
+          //   fullName: user.fullName || "",
+          //   phone: user.phoneNumber || "",
+          //   email: user.email || "",
+          //   dob: user.dob ? user.dob.split("T")[0] : "",
+          //   gender: user.gender || "",
+          //   zoneCode: user.address?.zoneCode || "",
+          //   area: user.address?.area || "",
+          //   city: user.address?.townCity || "",
+          //   remarks: user.remarks || "",
+          //   status: normalizeStatus(user.verificationStatus),
+          //   nationality: user.nationality
+          //     ? user.nationality.charAt(0).toUpperCase() +
+          //     user.nationality.slice(1)
+          //     : "Cameroon",
+          //   nationalIdExpiry: user.nationIdExpiry
+          //     ? user.nationIdExpiry.split("T")[0]
+          //     : "",
+          //   profilePicture: user.avatar?.url || dummyProfile,
+          //   idCardFront:
+          //     user.document?.documentIds?.find(
+          //       (doc) => doc.documentType === "national_identity_card_front"
+          //     )?.file?.url || dummyIdFront,
+          //   idCardBack:
+          //     user.document?.documentIds?.find(
+          //       (doc) => doc.documentType === "national_identity_card_back"
+          //     )?.file?.url || dummyIdBack,
+          // });
+          // setRemarks(user.remarks || "");
+
+          const mappedUser = {
             id: user._id || "",
             fullName: user.fullName || "",
             phone: user.phoneNumber || "",
@@ -169,8 +244,14 @@ const CustomerDetails = () => {
               user.document?.documentIds?.find(
                 (doc) => doc.documentType === "national_identity_card_back"
               )?.file?.url || dummyIdBack,
-          });
+          };
+
+          setOperator(mappedUser);
+          setInitialOperator(mappedUser);
+
           setRemarks(user.remarks || "");
+          setInitialRemarks(user.remarks || "");
+
         }
       } catch (error) {
         console.error("Error fetching customer details:", error);
