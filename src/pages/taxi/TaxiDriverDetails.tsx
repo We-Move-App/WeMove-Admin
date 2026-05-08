@@ -20,6 +20,7 @@ import axiosInstance from "@/api/axiosInstance";
 import fileUploadInstance from "@/api/fileUploadInstance";
 import BranchSelect from "@/components/branch-select/BranchSelect";
 import { useTranslation } from "react-i18next";
+import PhoneInput from "react-phone-input-2";
 
 const TaxiDriverDetails = () => {
   const { id } = useParams();
@@ -373,7 +374,8 @@ const TaxiDriverDetails = () => {
     return {
       basicDriverDetails: {
         fullName: driver.name || "",
-        phoneNo: driver.mobile || "",
+        // phoneNo: driver.mobile || "",
+        phoneNo: driver.mobile?.replace(/\s/g, "") || "",
         email: driver.email || "",
         age: driver.age || null,
         experience: driver.experience || 0,
@@ -413,9 +415,17 @@ const TaxiDriverDetails = () => {
       errors.age = t("validation.ageInvalid");
     }
 
-    if (!driver.mobile) {
+    // if (!driver.mobile) {
+    //   errors.mobile = t("validation.mobileRequired");
+    // } else if (!/^[0-9]{9}$/.test(driver.mobile.replace(/\D/g, ""))) {
+    //   errors.mobile = t("validation.mobileInvalid");
+    // }
+
+    const cleanedMobile = driver.mobile?.replace(/\s/g, "");
+
+    if (!cleanedMobile) {
       errors.mobile = t("validation.mobileRequired");
-    } else if (!/^[0-9]{10}$/.test(driver.mobile.replace(/\D/g, ""))) {
+    } else if (!/^\+\d{10,15}$/.test(cleanedMobile)) {
       errors.mobile = t("validation.mobileInvalid");
     }
 
@@ -676,7 +686,7 @@ const TaxiDriverDetails = () => {
                     }
                   />
                 </div>
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium mb-1">
                     {t("taxiDriversDetails.fields.mobile")}
                   </label>
@@ -684,6 +694,27 @@ const TaxiDriverDetails = () => {
                     value={driver.mobile}
                     disabled={isReadOnly}
                     onChange={(e) => handleChange("mobile", e.target.value)}
+                  />
+                </div> */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    {t("bikeDriversDetails.fields.mobile")}
+                  </label>
+                  <PhoneInput
+                    country={"in"}
+                    value={driver.mobile}
+                    disabled={isReadOnly}
+                    onChange={(phone) => {
+                      const formattedPhone = "+" + phone.replace(/\D/g, "");
+
+                      console.log("Phone Value:", formattedPhone);
+
+                      handleChange("mobile", formattedPhone);
+                    }}
+                    containerClass="w-full"
+                    inputClass="!w-full !h-10 !rounded-md !border !border-input !bg-background !pl-14 !pr-3 !text-base md:!text-sm focus:!ring-2 focus:!ring-ring focus:!ring-offset-2"
+                    buttonClass="!border-input !rounded-l-md !bg-background"
+                    dropdownClass="!text-sm"
                   />
                 </div>
                 <div>

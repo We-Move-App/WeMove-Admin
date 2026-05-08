@@ -1296,7 +1296,7 @@
     "nameRequired": "Name is required",
     "ageInvalid": "Please enter a valid age",
     "mobileRequired": "Mobile number is required",
-    "mobileInvalid": "Enter a valid 10-digit mobile number",
+    "mobileInvalid": "Enter a valid mobile number",
     "emailRequired": "Email is required",
     "emailInvalid": "Invalid email format",
     "addressRequired": "Address is required"
